@@ -8,6 +8,11 @@ import { Messenger } from './components/messenger/messenger';
 import { Error } from './components/error/error';
 import { Navigation } from './components/navigation/navigation';
 import { Footer } from './components/footer/footer';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { Register } from './components/register/register';
+import { Login } from './components/login/login';
+import { ReactiveFormsModule } from '@angular/forms';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 
 @NgModule({
   declarations: [
@@ -16,11 +21,16 @@ import { Footer } from './components/footer/footer';
     Messenger,
     Error,
     Navigation,
-    Footer
+    Footer,
+    Register,
+    Login
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule,
+    ReactiveFormsModule,
+    SweetAlert2Module.forRoot()
   ],
   providers: [
     provideBrowserGlobalErrorListeners()

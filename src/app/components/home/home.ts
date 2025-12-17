@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
+import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-home',
-  standalone: false,
   templateUrl: './home.html',
-  styleUrl: './home.css',
+  styleUrls: ['./home.css'], // <- corrected
+  standalone: false
 })
 export class Home {
-
-  public openPage(url:string) {
-    window.open(url, "_blank")
+  public openPage(url: string) {
+    window.open(url, "_blank");
   }
 }

@@ -30,7 +30,7 @@
 
   /* Borders / shadows */
   --border-color: #dcdfe6;           /* soft border color */
-  --shadow-color: rgba(0, 0, 0, 0.1); /* subtle shadows */
+  --shadow-color:   0 4px 12px rgba(0, 0, 0, 0.15);; /* subtle shadows */
 
   /* Navigation */
   --nav-background: #2f3e46;         /* sidebar/header background */
@@ -45,4 +45,8 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }

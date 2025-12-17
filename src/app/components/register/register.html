@@ -1,0 +1,39 @@
+<section class="page">
+  <form [formGroup]="regForm" class="register-card" (ngSubmit)="Register()">
+    <p class="title">Welcome</p>
+    <p class="title-desc">Let's create something great</p>
+
+    <div class="inputs">
+      <!-- Username -->
+      <div class="input-wrapper" [class.error-field]="regForm.get('name')?.touched && regForm.get('name')?.invalid">
+        <input formControlName="name" class="input" type="text" placeholder="Username">
+        <div class="error-message" *ngIf="regForm.get('name')?.touched && regForm.get('name')?.invalid">
+          <span *ngIf="regForm.get('name')?.errors?.['required']">Username is required</span>
+          <span *ngIf="regForm.get('name')?.errors?.['minlength']">Minimum 3 characters</span>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="input-wrapper" [class.error-field]="regForm.get('email')?.touched && regForm.get('email')?.invalid">
+        <input formControlName="email" class="input" type="email" placeholder="Email">
+        <div class="error-message" *ngIf="regForm.get('email')?.touched && regForm.get('email')?.invalid">
+          <span *ngIf="regForm.get('email')?.errors?.['required']">Email is required</span>
+          <span *ngIf="regForm.get('email')?.errors?.['email']">Invalid email format</span>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="input-wrapper" [class.error-field]="regForm.get('password')?.touched && regForm.get('password')?.invalid">
+        <input formControlName="password" class="input" type="password" placeholder="Password">
+        <div class="error-message" *ngIf="regForm.get('password')?.touched && regForm.get('password')?.invalid">
+          <span *ngIf="regForm.get('password')?.errors?.['required']">Password is required</span>
+          <span *ngIf="regForm.get('password')?.errors?.['minlength']">Minimum 6 characters</span>
+          <span *ngIf="regForm.get('password')?.errors?.['pattern']">Must include uppercase, lowercase, and number</span>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="reg-button" [disabled]="regForm.invalid">Register</button>
+    <a routerLink="/login">I already have an account</a>
+  </form>
+</section>
