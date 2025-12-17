@@ -1,1 +1,41 @@
-/* You can add global styles to this file, and also import other style files */
+/* Fonts (Google fonts) */
+@import url('https://fonts.googleapis.com/css2?family=Elms+Sans:ital,wght@0,100..900;1,100..900&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&family=Momo+Signature&family=Momo+Trust+Display&family=Oxygen:wght@300;400;700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* Font awsome cdn */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css');
+
+/* root */
+
+:root {
+  /* Backgrounds */
+  --background-color: #f5f5f5;
+  --chat-background: #ffffff;
+  --header-background: #e3f2fd;
+
+  /* Chat bubbles */
+  --user-bubble-color: #a8d0e6;
+  --other-bubble-color: #e0e0e0;
+  --system-bubble-color: #ffe0b2;
+
+  /* Text */
+  --text-color: #333333;
+  --secondary-text: #555555;
+  --placeholder-color: #888888;
+
+  /* Accent / interactive elements */
+  --accent-color: #ffb347;
+  --link-color: #4a90e2;
+  --hover-color: #f0c987;
+  
+  /* Borders / separators */
+  --border-color: #dcdcdc;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Baisic document configurations */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
