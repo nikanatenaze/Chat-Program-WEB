@@ -1,0 +1,24 @@
+.nav {
+    width: 100%;
+    height: auto;
+    padding: 15px 15px 15px 15px;
+}
+
+.navigation {
+    background-color: var(--nav-background);
+    color: var(--nav-text-color);
+
+}
+
+.buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    list-style: none;
+}
+
+.buttons li {
+    font-family: "Roboto", sans-serif;
+    
+}

@@ -8,4 +8,7 @@ import { Component } from '@angular/core';
 })
 export class Home {
 
+  public openPage(url:string) {
+    window.open(url, "_blank")
+  }
 }

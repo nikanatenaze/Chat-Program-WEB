@@ -8,28 +8,35 @@
 
 :root {
   /* Backgrounds */
-  --background-color: #f5f5f5;
-  --chat-background: #ffffff;
-  --header-background: #e3f2fd;
+  --dark-background-color: rgb(31, 30, 30);
+  --background-color: #f0f2f5;      /* page background */
+  --chat-background: #ffffff;        /* chat container background */
+  --header-background: #2f3e46;      /* dark modern header */
 
   /* Chat bubbles */
-  --user-bubble-color: #a8d0e6;
-  --other-bubble-color: #e0e0e0;
-  --system-bubble-color: #ffe0b2;
+  --user-bubble-color: #4a90e2;      /* your messages - modern blue */
+  --other-bubble-color: #e1e8ed;     /* other messages - light gray */
+  --system-bubble-color: #ffd166;    /* system notifications - soft yellow */
 
   /* Text */
-  --text-color: #333333;
-  --secondary-text: #555555;
-  --placeholder-color: #888888;
+  --text-color: #1c1c1e;             /* main text - dark gray */
+  --secondary-text: #6b6b70;         /* secondary text - soft gray */
+  --placeholder-color: #a0a0a5;      /* input placeholders */
 
   /* Accent / interactive elements */
-  --accent-color: #ffb347;
-  --link-color: #4a90e2;
-  --hover-color: #f0c987;
-  
-  /* Borders / separators */
-  --border-color: #dcdcdc;
-  --shadow-color: rgba(0, 0, 0, 0.1);
+  --accent-color: #9b5de5;           /* buttons, highlights - vibrant purple */
+  --link-color: #4a90e2;             /* links - blue */
+  --hover-color: #f0c987;            /* hover effects - subtle warm */
+
+  /* Borders / shadows */
+  --border-color: #dcdfe6;           /* soft border color */
+  --shadow-color: rgba(0, 0, 0, 0.1); /* subtle shadows */
+
+  /* Navigation */
+  --nav-background: #2f3e46;         /* sidebar/header background */
+  --nav-hover: #354f5c;              /* hover effect */
+  --nav-active: #4a90e2;             /* active menu item */
+  --nav-text-color: #ffffff;         /* text in navigation - white for contrast */
 }
 
 /* Baisic document configurations */
