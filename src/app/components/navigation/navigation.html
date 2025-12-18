@@ -1,9 +1,21 @@
-<section class="nav">
-    <div class="navigation">
-        <ul class="buttons">
-            <li>Messenger</li>
-            <li>asd</li>
-            <li>asd</li>
-        </ul>
+<nav class="navigaton">
+    <div class="navigaton-content">
+        <div class="title">
+            <p class="title-t" routerLink="/">Nikoloz's Chat</p>
+            <div class="line"></div>
+            <ul class="buttons">
+                <li routerLink="/">Home</li>
+                <li routerLink="/messenger">Messenger</li>
+                <li (click)="openPage('https://github.com/nikanatenaze/Chat-Program-WEB')">Archive</li>
+            </ul>
+        </div>
+        <div class="guest-panel" *ngIf="!userToken">
+            <div class="gp-button custom-btn-1" routerLink="/login">
+                <p>Cabinet <i class="fa-solid fa-user"></i></p>
+            </div>
+            <div class="gp-button custom-btn-2 border-gradient " routerLink="/register">
+                <p>Register →</p>
+            </div>
+        </div>
     </div>
-</section>
+</nav>

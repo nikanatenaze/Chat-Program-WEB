@@ -1,13 +1,47 @@
-.nav {
+.navigaton {
+    display: flex;
+    position: fixed;
+    top: 15px;
     width: 100%;
     height: auto;
-    padding: 15px 15px 15px 15px;
+    background-color: transparent;
+    align-items: center;
+    justify-content: center;
 }
 
-.navigation {
-    background-color: var(--nav-background);
-    color: var(--nav-text-color);
+.navigaton-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: .75rem;
+    width: 70%;
+    background-color: rgba(184, 180, 180, 0.329);
+    backdrop-filter: blur(20px);
+    height: 100%;
+    padding: 15px;
+}
 
+.title {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.title p {
+    cursor: pointer;
+    font-weight: bolder;
+    color: white;
+    font-size: 30px;
+    font-family: "Oxygen", sans-serif;
+}
+
+.line {
+    display: flex;
+    height: 35px;
+    width: 1px;
+    background-color: rgb(177, 177, 177);
 }
 
 .buttons {
@@ -15,10 +49,56 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
-    list-style: none;
+
 }
 
 .buttons li {
-    font-family: "Roboto", sans-serif;
-    
+    color: white;
+    list-style: none;
+    cursor: pointer;
+    font-family: "Oxygen", sans-serif;
+    font-size: 18px;
+    transition: 0.3s all ease;
+}
+
+.buttons li:hover {
+    color: rgb(207, 207, 207);
+}
+
+.guest-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 100%;
+}
+
+.gp-button {
+    font-weight: bold;
+    font-family: "Oxygen", sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 15px;
+    padding-right: 15px;
+    font-size: 1.125rem;
+    border-radius: .625rem;
+    cursor: pointer;
+    height: 3.25rem;
+    color: white;
+    transition: 0.3s all ease;
+}
+
+.custom-btn-1 {
+    background-color: black;
+    color: white;
+}
+
+.custom-btn-1:hover {
+    background-color: white;
+    color: black;
+}
+
+.custom-btn-2 {
+    background: linear-gradient(90deg, rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 50%, rgba(252, 176, 69, 1) 100%);
 }

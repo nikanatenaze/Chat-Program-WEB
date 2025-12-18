@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Auth } from '../../services/auth';
 import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -12,7 +13,7 @@ import Swal from 'sweetalert2';
 export class Login implements OnInit {
   public regForm!: FormGroup;
 
-  constructor(public auth: Auth) { }
+  constructor(public auth: Auth, public router: Router) { }
 
   ngOnInit(): void {
     this.GetFormGroup()
@@ -36,10 +37,8 @@ export class Login implements OnInit {
           timer: 1500
         });
         localStorage.setItem('token', x.token);
-        window.open("/")
         this.regForm.reset();
-        console.log(x);
-        
+        this.router.navigate(['/'])
       },
       error(err) {
         Swal.fire({
