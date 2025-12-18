@@ -38,6 +38,7 @@ export class Register implements OnInit {
           timer: 1500
         });
         this.regForm.reset();
+        window.open("/login")
       },
       error(err) {
         Swal.fire({

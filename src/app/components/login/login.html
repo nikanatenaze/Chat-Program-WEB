@@ -1,1 +1,29 @@
-<p>login works!</p>
+<section class="page">
+  <form [formGroup]="regForm" class="register-card border-gradient" (ngSubmit)="Register()">
+    <p class="title">Welcome back!</p>
+    <p class="title-desc">Are you ready?</p>
+
+    <div class="inputs">
+      <!-- Email -->
+      <div class="input-wrapper" [class.error-field]="regForm.get('email')?.touched && regForm.get('email')?.invalid">
+        <input formControlName="email" class="input" type="email" placeholder="Email">
+        <div class="error-message" *ngIf="regForm.get('email')?.touched && regForm.get('email')?.invalid">
+          <span *ngIf="regForm.get('email')?.errors?.['required']">Email is required</span>
+          <span *ngIf="regForm.get('email')?.errors?.['email']">Invalid email format</span>
+        </div>
+      </div>
+      <!-- Password -->
+      <div class="input-wrapper" [class.error-field]="regForm.get('password')?.touched && regForm.get('password')?.invalid">
+        <input formControlName="password" class="input" type="password" placeholder="Password">
+        <div class="error-message" *ngIf="regForm.get('password')?.touched && regForm.get('password')?.invalid">
+          <span *ngIf="regForm.get('password')?.errors?.['required']">Password is required</span>
+          <span *ngIf="regForm.get('password')?.errors?.['minlength']">Minimum 6 characters</span>
+          <span *ngIf="regForm.get('password')?.errors?.['pattern']">Must include uppercase, lowercase, and number</span>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="reg-button" [disabled]="regForm.invalid">Login</button>
+    <a routerLink="/register">I haven't account</a>
+  </form>
+</section>
