@@ -9,12 +9,21 @@
                 <li (click)="openPage('https://github.com/nikanatenaze/Chat-Program-WEB')">Archive</li>
             </ul>
         </div>
-        <div class="guest-panel" *ngIf="!userToken">
+
+        <!-- Guest panel -->
+        <div class="guest-panel" *ngIf="!(auth.userToken$ | async)">
             <div class="gp-button custom-btn-1" routerLink="/login">
                 <p>Cabinet <i class="fa-solid fa-user"></i></p>
             </div>
-            <div class="gp-button custom-btn-2 border-gradient " routerLink="/register">
+            <div class="gp-button custom-btn-2 border-gradient" routerLink="/register">
                 <p>Register →</p>
+            </div>
+        </div>
+
+        <!-- User panel -->
+        <div class="user-panel" *ngIf="auth.userToken$ | async">
+            <div class="gp-button custom-btn-1" routerLink="/profile">
+                <p>Cabinet <i class="fa-solid fa-user"></i></p>
             </div>
         </div>
     </div>

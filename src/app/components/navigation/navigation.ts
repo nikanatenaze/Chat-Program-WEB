@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-navigation',
@@ -8,11 +9,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class Navigation implements OnInit {
   public userToken: string | null = null;
-  ngOnInit(): void {
-    this.userToken = localStorage.getItem("token")
-    console.log(this.userToken);
-  }
 
+  constructor(public auth: Auth) {}
+
+  ngOnInit(): void {
+    this.auth.userToken$.subscribe(token => {
+      this.userToken = token;
+    });
+  }
 
   public openPage(url: string) {
     window.open(url, "_blank");

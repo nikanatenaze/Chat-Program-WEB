@@ -13,6 +13,7 @@ import { Register } from './components/register/register';
 import { Login } from './components/login/login';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { Profile } from './components/profile/profile';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     Navigation,
     Footer,
     Register,
-    Login
+    Login,
+    Profile
   ],
   imports: [
     BrowserModule,

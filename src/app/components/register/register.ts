@@ -37,9 +37,10 @@ export class Register implements OnInit {
           title: "Successfuly registred",
           showConfirmButton: false,
           timer: 1500
+        }).then(() => {
+          this.regForm.reset();
+          this.router.navigate(['/login'])
         });
-        this.regForm.reset();
-        this.router.navigate(['/login'])
       },
       error(err) {
         Swal.fire({
@@ -67,7 +68,7 @@ export class Register implements OnInit {
       password: new FormControl('', [
         Validators.required,
         Validators.minLength(6),
-        Validators.pattern('^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$') 
+        Validators.pattern('^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$')
       ])
     });
   }

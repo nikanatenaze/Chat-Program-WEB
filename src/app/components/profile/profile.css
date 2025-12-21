@@ -1,0 +1,111 @@
+.page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 100vh;
+    padding: 20px;
+    background-color: var(--dark-background-color);
+    --color: rgba(56, 56, 56, 0.3);
+    background-image:
+        linear-gradient(0deg, transparent 24%, var(--color) 25%, var(--color) 26%, transparent 27%, transparent 74%, var(--color) 75%, var(--color) 76%, transparent 77%, transparent),
+        linear-gradient(90deg, transparent 24%, var(--color) 25%, var(--color) 26%, transparent 27%, transparent 74%, var(--color) 75%, var(--color) 76%, transparent 77%, transparent);
+    background-size: 55px 55px;
+    font-family: "Roboto", sans-serif;
+}
+
+.profile-ui {
+    color: white !important;
+    border: 5px solid;
+    background-color: black;
+    border-radius: 10px;
+    padding: 30px 40px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 2px 2px 6px 5px rgba(216, 215, 215, 0.096);
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.divider {
+    height: 2px;
+    background-color: #ddd;
+    margin-bottom: 20px;
+    border-radius: 2px;
+}
+
+.main-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.input-div {
+
+    display: flex;
+    flex-direction: column;
+}
+
+.input-div label {
+    font-weight: 500;
+    font-size: 16px;
+    margin-bottom: 5px;
+    color:  white !important;;
+}
+
+.input-div input {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    color: #555;
+    background-color: #f9f9f9;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+button {
+    flex: 1;
+    padding: 12px 0;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.logout-btn {
+    background-color: #f44336;
+    color: #fff;
+}
+
+.logout-btn:hover {
+    background-color: #d32f2f;
+}
+
+.delete-btn {
+    background-color: #9e9e9e;
+    color: #fff;
+}
+
+.delete-btn:hover {
+    background-color: #757575;
+}
+
+.loading {
+    text-align: center;
+    font-size: 18px;
+    color: #666;
+}

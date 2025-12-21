@@ -35,10 +35,14 @@ export class Login implements OnInit {
           title: "Successfuly loged in",
           showConfirmButton: false,
           timer: 1500
+        }).then(() => {
+          localStorage.setItem('token', x.token);
+          if (x.user?.id !== undefined) {
+            localStorage.setItem('logedin_user_id', x.user.id.toString());
+          }
+          this.regForm.reset();
+          this.router.navigate(["/"])
         });
-        localStorage.setItem('token', x.token);
-        this.regForm.reset();
-        this.router.navigate(['/'])
       },
       error(err) {
         Swal.fire({
