@@ -5,7 +5,6 @@ import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 import { Home } from './components/home/home';
 import { Messenger } from './components/messenger/messenger';
-import { Error } from './components/error/error';
 import { Navigation } from './components/navigation/navigation';
 import { Footer } from './components/footer/footer';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -14,18 +13,19 @@ import { Login } from './components/login/login';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { Profile } from './components/profile/profile';
+import { ErrorComponent } from './components/error.component/error.component';
 
 @NgModule({
   declarations: [
     App,
     Home,
     Messenger,
-    Error,
     Navigation,
     Footer,
     Register,
     Login,
-    Profile
+    Profile,
+    ErrorComponent
   ],
   imports: [
     BrowserModule,

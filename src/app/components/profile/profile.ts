@@ -21,7 +21,7 @@ export class Profile implements OnInit {
     private userService: User,
     private router: Router,
     private auth: Auth
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const id = localStorage.getItem("logedin_user_id");
@@ -36,8 +36,8 @@ export class Profile implements OnInit {
       .subscribe({
         next: (user: UserClass) => {
           this.fetchedUser = user,
-          console.log(user);
-          
+            console.log(user);
+
         },
         error: () => this.router.navigate(['/'])
       });
@@ -64,6 +64,55 @@ export class Profile implements OnInit {
   }
 
   deleteUser(): void {
-    Swal.fire('Not implemented yet', '', 'info');
+    Swal.fire({
+      title: 'Confirm account deletion',
+      text: 'Enter your password to delete your account',
+      input: 'password',
+      inputPlaceholder: 'Password',
+      inputAttributes: {
+        autocapitalize: 'off',
+        autocorrect: 'off'
+      },
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Delete',
+      confirmButtonColor: '#d33',
+      inputValidator: (value) => {
+        if (!value) {
+          return 'Password is required';
+        }
+        return null;
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const payload = {
+          id: this.fetchedUser!.id,
+          password: result.value
+        };
+
+        this.userService.deleteUser(payload).subscribe({
+          next: () => {
+            Swal.fire(
+              'Deleted!',
+              'Your account has been deleted.',
+              'success'
+            ).then(() => {
+              localStorage.removeItem('token')
+              localStorage.removeItem('logedin_user_id')
+              this.auth.logout()
+              this.router.navigate(["/"])
+            });
+          },
+          error: (err) => {
+            Swal.fire(
+              'Error',
+              err?.error?.message || 'Wrong password',
+              'error'
+            );
+          }
+        });
+      }
+    });
   }
+
 }
