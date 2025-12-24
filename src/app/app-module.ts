@@ -14,6 +14,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { Profile } from './components/profile/profile';
 import { ErrorComponent } from './components/error.component/error.component';
+import { Chat } from './components/chat/chat';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { ErrorComponent } from './components/error.component/error.component';
     Register,
     Login,
     Profile,
-    ErrorComponent
+    ErrorComponent,
+    Chat,
   ],
   imports: [
     BrowserModule,

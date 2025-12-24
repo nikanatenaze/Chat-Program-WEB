@@ -1,40 +1,32 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { UserClass } from '../classes/user.class';
+import { UserInterface } from '../interfaces/user.interface';
+import { GlobalMethods } from '../classes/global-methods';
 
 @Injectable({
   providedIn: 'root',
 })
 export class User {
-  private apiUrl = "https://chat-program-api.onrender.com/api/User"
+  private apiUrl = GlobalMethods.GlobalApiUrl + "/User"
 
   constructor(private http: HttpClient) {}
 
-  private getAuthHeaders() {
-    const token = localStorage.getItem('token'); // or wherever you store your JWT
-    return new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    });
-  }
-  
-
   getUserById(id:number) {
-    return this.http.get<UserClass>(this.apiUrl+`/GetById/${id}`, {
-      headers: this.getAuthHeaders()
+    return this.http.get<UserInterface>(this.apiUrl+`/GetById/${id}`, {
+      headers: GlobalMethods.getAuthHeaders()
     })
   }
 
   updateUser(prompt: {id:number, name:string, email:string, password:string}) {
     return this.http.patch(this.apiUrl+`/Update`, prompt, {
-      headers: this.getAuthHeaders()
+      headers: GlobalMethods.getAuthHeaders()
     })
   }
   
   deleteUser(prompt: {id:number, password:string}) {
     return this.http.delete(this.apiUrl + "/Delete", {
       body: prompt,
-      headers: this.getAuthHeaders()
+      headers: GlobalMethods.getAuthHeaders()
     });
   }
 }

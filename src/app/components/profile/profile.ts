@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Auth } from '../../services/auth';
 import { User } from '../../services/user';
-import { UserClass } from '../../classes/user.class';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { finalize } from 'rxjs/operators';
+import { UserInterface } from '../../interfaces/user.interface';
 
 @Component({
   selector: 'app-profile',
@@ -14,7 +14,7 @@ import { finalize } from 'rxjs/operators';
 })
 export class Profile implements OnInit {
 
-  public fetchedUser: UserClass | null = null;
+  public fetchedUser: UserInterface | null = null;
   public loading = true;
 
   constructor(
@@ -34,7 +34,7 @@ export class Profile implements OnInit {
     this.userService.getUserById(Number(id))
       .pipe(finalize(() => this.loading = false))
       .subscribe({
-        next: (user: UserClass) => {
+        next: (user: UserInterface) => {
           this.fetchedUser = user,
             console.log(user);
 

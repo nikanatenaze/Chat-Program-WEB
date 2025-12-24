@@ -1,18 +1,19 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { UserClass } from '../classes/user.class';
+import { UserInterface } from '../interfaces/user.interface';
+import { GlobalMethods } from '../classes/global-methods';
 
 interface LoginResponse {
   token: string;
-  user?: UserClass;
+  user?: UserInterface;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class Auth {
-  private apiUrl = "https://chat-program-api.onrender.com/api/Auth"
+  private apiUrl = GlobalMethods.GlobalApiUrl + "/Auth"
 
   private _userToken = new BehaviorSubject<string | null>(localStorage.getItem('token'));
   public userToken$ = this._userToken.asObservable();
@@ -35,8 +36,8 @@ export class Auth {
     });
   }
 
-  register(data: { email: string; username: string; password: string }): Observable<UserClass> {
-    return this.http.post<UserClass>(`${this.apiUrl}/register`, data);
+  register(data: { email: string; username: string; password: string }): Observable<UserInterface> {
+    return this.http.post<UserInterface>(`${this.apiUrl}/register`, data);
   }
 
   logout() {
