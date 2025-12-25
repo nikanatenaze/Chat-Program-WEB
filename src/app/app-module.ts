@@ -4,7 +4,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 import { Home } from './components/home/home';
-import { Messenger } from './components/messenger/messenger';
 import { Navigation } from './components/navigation/navigation';
 import { Footer } from './components/footer/footer';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -22,7 +21,6 @@ import { Loader } from './components/loader/loader';
   declarations: [
     App,
     Home,
-    Messenger,
     Navigation,
     Footer,
     Register,

@@ -3,7 +3,7 @@ import { ChatInterface } from '../../interfaces/chat.interface';
 import { ChatService } from '../../services/chat.service';
 import { ChatUserService } from '../../services/chat-user.service';
 import { Router } from '@angular/router';
-import { BehaviorSubject, finalize, firstValueFrom } from 'rxjs';
+import { BehaviorSubject, finalize, firstValueFrom, map } from 'rxjs';
 import { GlobalMethods } from '../../classes/global-methods';
 import Swal from 'sweetalert2';
 import { User } from '../../services/user';
@@ -12,13 +12,14 @@ import { User } from '../../services/user';
   selector: 'app-chats',
   standalone: false,
   templateUrl: './chats.html',
-  styleUrl: './chats.css',
+  styleUrls: ['./chats.css'],
 })
 export class Chats implements OnInit {
 
   loading: boolean = true
   private _userChats$ = new BehaviorSubject<ChatInterface[]>([]);
   public userChats$ = this._userChats$.asObservable();
+  protected userId: number = 0
 
   constructor(private chatService: ChatService, private chatUserService: ChatUserService, private router: Router, private userService: User) {
   }
@@ -26,12 +27,12 @@ export class Chats implements OnInit {
   async ngOnInit(): Promise<void> {
     try {
       const data = await firstValueFrom(this.userService.getDataFromToken())
-      const id = Number(data.id)
-      if (!id) {
+      this.userId = Number(data.id)
+      if (!this.userId) {
         this.router.navigate(['/'])
       }
 
-      this.chatUserService.GetChatsOfUser(Number(id))
+      this.chatUserService.GetChatsOfUser(Number(this.userId))
         .pipe(finalize(() => {
           this.loading = false
         }))
@@ -49,8 +50,8 @@ export class Chats implements OnInit {
           })
         });
     } catch (error) {
-      console.log(error);
-      
+      console.error(error);
+      this.router.navigate(['/']);
     }
   }
 
@@ -104,9 +105,8 @@ export class Chats implements OnInit {
       if (result.isConfirmed) {
         const p = {
           ...result.value,
-          createdByUserId: sessionStorage.getItem("logedin_user_id"),
+          createdByUserId: Number(this.userId),
         }
-        console.log(p);
 
         this.chatService.CreateChat(p).subscribe({
           next: xa => {
@@ -137,7 +137,48 @@ export class Chats implements OnInit {
     });
   }
 
-  quitFromChat() {
+  quitFromChat(chatId: number) {
+    Swal.fire({
+      title: "You want quit?",
+      text: "You cant join back, by your self",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, I want quit"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.chatUserService.RemoveChatUser({ userId: this.userId, chatId: chatId })
+          .subscribe({
+            next: () => {
+              Swal.fire({
+                title: "Quited!",
+                text: "You have successfuly quited the chat.",
+                icon: "success"
+              }).then(() => {
+                const current = this._userChats$.getValue();
+                this._userChats$.next(current.filter(chat => chat.id !== chatId));
+              });
+            },
+            error: (x) => {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: `Something went wrong... \n Error: ${x}`,
+                footer: '<a href="#">Why do I have this issue?</a>'
+              });
+            }
+          })
+      }
+    });
+  }
 
+  moreInfo() {
+    Swal.fire({
+      icon: 'info',
+      title: 'Not Implemented',
+      text: 'This feature is not implemented yet.',
+      confirmButtonText: 'OK'
+    });
   }
 }
