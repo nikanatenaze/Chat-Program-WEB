@@ -3,8 +3,9 @@ import { Auth } from '../../services/auth';
 import { User } from '../../services/user';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
-import { finalize } from 'rxjs/operators';
+import { finalize, map } from 'rxjs/operators';
 import { UserInterface } from '../../interfaces/user.interface';
+import { GlobalMethods } from '../../classes/global-methods';
 
 @Component({
   selector: 'app-profile',
@@ -24,24 +25,34 @@ export class Profile implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    const id = localStorage.getItem("logedin_user_id");
+    const id = sessionStorage.getItem("logedin_user_id");
 
     if (!id) {
+
       this.router.navigate(['/']);
       return;
     }
 
     this.userService.getUserById(Number(id))
-      .pipe(finalize(() => this.loading = false))
+      .pipe(
+        map(x => {
+          return {
+            ...x,
+            createdAt: GlobalMethods.formatDate(x.createdAt)
+          };
+        }),
+        finalize(() => this.loading = false)
+      )
       .subscribe({
-        next: (user: UserInterface) => {
-          this.fetchedUser = user,
-            console.log(user);
-
+        next: (x) => {
+          this.fetchedUser = x;
         },
-        error: () => this.router.navigate(['/'])
+        error: () => {
+          this.router.navigate(['/']);
+        }
       });
   }
+
 
   logout(): void {
     Swal.fire({
@@ -97,8 +108,8 @@ export class Profile implements OnInit {
               'Your account has been deleted.',
               'success'
             ).then(() => {
-              localStorage.removeItem('token')
-              localStorage.removeItem('logedin_user_id')
+              sessionStorage.removeItem('token')
+              sessionStorage.removeItem('logedin_user_id')
               this.auth.logout()
               this.router.navigate(["/"])
             });

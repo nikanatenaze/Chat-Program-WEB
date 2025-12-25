@@ -27,8 +27,6 @@ export class Register implements OnInit {
 
     const formData = this.regForm.value;
 
-    console.log(formData);
-
     this.auth.register(formData).subscribe({
       next: (x) => {
         Swal.fire({

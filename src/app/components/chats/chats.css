@@ -1,0 +1,146 @@
+.content {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chats-ui {
+    width: 70%;
+    max-width: 70%;
+    height: 650px;
+    padding: 20px;
+    background-color: #0b0b0b;
+    color: white;
+    border-radius: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+}
+
+.title-div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ui-title {
+    font-family: "Oxygen", sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.line {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #555, transparent);
+}
+
+.chat-list {
+    padding-top: 10px;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.chat-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-list::-webkit-scrollbar-thumb {
+    background-color: #444;
+    border-radius: 10px;
+}
+
+.chat-card {
+    background: linear-gradient(135deg, #ffffff, #f0f0f0);
+    color: #000;
+    border-radius: 0.75rem;
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.25s ease;
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+.chat-card:hover {
+    background: linear-gradient(135deg, #111, #1a1a1a);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.chat-information {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.chat-main {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.chat-name {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.chat-id {
+    font-size: 13px;
+    opacity: 0.6;
+}
+
+.chat-date {
+    font-size: 13px;
+    opacity: 0.75;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.chat-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.chat-button {
+    font-size: 18px;
+    cursor: grab;
+    opacity: 0.7;
+    transition: 0.2s ease;
+}
+
+.chat-button:hover {
+    opacity: 1;
+    transform: scale(1.15);
+}
+
+.create-new-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #6faa17, #4d8a0f);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.create-new-button:hover {
+    background: linear-gradient(135deg, #7ecb1e, #5ca813);
+    transform: translateY(-1px);
+}

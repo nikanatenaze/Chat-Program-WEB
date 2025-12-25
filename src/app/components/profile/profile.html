@@ -1,4 +1,4 @@
-<section class="page">
+<section class="page default-page-background">
   <div class="profile-ui border-gradient" *ngIf="!loading && fetchedUser; else loadingTemplate">
     <p class="title">User Details</p>
     <div class="divider"></div>
@@ -29,6 +29,6 @@
   </div>
 
   <ng-template #loadingTemplate>
-    <div class="loading">Loading user data...</div>
+    <app-loader></app-loader>
   </ng-template>
 </section>

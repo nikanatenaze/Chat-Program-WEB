@@ -1,0 +1,38 @@
+<section class="content default-page-background">
+    <div class="chats-ui border-gradient" *ngIf="!loading; else loadingTemplate">
+        <div class="title-div">
+            <p class="ui-title">Your chats</p>
+            <button class="create-new-button" (click)="createChat()">
+                <i class="fa-solid fa-plus"></i>
+                Create new
+            </button>
+        </div>
+        <div class="line"></div>
+        <ul class="chat-list" *ngIf="userChats$; else nocontent">
+            <li *ngFor="let i of userChats$ | async" class="chat-card">
+                <div class="chat-information">
+                    <div class="chat-main">
+                        <p class="chat-name">{{ i.name }}</p>
+                        <p class="chat-id">ID: {{ i.id }}</p>
+                    </div>
+                    <p class="chat-date">
+                        <i class="fa-regular fa-clock"></i>
+                        {{ i.createdAt }}
+                    </p>
+                </div>
+
+                <div class="chat-buttons">
+                    <i class="chat-button fa-solid fa-circle-info" title="Info"></i>
+                    <i class="chat-button fa-solid fa-arrow-right-from-bracket" title="Open"></i>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <ng-template #nocontent>
+        <h1>You have no enemies</h1>
+    </ng-template>
+    <ng-template #loadingTemplate>
+        <app-loader></app-loader>
+    </ng-template>
+</section>

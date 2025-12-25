@@ -51,7 +51,19 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Baisic styles */
+
 .border-gradient {
     transition: 0.3s all ease;
     border-image: linear-gradient(90deg,rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 50%, rgba(252, 176, 69, 1) 100%) 1 !important;
+}
+
+.default-page-background {
+  background-color: var(--dark-background-color);
+    --color: rgba(56, 56, 56, 0.3);
+    background-image:
+        linear-gradient(0deg, transparent 24%, var(--color) 25%, var(--color) 26%, transparent 27%, transparent 74%, var(--color) 75%, var(--color) 76%, transparent 77%, transparent),
+        linear-gradient(90deg, transparent 24%, var(--color) 25%, var(--color) 26%, transparent 27%, transparent 74%, var(--color) 75%, var(--color) 76%, transparent 77%, transparent);
+    background-size: 55px 55px;
+    font-family: "Roboto", sans-serif;
 }

@@ -6,6 +6,7 @@ import { Register } from './components/register/register';
 import { Login } from './components/login/login';
 import { Profile } from './components/profile/profile';
 import { ErrorComponent } from './components/error.component/error.component';
+import { Chats } from './components/chats/chats';
 
 const routes: Routes = [
   {path: "", component: Home},
@@ -14,6 +15,7 @@ const routes: Routes = [
   {path: "register", component: Register},
   {path: "login", component: Login},
   {path: "profile", component: Profile},
+  {path: "chats", component: Chats},
   {path: "**", component: ErrorComponent},
 ];
 
