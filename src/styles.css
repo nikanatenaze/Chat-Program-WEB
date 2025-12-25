@@ -9,42 +9,61 @@
 :root {
   /* Backgrounds */
   --dark-background-color: rgb(31, 30, 30);
-  --background-color: #f0f2f5;      /* page background */
-  --chat-background: #ffffff;        /* chat container background */
-  --header-background: #2f3e46;      /* dark modern header */
+  --background-color: #f0f2f5;
+  /* page background */
+  --chat-background: #ffffff;
+  /* chat container background */
+  --header-background: #2f3e46;
+  /* dark modern header */
 
   /* Chat bubbles */
-  --user-bubble-color: #4a90e2;      /* your messages - modern blue */
-  --other-bubble-color: #e1e8ed;     /* other messages - light gray */
-  --system-bubble-color: #ffd166;    /* system notifications - soft yellow */
+  --user-bubble-color: #4a90e2;
+  /* your messages - modern blue */
+  --other-bubble-color: #e1e8ed;
+  /* other messages - light gray */
+  --system-bubble-color: #ffd166;
+  /* system notifications - soft yellow */
 
   /* Text */
-  --text-color: #1c1c1e;             /* main text - dark gray */
-  --secondary-text: #6b6b70;         /* secondary text - soft gray */
-  --placeholder-color: #a0a0a5;      /* input placeholders */
+  --text-color: #1c1c1e;
+  /* main text - dark gray */
+  --secondary-text: #6b6b70;
+  /* secondary text - soft gray */
+  --placeholder-color: #a0a0a5;
+  /* input placeholders */
 
   /* Accent / interactive elements */
-  --accent-color: #9b5de5;           /* buttons, highlights - vibrant purple */
-  --link-color: #4a90e2;             /* links - blue */
-  --hover-color: #f0c987;            /* hover effects - subtle warm */
+  --accent-color: #9b5de5;
+  /* buttons, highlights - vibrant purple */
+  --link-color: #4a90e2;
+  /* links - blue */
+  --hover-color: #f0c987;
+  /* hover effects - subtle warm */
 
   /* Borders / shadows */
-  --border-color: #dcdfe6;           /* soft border color */
-  --shadow-color:   0 4px 12px rgba(0, 0, 0, 0.15);; /* subtle shadows */
+  --border-color: #dcdfe6;
+  /* soft border color */
+  --shadow-color: 0 4px 12px rgba(0, 0, 0, 0.15);
+  ;
+  /* subtle shadows */
 
   /* Navigation */
-  --nav-background: #2f3e46;         /* sidebar/header background */
-  --nav-hover: #354f5c;              /* hover effect */
-  --nav-active: #4a90e2;             /* active menu item */
-  --nav-text-color: #ffffff;         /* text in navigation - white for contrast */
+  --nav-background: #2f3e46;
+  /* sidebar/header background */
+  --nav-hover: #354f5c;
+  /* hover effect */
+  --nav-active: #4a90e2;
+  /* active menu item */
+  --nav-text-color: #ffffff;
+  /* text in navigation - white for contrast */
 }
 
 /* Baisic document configurations */
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 html {
@@ -54,16 +73,24 @@ html {
 /* Baisic styles */
 
 .border-gradient {
-    transition: 0.3s all ease;
-    border-image: linear-gradient(90deg,rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 50%, rgba(252, 176, 69, 1) 100%) 1 !important;
+  transition: 0.3s all ease;
+  border-image: linear-gradient(90deg, rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 50%, rgba(252, 176, 69, 1) 100%) 1 !important;
 }
 
 .default-page-background {
   background-color: var(--dark-background-color);
-    --color: rgba(56, 56, 56, 0.3);
-    background-image:
-        linear-gradient(0deg, transparent 24%, var(--color) 25%, var(--color) 26%, transparent 27%, transparent 74%, var(--color) 75%, var(--color) 76%, transparent 77%, transparent),
-        linear-gradient(90deg, transparent 24%, var(--color) 25%, var(--color) 26%, transparent 27%, transparent 74%, var(--color) 75%, var(--color) 76%, transparent 77%, transparent);
-    background-size: 55px 55px;
-    font-family: "Roboto", sans-serif;
+  --color: rgba(56, 56, 56, 0.3);
+  background-image:
+    linear-gradient(0deg, transparent 24%, var(--color) 25%, var(--color) 26%, transparent 27%, transparent 74%, var(--color) 75%, var(--color) 76%, transparent 77%, transparent),
+    linear-gradient(90deg, transparent 24%, var(--color) 25%, var(--color) 26%, transparent 27%, transparent 74%, var(--color) 75%, var(--color) 76%, transparent 77%, transparent);
+  background-size: 55px 55px;
+  font-family: "Roboto", sans-serif;
+}
+
+.text-gradient {
+  background: linear-gradient(90deg, rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 50%, rgba(252, 176, 69, 1) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline-block;
 }

@@ -3,7 +3,12 @@
         <div class="title">
             <p class="title-t" routerLink="/">Nikoloz's Chat</p>
             <div class="line"></div>
-            <ul class="buttons">
+            <ul class="buttons" *ngIf="!(auth.userToken$ | async)">
+                <li routerLink="/">Home</li>
+                <li routerLink="/about">About</li>
+                <li (click)="openPage('https://github.com/nikanatenaze/Chat-Program-WEB')">Archive</li>
+            </ul>
+            <ul class="buttons" *ngIf="auth.userToken$ | async">
                 <li routerLink="/">Home</li>
                 <li routerLink="/chats">Chats</li>
                 <li (click)="openPage('https://github.com/nikanatenaze/Chat-Program-WEB')">Archive</li>
