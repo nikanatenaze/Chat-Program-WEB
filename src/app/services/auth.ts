@@ -42,7 +42,6 @@ export class Auth {
 
   logout() {
     sessionStorage.removeItem('token');
-    sessionStorage.removeItem('logedin_user_id');
     this._userToken.next(null);
   }
 

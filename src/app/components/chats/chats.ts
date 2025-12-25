@@ -3,9 +3,10 @@ import { ChatInterface } from '../../interfaces/chat.interface';
 import { ChatService } from '../../services/chat.service';
 import { ChatUserService } from '../../services/chat-user.service';
 import { Router } from '@angular/router';
-import { BehaviorSubject, finalize } from 'rxjs';
+import { BehaviorSubject, finalize, firstValueFrom } from 'rxjs';
 import { GlobalMethods } from '../../classes/global-methods';
 import Swal from 'sweetalert2';
+import { User } from '../../services/user';
 
 @Component({
   selector: 'app-chats',
@@ -19,34 +20,38 @@ export class Chats implements OnInit {
   private _userChats$ = new BehaviorSubject<ChatInterface[]>([]);
   public userChats$ = this._userChats$.asObservable();
 
-  constructor(private chatService: ChatService, private chatUserService: ChatUserService, private router: Router) {
+  constructor(private chatService: ChatService, private chatUserService: ChatUserService, private router: Router, private userService: User) {
   }
 
-  ngOnInit(): void {
-    const id = sessionStorage.getItem("logedin_user_id")
+  async ngOnInit(): Promise<void> {
+    try {
+      const data = await firstValueFrom(this.userService.getDataFromToken())
+      const id = Number(data.id)
+      if (!id) {
+        this.router.navigate(['/'])
+      }
 
-    if (!id) {
-      this.router.navigate(['/'])
-    }
-
-    this.chatUserService.GetChatsOfUser(Number(id))
-      .pipe(finalize(() => {
-        this.loading = false
-      }))
-      .subscribe({
-        next: (x) => {
-          const formattedChats = x.map(c => ({
-            ...c,
-            createdAt: GlobalMethods.formatDate(c.createdAt)
-          }));
-          this._userChats$.next(formattedChats);
-        },
-        error: ((x) => {
-          console.log(x);
-          this.router.navigate(["/"])
-        })
-      });
+      this.chatUserService.GetChatsOfUser(Number(id))
+        .pipe(finalize(() => {
+          this.loading = false
+        }))
+        .subscribe({
+          next: (x) => {
+            const formattedChats = x.map(c => ({
+              ...c,
+              createdAt: GlobalMethods.formatDate(c.createdAt)
+            }));
+            this._userChats$.next(formattedChats);
+          },
+          error: ((x) => {
+            console.log(x);
+            this.router.navigate(["/"])
+          })
+        });
+    } catch (error) {
+      console.log(error);
       
+    }
   }
 
   loadUserChats(userId: number) {

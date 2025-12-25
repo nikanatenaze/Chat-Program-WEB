@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { UserInterface } from '../interfaces/user.interface';
 import { GlobalMethods } from '../classes/global-methods';
+import { TokenModelInterface } from '../interfaces/token-model.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +14,12 @@ export class User {
 
   getUserById(id:number) {
     return this.http.get<UserInterface>(this.apiUrl+`/GetById/${id}`, {
+      headers: GlobalMethods.getAuthHeaders()
+    })
+  }
+
+    getDataFromToken() {
+    return this.http.get<TokenModelInterface>(this.apiUrl + `/GetTokenData`, {
       headers: GlobalMethods.getAuthHeaders()
     })
   }

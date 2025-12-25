@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import { finalize, map } from 'rxjs/operators';
 import { UserInterface } from '../../interfaces/user.interface';
 import { GlobalMethods } from '../../classes/global-methods';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -21,38 +22,43 @@ export class Profile implements OnInit {
   constructor(
     private userService: User,
     private router: Router,
-    private auth: Auth
+    private auth: Auth,
   ) { }
 
-  ngOnInit(): void {
-    const id = sessionStorage.getItem("logedin_user_id");
+  async ngOnInit(): Promise<void> {
 
-    if (!id) {
+    try {
+      const tokenData = await firstValueFrom(this.userService.getDataFromToken())
+      const id = Number(tokenData.id)
+      if (!id) {
+        this.router.navigate(['/']);
+        return;
+      }
 
+      this.userService.getUserById(Number(id))
+        .pipe(
+          map(x => {
+            return {
+              ...x,
+              createdAt: GlobalMethods.formatDate(x.createdAt)
+            };
+          }),
+          finalize(() => this.loading = false)
+        )
+        .subscribe({
+          next: (x) => {
+            this.fetchedUser = x;
+          },
+          error: () => {
+            this.router.navigate(['/']);
+          }
+        });
+    } catch (err) {
+      console.error(err);
       this.router.navigate(['/']);
-      return;
+      this.loading = false;
     }
-
-    this.userService.getUserById(Number(id))
-      .pipe(
-        map(x => {
-          return {
-            ...x,
-            createdAt: GlobalMethods.formatDate(x.createdAt)
-          };
-        }),
-        finalize(() => this.loading = false)
-      )
-      .subscribe({
-        next: (x) => {
-          this.fetchedUser = x;
-        },
-        error: () => {
-          this.router.navigate(['/']);
-        }
-      });
   }
-
 
   logout(): void {
     Swal.fire({
@@ -109,7 +115,6 @@ export class Profile implements OnInit {
               'success'
             ).then(() => {
               sessionStorage.removeItem('token')
-              sessionStorage.removeItem('logedin_user_id')
               this.auth.logout()
               this.router.navigate(["/"])
             });

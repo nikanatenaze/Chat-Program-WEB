@@ -37,9 +37,6 @@ export class Login implements OnInit {
           timer: 1500
         }).then(() => {
           sessionStorage.setItem('token', x.token);
-          if (x.user?.id !== undefined) {
-            sessionStorage.setItem('logedin_user_id', x.user.id.toString());
-          }
           this.regForm.reset();
           this.router.navigate(["/"])
         });
