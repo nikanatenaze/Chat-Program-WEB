@@ -16,6 +16,10 @@ export class GlobalMethods {
         });
     }
 
+    static getToken() {
+        return sessionStorage.getItem('token');
+    }
+
     static formatDate(dateString: string): string {
         const date = new Date(dateString);
         return date.toLocaleString();

@@ -1,4 +1,16 @@
-<p (click)="createMessage('Im sadam from syria')">chat works!</p>
-<p *ngFor="let i of messagesData">{{i.userId}}: {{i.content}}</p>
-<input type="text" #messageInput>
-<button (click)="createMessage(messageInput.value)">send</button>
+<div class="chat-container">
+  <div class="messages">
+    <div *ngFor="let msg of messagesData" class="message">
+      <strong>{{msg.userId}}:</strong> {{msg.content}}
+    </div>
+  </div>
+
+  <div class="input-area">
+  <input type="text" [(ngModel)]="newMessage" placeholder="Type a message..." (keyup.enter)="createMessage()">
+  <button (click)="createMessage()">Send</button>
+</div>
+</div>
+
+<ng-template #loadingTpl>
+  <p>Loading chat...</p>
+</ng-template>

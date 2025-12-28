@@ -9,7 +9,7 @@ import { Footer } from './components/footer/footer';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Register } from './components/register/register';
 import { Login } from './components/login/login';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { Profile } from './components/profile/profile';
 import { ErrorComponent } from './components/error.component/error.component';
@@ -17,6 +17,7 @@ import { Chats } from './components/chats/chats';
 import { Loader } from './components/loader/loader';
 import { ChatDetails } from './components/chat-details/chat-details';
 import { Chat } from './components/chat/chat';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -38,6 +39,8 @@ import { Chat } from './components/chat/chat';
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
+    FormsModule,
+    CommonModule,
     SweetAlert2Module.forRoot()
   ],
   providers: [

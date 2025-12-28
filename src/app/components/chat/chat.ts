@@ -1,90 +1,102 @@
-import { Component, OnInit } from '@angular/core';
-import { ChatService } from '../../services/chat.service';
-import { ChatUserService } from '../../services/chat-user.service';
-import { ActivatedRoute, Route, Router } from '@angular/router';
-import { User } from '../../services/user';
-import { TokenModelInterface } from '../../interfaces/token-model.interface';
-import { Token } from '@angular/compiler';
+import { Component, OnInit, OnDestroy, AfterViewChecked } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ChatHubService } from '../../services/chat-hub.service';
 import { MessageService } from '../../services/message.service';
+import { ChatService } from '../../services/chat.service';
+import { User } from '../../services/user';
 import { MessageInterface } from '../../interfaces/message.interface';
-import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
-import { Observable } from 'rxjs';
+import { TokenModelInterface } from '../../interfaces/token-model.interface';
 
 @Component({
   selector: 'app-chat',
   standalone: false,
   templateUrl: './chat.html',
-  styleUrl: './chat.css',
+  styleUrls: ['./chat.css'], // ✅ plural
 })
-export class Chat implements OnInit {
-  private socket$!: WebSocketSubject<any>;
-  public routerId!: number;
+export class Chat implements OnInit, OnDestroy, AfterViewChecked {
+  public routerId!: number; // Chat ID from route
   public tokenData!: TokenModelInterface;
-  public messagesData!: Array<MessageInterface>
+  public messagesData: MessageInterface[] = [];
+  public newMessage = '';
   public loading = true;
 
-
   constructor(
-    private userService: User,
-    private chatService: ChatService,
-    private chatUserService: ChatUserService,
-    private messagesService: MessageService,
     private actRouter: ActivatedRoute,
-    private router: Router
-  ) { }
+    private router: Router,
+    private userService: User,
+    private chatHub: ChatHubService,
+    private messagesService: MessageService,
+    private chatService: ChatService
+  ) {}
 
   ngOnInit(): void {
-    this.getStaticData()
-    this.fetchMessages()
-  }
-
-  getStaticData() {
-    this.actRouter.params.subscribe((params: any) => {
+    this.actRouter.params.subscribe(params => {
       this.routerId = +params['id'];
-      this.userService.getDataFromToken().subscribe((data: TokenModelInterface) => {
-        this.tokenData = data;
-        this.checkMembership();
+      this.userService.getDataFromToken().subscribe(token => {
+        this.tokenData = token;
+        this.initChat();
       });
     });
-    this.loading = false
   }
 
-  checkMembership() {
-    this.chatUserService.CheckUserInChat(this.routerId, this.tokenData.id).subscribe({
-      next: (x) => {
-        if (!x) {
-          this.router.navigate(['/']);
-        }
-      },
-      error: (err) => {
-        console.error(err);
-        this.router.navigate(['/']);
-      }
+  private initChat() {
+    this.chatHub.startConnection(sessionStorage.getItem("token") ?? '')
+      .then(() => {
+        this.chatHub.joinChat(this.routerId);
+        this.chatHub.onCreateMessage(msg => {
+          this.messagesData.push(msg);
+          this.scrollToBottom();
+        });
+
+        this.chatHub.onEditMessage(msg => {
+          const index = this.messagesData.findIndex(m => m.id === msg.id);
+          if (index !== -1) this.messagesData[index] = msg;
+        });
+
+        this.chatHub.onDeleteMessage(msg => {
+          this.messagesData = this.messagesData.filter(m => m.id !== msg.id);
+        });
+      });
+    this.fetchMessages();
+  }
+
+  private fetchMessages() {
+    this.chatService.GetChatMessages(this.routerId).subscribe(msgs => {
+      this.messagesData = msgs;
+      this.loading = false;
+      this.scrollToBottom();
     });
   }
 
-  fetchMessages() {
-    this.chatService.GetChatMessages(this.routerId).subscribe(x => {
-      this.messagesData = x
-      console.log(x); 
-    })
+  public createMessage() {
+    if (!this.newMessage.trim()) return;
+
+    const payload = {
+      content: this.newMessage,
+      userId: this.tokenData.id,
+      chatId: this.routerId
+    };
+
+    this.messagesService.CreateMessage(payload).subscribe({
+      next: () => this.newMessage = '',
+      error: err => console.error(err)
+    });
   }
 
-  connect(chatId: number): Observable<MessageInterface> {
-    this.socket$ = webSocket(`ws://localhost:5000/chat/${chatId}`); // change URL to your backend
-    return this.socket$;
+  private scrollToBottom() {
+    setTimeout(() => {
+      const container = document.querySelector('.messages');
+      if (container) container.scrollTop = container.scrollHeight;
+    }, 50);
   }
 
-  createMessage(input: string) {
-    this.messagesService.CreateMessage({content: input, userId: this.tokenData.id, chatId: this.routerId}).subscribe({
-      next: x => {
-        console.log(x);
-        
-      },
-      error(err) {
-        console.log(err);
-        
-      },
-    })
+  ngAfterViewChecked(): void {
+    this.scrollToBottom();
+  }
+
+  ngOnDestroy(): void {
+    this.chatHub.stopConnection();
   }
 }

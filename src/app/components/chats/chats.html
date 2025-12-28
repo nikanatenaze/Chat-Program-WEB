@@ -10,7 +10,7 @@
         <div class="line"></div>
         <ng-container *ngIf="(userChats$ | async) as chats">
             <ul class="chat-list" *ngIf="chats.length > 0; else nocontent">
-                <li *ngFor="let i of chats" class="chat-card" routerLink="/chat/{{i.id}}">
+                <li *ngFor="let i of chats" class="chat-card" routerLink="/chat/11">
                     <div class="chat-information">
                         <div class="chat-main">
                             <p class="chat-name">{{ i.name }}</p>
