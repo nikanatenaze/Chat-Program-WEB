@@ -13,9 +13,10 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { Profile } from './components/profile/profile';
 import { ErrorComponent } from './components/error.component/error.component';
-import { Chat } from './components/chat/chat';
 import { Chats } from './components/chats/chats';
 import { Loader } from './components/loader/loader';
+import { ChatDetails } from './components/chat-details/chat-details';
+import { Chat } from './components/chat/chat';
 
 @NgModule({
   declarations: [
@@ -27,9 +28,10 @@ import { Loader } from './components/loader/loader';
     Login,
     Profile,
     ErrorComponent,
-    Chat,
     Chats,
     Loader,
+    ChatDetails,
+    Chat,
   ],
   imports: [
     BrowserModule,

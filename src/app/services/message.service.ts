@@ -17,19 +17,19 @@ export class MessageService {
     })
   }
 
-  CreateMessage(propmt: {content: string, userId: number, chatId: number}) {
+  CreateMessage(propmt: { content: string, userId: number, chatId: number }) {
     return this.http.post<MessageInterface>(this.api + `/Create`, propmt, {
       headers: GlobalMethods.getAuthHeaders()
     })
   }
 
-  EditMessage(prompt: {id: number, content: string, userId: number}) {
+  EditMessage(prompt: { id: number, content: string, userId: number }) {
     return this.http.patch<MessageInterface>(this.api + `/Edit`, prompt, {
       headers: GlobalMethods.getAuthHeaders()
     })
   }
 
-  DeleteMessage(propmt: {id: number, userId: number}) {
+  DeleteMessage(propmt: { id: number, userId: number }) {
     return this.http.delete<MessageInterface>(this.api + `Delete`, {
       headers: GlobalMethods.getAuthHeaders(),
       body: propmt

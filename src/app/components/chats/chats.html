@@ -8,30 +8,38 @@
             </button>
         </div>
         <div class="line"></div>
-        <ul class="chat-list" *ngIf="userChats$; else nocontent">
-            <li *ngFor="let i of userChats$ | async" class="chat-card">
-                <div class="chat-information">
-                    <div class="chat-main">
-                        <p class="chat-name">{{ i.name }}</p>
-                        <p class="chat-id">ID: {{ i.id }}</p>
+        <ng-container *ngIf="(userChats$ | async) as chats">
+            <ul class="chat-list" *ngIf="chats.length > 0; else nocontent">
+                <li *ngFor="let i of chats" class="chat-card" routerLink="/chat/{{i.id}}">
+                    <div class="chat-information">
+                        <div class="chat-main">
+                            <p class="chat-name">{{ i.name }}</p>
+                            <p class="chat-id">ID: {{ i.id }}</p>
+                        </div>
+                        <p class="chat-date">
+                            <i class="fa-regular fa-clock"></i>
+                            {{ i.createdAt }}
+                        </p>
                     </div>
-                    <p class="chat-date">
-                        <i class="fa-regular fa-clock"></i>
-                        {{ i.createdAt }}
-                    </p>
-                </div>
 
-                <div class="chat-buttons">
-                    <i class="chat-button fa-solid fa-circle-info" title="Info" (click)="moreInfo()"></i>
-                    <i class="chat-button fa-solid fa-arrow-right-from-bracket" title="QuitFromChat" (click)="quitFromChat(i.id)"></i>
-                </div>
-            </li>
-        </ul>
+                    <div class="chat-buttons">
+                        <i class="chat-button fa-solid fa-circle-info" title="Info" (click)="moreInfo()"></i>
+                        <i class="chat-button fa-solid fa-arrow-right-from-bracket" title="QuitFromChat"
+                            (click)="quitFromChat(i.id)"></i>
+                    </div>
+                </li>
+            </ul>
+        </ng-container>
     </div>
 
     <ng-template #nocontent>
-        <h1>You have no enemies</h1>
+        <div class="no-content">
+            <h2>You have not any chats yet.</h2>
+            <p class="text-gradient" (click)="createChat()">Lets create new one?</p>
+        </div>
     </ng-template>
+
+
     <ng-template #loadingTemplate>
         <app-loader></app-loader>
     </ng-template>

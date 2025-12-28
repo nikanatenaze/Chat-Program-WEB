@@ -7,7 +7,7 @@
 }
 
 .chats-ui {
-    width: 70%;
+    width: 55%;
     max-width: 70%;
     height: 650px;
     padding: 20px;
@@ -143,4 +143,19 @@
 .create-new-button:hover {
     background: linear-gradient(135deg, #7ecb1e, #5ca813);
     transform: translateY(-1px);
+}
+
+.no-content {
+  height: 100%;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+  justify-content: center; 
+  text-align: center;
+}
+
+.no-content p {
+    cursor: pointer;
 }

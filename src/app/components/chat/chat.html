@@ -1,1 +1,4 @@
-<p>chat works!</p>
+<p (click)="createMessage('Im sadam from syria')">chat works!</p>
+<p *ngFor="let i of messagesData">{{i.userId}}: {{i.content}}</p>
+<input type="text" #messageInput>
+<button (click)="createMessage(messageInput.value)">send</button>

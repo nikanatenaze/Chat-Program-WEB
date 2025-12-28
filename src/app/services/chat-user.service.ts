@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { ChatInterface } from '../interfaces/chat.interface';
 import { UserInterface } from '../interfaces/user.interface';
 import { GlobalMethods } from '../classes/global-methods';
+import { MessageInterface } from '../interfaces/message.interface';
 
 @Injectable({
   providedIn: 'root',
