@@ -13,10 +13,10 @@ import { TokenModelInterface } from '../../interfaces/token-model.interface';
   selector: 'app-chat',
   standalone: false,
   templateUrl: './chat.html',
-  styleUrls: ['./chat.css'], // ✅ plural
+  styleUrls: ['./chat.css'],
 })
 export class Chat implements OnInit, OnDestroy, AfterViewChecked {
-  public routerId!: number; // Chat ID from route
+  public routerId!: number;
   public tokenData!: TokenModelInterface;
   public messagesData: MessageInterface[] = [];
   public newMessage = '';
@@ -29,7 +29,7 @@ export class Chat implements OnInit, OnDestroy, AfterViewChecked {
     private chatHub: ChatHubService,
     private messagesService: MessageService,
     private chatService: ChatService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.actRouter.params.subscribe(params => {
@@ -66,6 +66,8 @@ export class Chat implements OnInit, OnDestroy, AfterViewChecked {
     this.chatService.GetChatMessages(this.routerId).subscribe(msgs => {
       this.messagesData = msgs;
       this.loading = false;
+      console.log(this.loading);
+      
       this.scrollToBottom();
     });
   }
