@@ -1,15 +1,26 @@
-<div class="chat-container" *ngIf="!loading; else loadingTpl">
-  <div class="messages">
-    <div *ngFor="let msg of messagesData" class="message">
-      <strong>{{msg.userId}}:</strong> {{msg.content}}
+<section class="content default-page-background">
+  <div class="chat-container" *ngIf="!loading; else loadingTpl">
+    <p><span><i class="fa-solid fa-arrow-left"></i></span></p>
+    <div class="messages">
+      <div class="message" *ngFor="let i of messagesData">
+        <p class="message-info">{{i.id}} • {{i.createdAt}}</p>
+        <p class="message-content">{{i.content}}</p>
+      </div>
+    </div>
+    <div class="input-area">
+      <i class="fa-solid fa-plus"></i>
+      <input type="text" placeholder="Enter the text..." (keypress.enter)="createMessage()">   
+      <button (click)="createMessage()"><i class="fa-solid fa-arrow-up-long"></i></button>
     </div>
   </div>
+</section>
 
-  <div class="input-area">
-    <input type="text" [(ngModel)]="newMessage" placeholder="Type a message..." (keyup.enter)="createMessage()">
-    <button (click)="createMessage()">Send</button>
+<ng-template #systemUserMessage>
+  <div class="message">
+    <p class="message-info">You • 10/10/0000</p>
+    <p class="message-content mymessage">Hello Im' nikoloz, its an test message</p>
   </div>
-</div>
+</ng-template>
 
 <ng-template #loadingTpl>
   <app-loader></app-loader>

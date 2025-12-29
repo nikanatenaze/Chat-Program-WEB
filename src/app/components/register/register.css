@@ -12,7 +12,8 @@
   width: 330px;
   padding: 30px 15px;
   border-radius: 10px;
-  background-color: white;
+  background-color: var(--ui-background-color);
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -20,11 +21,6 @@
   box-shadow: 
     0 10px 30px rgba(0, 0, 0, 0.35),
     0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.register-card:hover {
-  background-color: #050506;
-  color: white;
 }
 
 .title {

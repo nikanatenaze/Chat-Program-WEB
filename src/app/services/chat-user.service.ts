@@ -4,6 +4,7 @@ import { ChatInterface } from '../interfaces/chat.interface';
 import { UserInterface } from '../interfaces/user.interface';
 import { GlobalMethods } from '../classes/global-methods';
 import { MessageInterface } from '../interfaces/message.interface';
+import { ChatUserInterface } from '../interfaces/chat-user.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -14,13 +15,13 @@ export class ChatUserService {
   constructor(private http: HttpClient) {}
 
   GetUsersInChat(id:number) {
-    return this.http.get<Array<UserInterface>>(this.api + `/GetUsersInChat/${id}`, {
+    return this.http.get<Array<ChatUserInterface>>(this.api + `/GetUsersInChat/${id}`, {
       headers: GlobalMethods.getAuthHeaders()
     })
   }
 
   GetChatsOfUser(id: number) {
-    return this.http.get<Array<ChatInterface>>(this.api + `/GetChatsOfUser/${id}`, {
+    return this.http.get<Array<ChatUserInterface>>(this.api + `/GetChatsOfUser/${id}`, {
       headers: GlobalMethods.getAuthHeaders()
     })
   }

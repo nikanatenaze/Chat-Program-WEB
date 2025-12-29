@@ -11,7 +11,7 @@
     max-width: 70%;
     height: 650px;
     padding: 20px;
-    background-color: #050506 ;
+    background-color: var(--ui-background-color);
     color: white;
     border-radius: 1rem;
     border: 5px solid rgba(255, 255, 255, 0.15);
