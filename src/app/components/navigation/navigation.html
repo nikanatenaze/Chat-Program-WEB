@@ -1,4 +1,4 @@
-<nav class="navigaton">
+<nav class="navigaton" #navContent>
     <div class="navigaton-content">
         <div class="title">
             <p class="title-t" routerLink="/">Nikoloz's Chat</p>
@@ -18,21 +18,22 @@
                 <p>Register →</p>
             </div>
         </div>
-
-        <ng-template #userPanel>
-            <div class="user-panel" *ngIf="auth.userToken$ | async">
-                <div class="gp-button custom-btn-1" routerLink="/profile">
-                    <p>Profile <i class="fa-solid fa-user"></i></p>
-                </div>
-            </div>
-        </ng-template>
-
-        <ng-template #userUl>
-            <ul class="buttons" *ngIf="auth.userToken$ | async">
-                <li routerLink="/">Home</li>
-                <li routerLink="/chats">Chats</li>
-                <li (click)="openPage('https://github.com/nikanatenaze/Chat-Program-WEB')">Archive</li>
-            </ul>
-        </ng-template>
     </div>
+    <i class="up-down-btn fa-solid fa-chevron-up" (click)="toggleHiddeNav()" #toggleHideButton></i>
 </nav>
+
+<ng-template #userPanel>
+    <div class="user-panel" *ngIf="auth.userToken$ | async">
+        <div class="gp-button custom-btn-1" routerLink="/profile">
+            <p>Profile <i class="fa-solid fa-user"></i></p>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #userUl>
+    <ul class="buttons" *ngIf="auth.userToken$ | async">
+        <li routerLink="/">Home</li>
+        <li routerLink="/chats">Chats</li>
+        <li (click)="openPage('https://github.com/nikanatenaze/Chat-Program-WEB')">Archive</li>
+    </ul>
+</ng-template>

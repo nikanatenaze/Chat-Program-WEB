@@ -10,7 +10,7 @@
         <div class="line"></div>
         <ng-container *ngIf="(userChats$ | async) as chats">
             <ul class="chat-list" *ngIf="chats.length > 0; else nocontent">
-                <li *ngFor="let i of chats" class="chat-card" routerLink="/chat/11">
+                <li *ngFor="let i of chats" class="chat-card" routerLink="/chat/{{i.id}}">
                     <div class="chat-information">
                         <div class="chat-main">
                             <p class="chat-name">{{ i.name }}</p>
@@ -23,9 +23,9 @@
                     </div>
 
                     <div class="chat-buttons">
-                        <i class="chat-button fa-solid fa-circle-info" title="Info" (click)="moreInfo()"></i>
+                        <i class="chat-button fa-solid fa-circle-info" title="Info" (click)="moreInfo(); $event.stopPropagation()"></i>
                         <i class="chat-button fa-solid fa-arrow-right-from-bracket" title="QuitFromChat"
-                            (click)="quitFromChat(i.id)"></i>
+                            (click)="quitFromChat(i.id); $event.stopPropagation()"></i>
                     </div>
                 </li>
             </ul>

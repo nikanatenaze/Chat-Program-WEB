@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, viewChild } from '@angular/core';
 import { Auth } from '../../services/auth';
 
 @Component({
@@ -9,6 +9,8 @@ import { Auth } from '../../services/auth';
 })
 export class Navigation implements OnInit {
   public userToken: string | null = null;
+  @ViewChild('navContent') navigation!: ElementRef
+  @ViewChild('toggleHideButton') hiddeButton!: ElementRef
 
   constructor(public auth: Auth) {}
 
@@ -16,6 +18,12 @@ export class Navigation implements OnInit {
     this.auth.userToken$.subscribe(token => {
       this.userToken = token;
     });
+  }
+
+  toggleHiddeNav() {
+    this.navigation.nativeElement.classList.toggle('hidden-nav-content')
+    this.hiddeButton.nativeElement.classList.toggle('fa-chevron-up')
+    this.hiddeButton.nativeElement.classList.toggle('fa-chevron-down')
   }
 
   public openPage(url: string) {

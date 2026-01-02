@@ -1,5 +1,7 @@
 .navigaton {
     display: flex;
+    flex-direction: column;
+    gap: 8px;
     position: fixed;
     top: 15px;
     width: 100%;
@@ -7,6 +9,7 @@
     background-color: transparent;
     align-items: center;
     justify-content: center;
+    transition: .3s all ease;
 }
 
 .navigaton-content {
@@ -17,13 +20,21 @@
     border-radius: .75rem;
     width: 70%;
     background-color: rgba(167, 160, 160, 0.438);
-    box-shadow: 0px 4px 9px rgba(160, 159, 159, 0.15);;
+    box-shadow: 0px 2px 15px rgba(160, 159, 159, 0.15);;
     backdrop-filter: blur(20px);
     height: 100%;
-    padding: 15px;
+    padding: 13px;
 }
-.navigaton-content:hover {
-    background-color: rgb(17, 17, 17);
+
+.up-down-btn {
+    font-size: 20px;
+    color: rgb(216, 215, 215);
+    transition: .3s all ease ;
+    cursor: pointer;
+}
+
+.hidden-nav-content {
+    top: -75px !important;
 }
 
 .title {
@@ -38,13 +49,13 @@
     cursor: pointer;
     font-weight: bolder;
     color: white;
-    font-size: 25px;
+    font-size: 23px;
     font-family: "Oxygen", sans-serif;
 }
 
 .line {
     display: flex;
-    height: 35px;
+    height: 28px;
     width: 1px;
     background-color: rgb(177, 177, 177);
 }
@@ -91,7 +102,7 @@
     font-size: 1.125rem;
     border-radius: .625rem;
     cursor: pointer;
-    height: 3.25rem;
+    height: 3rem;
     color: white;
     transition: 0.3s all ease;
 }
