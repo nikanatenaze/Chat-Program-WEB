@@ -7,7 +7,6 @@
 }
 
 .chat-container {
-    padding-top: 90px;
     width: 40%;
     height: 100%;
     display: flex;
@@ -113,8 +112,7 @@
 
 .message-info {
     font-weight: bold;
-    position: relative;
-    left: 10px;
+    margin-left: 10px;
     color: rgb(214, 211, 211);
     font-size: 9px;
 }

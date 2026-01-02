@@ -9,7 +9,8 @@ import { Auth } from '../../services/auth';
 })
 export class Navigation implements OnInit {
   public userToken: string | null = null;
-  @ViewChild('navContent') navigation!: ElementRef
+  @ViewChild('navigation') navigation!: ElementRef
+  @ViewChild('navContent') navContent!: ElementRef
   @ViewChild('toggleHideButton') hiddeButton!: ElementRef
 
   constructor(public auth: Auth) {}
@@ -22,6 +23,7 @@ export class Navigation implements OnInit {
 
   toggleHiddeNav() {
     this.navigation.nativeElement.classList.toggle('hidden-nav-content')
+    this.navContent.nativeElement.classList.toggle('navigaton-content-shadow')
     this.hiddeButton.nativeElement.classList.toggle('fa-chevron-up')
     this.hiddeButton.nativeElement.classList.toggle('fa-chevron-down')
   }
