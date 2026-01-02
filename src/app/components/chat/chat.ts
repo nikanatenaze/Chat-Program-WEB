@@ -67,6 +67,8 @@ export class Chat implements OnInit, OnDestroy {
       console.error(err);
       this.router.navigate(["/"])
     } finally {
+      var checkUser = this.getUserById(this.tokenData.id)
+      if(!checkUser) this.router.navigate(["/"])
       this.loading = false;
     }
   }
@@ -194,6 +196,6 @@ export class Chat implements OnInit, OnDestroy {
   }
 
   private getUserById(id: number) {
-    return this.usersData.find(x => x.id === id)
+    return this.usersData.find(x => x.id == id)
   }
 }
