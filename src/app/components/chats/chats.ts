@@ -17,8 +17,8 @@ import { User } from '../../services/user';
 export class Chats implements OnInit {
 
   loading: boolean = true
-  private _userChats$ = new BehaviorSubject<ChatInterface[]>([]);
-  public userChats$ = this._userChats$.asObservable();
+  private readonly _userChats$ = new BehaviorSubject<ChatInterface[]>([]);
+  readonly userChats$ = this._userChats$.asObservable();
   protected userId: number = 0
 
   constructor(private chatService: ChatService, private chatUserService: ChatUserService, private router: Router, private userService: User) {
@@ -26,41 +26,55 @@ export class Chats implements OnInit {
 
   async ngOnInit(): Promise<void> {
     try {
-      const data = await firstValueFrom(this.userService.getDataFromToken())
-      this.userId = Number(data.id)
+      const data = await firstValueFrom(this.userService.getDataFromToken());
+      this.userId = Number(data?.id);
+
       if (!this.userId) {
-        this.router.navigate(['/'])
+        this.router.navigate(['/']);
+        return;
       }
 
-      this.chatUserService.GetChatsOfUser(Number(this.userId))
-        .pipe(finalize(() => {
-          this.loading = false
-        }))
+      this.chatUserService
+        .GetChatsOfUser(this.userId)
+        .pipe(finalize(() => (this.loading = false)))
         .subscribe({
-          next: (x) => {
-            const formattedChats = x.map(c => ({
+          next: chats => {
+            const formatted = chats.map(c => ({
               ...c,
-              createdAt: GlobalMethods.formatDate(c.createdAt)
+              createdAt: GlobalMethods.formatDate(c.createdAt),
             }));
-            this._userChats$.next(formattedChats);
+            this._userChats$.next(formatted);
           },
-          error: ((x) => {
-            console.log(x);
-            this.router.navigate(["/"])
-          })
+          error: err => {
+            console.error(err);
+            this.router.navigate(['/']);
+          },
         });
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       this.router.navigate(['/']);
     }
   }
 
-  loadUserChats(userId: number) {
-    this.chatUserService.GetChatsOfUser(userId).subscribe({
-      next: (chats) => this._userChats$.next(chats),
-      error: (err) => console.error(err)
-    });
+  loadUserChats(userId: number): void {
+    this.chatUserService
+      .GetChatsOfUser(userId)
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
+        next: chats => {
+          const formatted = chats.map((c: any) => ({
+            ...c,
+            createdAt: GlobalMethods.formatDate(c.createdAt),
+          }));
+          this._userChats$.next(formatted);
+        },
+        error: err => {
+          console.error(err);
+          this.router.navigate(['/']);
+        },
+      });
   }
+
 
   createChat() {
     Swal.fire({

@@ -1,15 +1,17 @@
-<section class="content default-page-background">
-  <div class="chat-container" *ngIf="!loading; else loadingTpl">
+<section class="content default-page-background" *ngIf="!loading; else loadingTpl">
+  <div class="chat-container">
     <p><span><i class="fa-solid fa-arrow-left"></i></span></p>
     <div class="messages">
       <div class="message" *ngFor="let i of messagesData">
-        <p class="message-info">{{i.id}} • {{i.createdAt}}</p>
-        <p class="message-content">{{i.content}}</p>
+        <p class="message-info" *ngIf="i.userId == tokenData.id">You • {{i.createdAt}}</p>
+        <p class="message-info" *ngIf="i.userId != tokenData.id">{{i.userName}} • {{i.createdAt}}</p>
+        <span class="message-content user-message" *ngIf="i.userId == tokenData.id">{{i.content}}</span>
+        <span class="message-content" *ngIf="i.userId != tokenData.id">{{i.content}}</span>
       </div>
     </div>
     <div class="input-area">
-      <i class="fa-solid fa-plus"></i>
-      <input type="text" placeholder="Enter the text..." (keypress.enter)="createMessage()">   
+      <i class="input-plus-button fa-solid fa-plus"></i>
+      <input type="text" [(ngModel)]="newMessage" placeholder="Enter the text..." (keydown.enter)="createMessage()" >
       <button (click)="createMessage()"><i class="fa-solid fa-arrow-up-long"></i></button>
     </div>
   </div>
@@ -23,5 +25,7 @@
 </ng-template>
 
 <ng-template #loadingTpl>
-  <app-loader></app-loader>
+  <div class="loading-div default-page-background">
+    <app-loader></app-loader>
+  </div>
 </ng-template>

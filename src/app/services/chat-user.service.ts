@@ -5,43 +5,53 @@ import { UserInterface } from '../interfaces/user.interface';
 import { GlobalMethods } from '../classes/global-methods';
 import { MessageInterface } from '../interfaces/message.interface';
 import { ChatUserInterface } from '../interfaces/chat-user.interface';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChatUserService {
   private api = GlobalMethods.GlobalApiUrl + "/ChatUser"
+  constructor(private http: HttpClient) { }
 
-  constructor(private http: HttpClient) {}
-
-  GetUsersInChat(id:number) {
-    return this.http.get<Array<ChatUserInterface>>(this.api + `/GetUsersInChat/${id}`, {
-      headers: GlobalMethods.getAuthHeaders()
-    })
+  // ✅ RETURNS ARRAY
+  GetChatsOfUser(id: number): Observable<ChatInterface[]> {
+    return this.http.get<ChatInterface[]>(
+      `${this.api}/GetChatsOfUser/${id}`,
+      { headers: GlobalMethods.getAuthHeaders() }
+    );
   }
 
-  GetChatsOfUser(id: number) {
-    return this.http.get<Array<ChatUserInterface>>(this.api + `/GetChatsOfUser/${id}`, {
-      headers: GlobalMethods.getAuthHeaders()
-    })
+  // ✅ RETURNS ARRAY
+  GetUsersInChat(id: number): Observable<UserInterface[]> {
+    return this.http.get<UserInterface[]>(
+      `${this.api}/GetUsersInChat/${id}`,
+      { headers: GlobalMethods.getAuthHeaders() }
+    );
   }
 
-  CheckUserInChat(chatId: number, userId: number) {
-    return this.http.get<boolean>(this.api + `/${chatId}/isMember/${userId}`, {
-      headers: GlobalMethods.getAuthHeaders()
-    })
+  CheckUserInChat(chatId: number, userId: number): Observable<boolean> {
+    return this.http.get<boolean>(
+      `${this.api}/${chatId}/isMember/${userId}`,
+      { headers: GlobalMethods.getAuthHeaders() }
+    );
   }
 
-  AddChatUser(propmt: {userId: number, chatId: number}) {
-    return this.http.post(this.api + `/AddChatUser`, propmt, {
-      headers: GlobalMethods.getAuthHeaders()
-    })
+  AddChatUser(prompt: { userId: number; chatId: number }): Observable<void> {
+    return this.http.post<void>(
+      `${this.api}/AddChatUser`,
+      prompt,
+      { headers: GlobalMethods.getAuthHeaders() }
+    );
   }
 
-  RemoveChatUser(propmt: {userId: number, chatId: number}) {
-    return this.http.delete(this.api + `/RemoveFromChat`, {
-      headers: GlobalMethods.getAuthHeaders(),
-      body: propmt
-    })
+  RemoveChatUser(prompt: { userId: number; chatId: number }): Observable<void> {
+    return this.http.delete<void>(
+      `${this.api}/RemoveFromChat`,
+      {
+        headers: GlobalMethods.getAuthHeaders(),
+        body: prompt,
+      }
+    );
   }
 }

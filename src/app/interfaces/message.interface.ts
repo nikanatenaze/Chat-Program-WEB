@@ -4,4 +4,5 @@ export interface MessageInterface {
     createdAt: string
     userId: number
     chatId: number
+    userName?: string;
 }

@@ -9,6 +9,11 @@ import { User } from '../../services/user';
 import { MessageInterface } from '../../interfaces/message.interface';
 import { TokenModelInterface } from '../../interfaces/token-model.interface';
 import { ChatUserService } from '../../services/chat-user.service';
+import { ChatUserInterface } from '../../interfaces/chat-user.interface';
+import { ChatInterface } from '../../interfaces/chat.interface';
+import { GlobalMethods } from '../../classes/global-methods';
+import { UserInterface } from '../../interfaces/user.interface';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-chat',
@@ -19,10 +24,12 @@ import { ChatUserService } from '../../services/chat-user.service';
 export class Chat implements OnInit, OnDestroy {
   public routerId!: number;
   public tokenData!: TokenModelInterface;
+  public usersData!: UserInterface[];
+  public chatData!: ChatInterface;
   public messagesData: MessageInterface[] = [];
-  public chatUsersData: any
   public newMessage = '';
   public loading = true;
+  public isSending = false;
 
   constructor(
     private actRouter: ActivatedRoute,
@@ -45,11 +52,89 @@ export class Chat implements OnInit, OnDestroy {
   }
 
   private initChat() {
+    this.connection();
+    this.fetchData();
+  }
+
+  //Data fetching methods
+
+  private async fetchData() {
+    try {
+      await this.fetchChat();
+      await this.fetchUsers();
+      await this.fetchMessages();
+    } catch (err) {
+      console.error(err);
+      this.router.navigate(["/"])
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  private fetchUsers(): Promise<void> {
+    return new Promise((res, rej) => {
+      this.chatUserService.GetUsersInChat(this.routerId).subscribe({
+        next: x => {
+          this.usersData = x
+          res();
+        },
+        error(err) {
+          rej(err)
+        },
+      })
+    })
+  }
+
+  private fetchMessages(): Promise<void> {
+    return new Promise((res, rej) => {
+      this.chatService.GetChatMessages(this.routerId).subscribe({
+        next: x => {
+          const formatted = x.map(a => ({
+            ...a,
+            createdAt: GlobalMethods.formatDate(a.createdAt, true),
+            userName: this.getUserById(a.userId)?.name || 'Unknown'
+          }));
+          this.messagesData = formatted;
+          this.scrollToBottom();
+          res()
+        },
+        error(err) {
+          rej(err)
+        },
+      });
+    })
+  }
+
+  private fetchChat(): Promise<void> {
+    return new Promise((res, rej) => {
+      this.chatService.GetChatById(this.routerId).subscribe({
+        next: x => {
+          const formated = {
+            ...x,
+            createdAt: GlobalMethods.formatDate(x.createdAt, true)
+          }
+          this.chatData = x
+          res();
+        },
+        error(err) {
+          rej(err)
+        },
+      })
+    })
+  }
+
+  // signalR methods
+  private connection() {
     this.chatHub.startConnection(sessionStorage.getItem("token") ?? '')
       .then(() => {
         this.chatHub.joinChat(this.routerId);
         this.chatHub.onCreateMessage(msg => {
-          this.messagesData.push(msg);
+          const formattedMsg = {
+            ...msg,
+            createdAt: GlobalMethods.formatDate(msg.createdAt, true),
+            userName: this.getUserById(msg.userId)?.name || 'Unknown'
+          };
+          this.messagesData.push(formattedMsg);
           this.scrollToBottom();
         });
 
@@ -62,24 +147,21 @@ export class Chat implements OnInit, OnDestroy {
           this.messagesData = this.messagesData.filter(m => m.id !== msg.id);
         });
       });
-    this.fetchData();
-  }
-
-  private fetchData() {
-    this.fetchMessages()
-  }
-
-  private fetchMessages() {
-    this.chatService.GetChatMessages(this.routerId).subscribe(msgs => {
-      this.messagesData = msgs;
-      this.loading = false;
-      this.scrollToBottom();
-    });
   }
 
   public createMessage() {
+    if (this.isSending) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Stop spamming!",
+        footer: '<a href="#">Why do I have this issue?</a>'
+      });
+      return;
+    };
     if (!this.newMessage.trim()) return;
 
+    this.isSending = true;
     const payload = {
       content: this.newMessage,
       userId: this.tokenData.id,
@@ -87,12 +169,23 @@ export class Chat implements OnInit, OnDestroy {
     };
 
     this.messagesService.CreateMessage(payload).subscribe({
-      next: () => this.newMessage = '',
-      error: err => console.error(err)
+      next: () => {
+        this.newMessage = ''
+        this.isSending = false;
+      },
+      error: err => {
+        console.error(err)
+        this.isSending = false;
+      }
     });
     this.scrollToBottom()
   }
 
+  ngOnDestroy(): void {
+    this.chatHub.stopConnection();
+  }
+
+  // Baisic methods
   private scrollToBottom() {
     setTimeout(() => {
       const container = document.querySelector('.messages');
@@ -100,7 +193,7 @@ export class Chat implements OnInit, OnDestroy {
     }, 50);
   }
 
-  ngOnDestroy(): void {
-    this.chatHub.stopConnection();
+  private getUserById(id: number) {
+    return this.usersData.find(x => x.id === id)
   }
 }

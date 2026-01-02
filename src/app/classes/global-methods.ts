@@ -20,8 +20,21 @@ export class GlobalMethods {
         return sessionStorage.getItem('token');
     }
 
-    static formatDate(dateString: string): string {
-        const date = new Date(dateString);
-        return date.toLocaleString();
+    static formatDate(dateString: string, withTime: boolean = false) {
+        const date = new Date(dateString)
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1; // 0-based
+        const day = date.getDate();
+        if (withTime) {
+            return `${year}/${month}/${day} ${this.to12Hour(date.getHours(), date.getMinutes())}`
+        }
+        return `${year}/${month}/${day}`
+    }
+
+    static to12Hour(hours: number, minutes: number) {
+        const period = hours >= 12 ? 'PM' : 'AM';
+        const h = hours % 12 || 12; 
+
+        return `${h}:${minutes.toString().padStart(2, '0')} ${period}`;
     }
 }
