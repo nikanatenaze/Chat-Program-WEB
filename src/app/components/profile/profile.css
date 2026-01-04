@@ -103,3 +103,54 @@ button {
     font-size: 18px;
     color: #666;
 }
+
+/* --- Mobile / Phone Responsiveness --- */
+@media (max-width: 480px) {
+    .page {
+        padding: 10px;
+    }
+
+    .profile-ui {
+        padding: 20px 25px;
+        width: 100%;
+        max-width: 100%;
+        border-radius: 8px;
+        box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .title {
+        font-size: 22px;
+        margin-bottom: 8px;
+    }
+
+    .divider {
+        height: 1.5px;
+        margin-bottom: 15px;
+    }
+
+    .main-info {
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .input-div label {
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+
+    .input-div input {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+
+    .buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .buttons button {
+        flex: 1;
+        padding: 10px 0;
+        font-size: 15px;
+    }
+}

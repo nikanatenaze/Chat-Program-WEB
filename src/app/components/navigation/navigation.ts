@@ -27,10 +27,13 @@ export class Navigation implements OnInit {
     this.auth.userToken$.subscribe(token => {
       this.userToken = token;
     });
-    setTimeout(() => this.restoreNavState());
+
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(() => {
+      .subscribe((event: NavigationEnd) => {
+        const url = event.urlAfterRedirects;
+        const shouldHide = url.startsWith('/chat/');
+        sessionStorage.setItem(this.STORAGE_KEY, String(shouldHide));
         this.restoreNavState();
       });
   }

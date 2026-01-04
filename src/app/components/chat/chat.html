@@ -2,7 +2,7 @@
   <div class="chat-container">
     <div class="chat-info">
       <div class="title">
-        <i class="back-btn fa-solid fa-arrow-left-long"  routerLink="/chats"></i>
+        <i class="back-btn fa-solid fa-arrow-left-long" routerLink="/chats"></i>
         <p>{{chatData.name}}</p>
       </div>
       <div class="chat-info-buttons">
@@ -11,17 +11,17 @@
         <p (click)="quitFromChat()"><i class="fa-solid fa-arrow-right-from-bracket"></i></p>
       </div>
     </div>
-    <div class="messages" *ngIf="messagesData.length > 0; else noMessages">
-      <div class="message" *ngFor="let i of messagesData">
-        <p class="message-info" *ngIf="i.userId == tokenData.id">You • {{i.createdAt}}</p>
-        <p class="message-info" *ngIf="i.userId != tokenData.id">{{i.userName}} • {{i.createdAt}}</p>
-        <span class="message-content user-message" *ngIf="i.userId == tokenData.id">{{i.content}}</span>
-        <span class="message-content" *ngIf="i.userId != tokenData.id">{{i.content}}</span>
+    <div class="messages" *ngIf="messagesData.length > 0; else noMessages" >
+      <div class="message" [class.own]="m.userId == tokenData.id" *ngFor="let m of messagesData; let i = index">
+        <p class="message-info" *ngIf="!isGrouped(i)">{{ m.userId == tokenData.id ? 'You' : m.userName }} • {{ m.createdAt }}</p>
+        <span class="message-content" [class.own]="m.userId == tokenData.id" [class.user-message]="m.userId === tokenData.id">{{ m.content }}</span>
       </div>
     </div>
     <div class="input-area">
-      <input type="text" [(ngModel)]="newMessage" placeholder="Enter the text..." (keydown.enter)="createMessage()" >
-      <button (click)="createMessage()"><i class="fa-solid fa-arrow-up-long"></i></button>
+      <input type="text" [(ngModel)]="newMessage" placeholder="Enter the text..." (keydown.enter)="createMessage()">
+      <button (click)="createMessage()">
+        <i class="fa-solid fa-arrow-up-long"></i>
+      </button>
     </div>
   </div>
 </section>
@@ -34,7 +34,7 @@
 
 <ng-template #noMessages>
   <div class="no-messages">
-    <p class="no-messages-title text-gradient">There are not any messages</p>
-    <p class="no-messages-desc">create first one right now!</p>
+    <p class="no-messages-title text-gradient">There aren’t any messages.</p>
+    <p class="no-messages-desc">Create the first one right now!</p>
   </div>
 </ng-template>

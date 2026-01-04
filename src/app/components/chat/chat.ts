@@ -42,7 +42,6 @@ export class Chat implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    sessionStorage.setItem("navHidden", "true")
     this.actRouter.params.subscribe(params => {
       this.routerId = +params['id'];
       this.userService.getDataFromToken().subscribe(token => {
@@ -231,5 +230,9 @@ export class Chat implements OnInit, OnDestroy {
       }
     })
   }
-  
+
+  isGrouped(index: number): boolean {
+    if (index === 0) return false;
+    return this.messagesData[index].userId === this.messagesData[index - 1].userId;
+  }
 }
