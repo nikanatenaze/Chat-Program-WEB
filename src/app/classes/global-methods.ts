@@ -1,6 +1,7 @@
 import { HttpHeaders } from "@angular/common/http";
 import { User } from "../services/user";
 import { Auth } from "../services/auth";
+import Swal from "sweetalert2";
 
 export class GlobalMethods {
 
@@ -33,8 +34,17 @@ export class GlobalMethods {
 
     static to12Hour(hours: number, minutes: number) {
         const period = hours >= 12 ? 'PM' : 'AM';
-        const h = hours % 12 || 12; 
+        const h = hours % 12 || 12;
 
         return `${h}:${minutes.toString().padStart(2, '0')} ${period}`;
+    }
+
+    static notImplemented() {
+        Swal.fire({
+            icon: 'info',
+            title: 'Not Implemented',
+            text: 'This feature is not implemented yet.',
+            confirmButtonText: 'OK'
+        });
     }
 }

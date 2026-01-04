@@ -1,5 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild, viewChild } from '@angular/core';
 import { Auth } from '../../services/auth';
+import { filter } from 'rxjs';
+import { NavigationEnd, Router } from '@angular/router';
 
 @Component({
   selector: 'app-navigation',
@@ -9,23 +11,44 @@ import { Auth } from '../../services/auth';
 })
 export class Navigation implements OnInit {
   public userToken: string | null = null;
-  @ViewChild('navigation') navigation!: ElementRef
-  @ViewChild('navContent') navContent!: ElementRef
-  @ViewChild('toggleHideButton') hiddeButton!: ElementRef
 
-  constructor(public auth: Auth) {}
+  @ViewChild('navigation') navigation!: ElementRef;
+  @ViewChild('navContent') navContent!: ElementRef;
+  @ViewChild('toggleHideButton') hiddeButton!: ElementRef;
+
+  private readonly STORAGE_KEY = 'navHidden';
+
+  constructor(
+    public auth: Auth,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
     this.auth.userToken$.subscribe(token => {
       this.userToken = token;
     });
+    setTimeout(() => this.restoreNavState());
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.restoreNavState();
+      });
   }
 
   toggleHiddeNav() {
-    this.navigation.nativeElement.classList.toggle('hidden-nav-content')
-    this.navContent.nativeElement.classList.toggle('navigaton-content-shadow')
-    this.hiddeButton.nativeElement.classList.toggle('fa-chevron-up')
-    this.hiddeButton.nativeElement.classList.toggle('fa-chevron-down')
+    const isHidden = this.navigation.nativeElement.classList.toggle('hidden-nav-content');
+    this.navContent.nativeElement.classList.toggle('navigaton-content-shadow');
+    this.hiddeButton.nativeElement.classList.toggle('fa-chevron-up');
+    this.hiddeButton.nativeElement.classList.toggle('fa-chevron-down');
+    sessionStorage.setItem(this.STORAGE_KEY, String(isHidden));
+  }
+
+  private restoreNavState() {
+    const isHidden = sessionStorage.getItem(this.STORAGE_KEY) === 'true';
+    this.navigation.nativeElement.classList.toggle('hidden-nav-content', isHidden);
+    this.navContent.nativeElement.classList.toggle('navigaton-content-shadow', !isHidden);
+    this.hiddeButton.nativeElement.classList.toggle('fa-chevron-up', !isHidden);
+    this.hiddeButton.nativeElement.classList.toggle('fa-chevron-down', isHidden);
   }
 
   public openPage(url: string) {

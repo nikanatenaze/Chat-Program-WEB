@@ -26,14 +26,13 @@ export class Profile implements OnInit {
   ) { }
 
   async ngOnInit(): Promise<void> {
-
     try {
       const tokenData = await firstValueFrom(this.userService.getDataFromToken())
       const id = Number(tokenData.id)
-      if (!id) {
-        this.router.navigate(['/']);
-        return;
-      }
+      // if (!id) {
+      //   this.router.navigate(['/']);
+      //   return;
+      // }
 
       this.userService.getUserById(Number(id))
         .pipe(

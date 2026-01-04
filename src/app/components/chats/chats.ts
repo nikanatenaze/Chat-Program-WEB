@@ -186,13 +186,8 @@ export class Chats implements OnInit {
       }
     });
   }
-
-  moreInfo() {
-    Swal.fire({
-      icon: 'info',
-      title: 'Not Implemented',
-      text: 'This feature is not implemented yet.',
-      confirmButtonText: 'OK'
-    });
+  
+  notImplemented() {
+    GlobalMethods.notImplemented();
   }
 }

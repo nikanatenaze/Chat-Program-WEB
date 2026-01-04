@@ -1,4 +1,4 @@
-.navigaton {
+ .navigaton {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -10,9 +10,11 @@
     align-items: center;
     justify-content: center;
     transition: .3s all ease;
+    pointer-events: none;
 }
 
 .navigaton-content {
+    pointer-events: auto;
     transition: 0.4s all ease;
     display: flex;
     align-items: center;
@@ -30,6 +32,7 @@
 }
 
 .up-down-btn {
+    pointer-events: auto;
     font-size: 16px;
     color: rgb(216, 215, 215);
     transition: .3s all ease;

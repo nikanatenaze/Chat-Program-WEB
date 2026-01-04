@@ -21,9 +21,9 @@
                             {{ i.createdAt }}
                         </p>
                     </div>
-
                     <div class="chat-buttons">
-                        <i class="chat-button fa-solid fa-circle-info" title="Info" (click)="moreInfo(); $event.stopPropagation()"></i>
+                        <i class="chat-button fa-solid fa-circle-info" title="Info"
+                            (click)="notImplemented(); $event.stopPropagation()"></i>
                         <i class="chat-button fa-solid fa-arrow-right-from-bracket" title="QuitFromChat"
                             (click)="quitFromChat(i.id); $event.stopPropagation()"></i>
                     </div>
@@ -31,16 +31,15 @@
             </ul>
         </ng-container>
     </div>
-
-    <ng-template #nocontent>
-        <div class="no-content">
-            <h2>You have not any chats yet.</h2>
-            <p class="text-gradient" (click)="createChat()">Lets create new one?</p>
-        </div>
-    </ng-template>
-
-
-    <ng-template #loadingTemplate>
-        <app-loader></app-loader>
-    </ng-template>
 </section>
+
+<ng-template #nocontent>
+    <div class="no-content">
+        <h2>You have not any chats yet.</h2>
+        <p class="text-gradient" (click)="createChat()">Lets create new one?</p>
+    </div>
+</ng-template>
+
+<ng-template #loadingTemplate>
+    <app-loader></app-loader>
+</ng-template>

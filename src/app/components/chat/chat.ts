@@ -42,6 +42,7 @@ export class Chat implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    sessionStorage.setItem("navHidden", "true")
     this.actRouter.params.subscribe(params => {
       this.routerId = +params['id'];
       this.userService.getDataFromToken().subscribe(token => {
@@ -68,7 +69,7 @@ export class Chat implements OnInit, OnDestroy {
       this.router.navigate(["/"])
     } finally {
       var checkUser = this.getUserById(this.tokenData.id)
-      if(!checkUser) this.router.navigate(["/"])
+      if (!checkUser) this.router.navigate(["/"])
       this.loading = false;
     }
   }
@@ -198,4 +199,37 @@ export class Chat implements OnInit, OnDestroy {
   private getUserById(id: number) {
     return this.usersData.find(x => x.id == id)
   }
+
+  notImplemented() {
+    GlobalMethods.notImplemented();
+  }
+
+  // Functional
+
+  quitFromChat() {
+    Swal.fire({
+      title: "You want quit?",
+      text: "You cant join back, by your self",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, I want quit"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.chatUserService.RemoveChatUser({ userId: this.tokenData.id, chatId: this.chatData.id }).subscribe({
+          next: () => {
+            Swal.fire({
+              title: "Quited!",
+              text: "You have successfuly quited the chat.",
+              icon: "success"
+            }).then(() => {
+              this.router.navigate(["/chats"])
+            });
+          }
+        })
+      }
+    })
+  }
+  
 }
