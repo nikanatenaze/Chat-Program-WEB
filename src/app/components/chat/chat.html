@@ -2,8 +2,8 @@
   <div class="chat-container">
     <div class="chat-info">
       <div class="title">
-        <i class="back-btn fa-solid fa-arrow-left-long" routerLink="/chats"></i>
-        <p>{{chatData.name}}</p>
+        <i class="back-btn fa-solid fa-caret-left" routerLink="/chats"></i>
+        <p class="chat-title">{{ chatData.name }}</p>
       </div>
       <div class="chat-info-buttons">
         <p (click)="notImplemented()"><i class="fa-solid fa-user-plus"></i></p>
@@ -11,10 +11,14 @@
         <p (click)="quitFromChat()"><i class="fa-solid fa-arrow-right-from-bracket"></i></p>
       </div>
     </div>
-    <div class="messages" *ngIf="messagesData.length > 0; else noMessages" >
+    <div class="messages" *ngIf="messagesData.length > 0; else noMessages">
       <div class="message" [class.own]="m.userId == tokenData.id" *ngFor="let m of messagesData; let i = index">
-        <p class="message-info" *ngIf="!isGrouped(i)">{{ m.userId == tokenData.id ? 'You' : m.userName }} • {{ m.createdAt }}</p>
-        <span class="message-content" [class.own]="m.userId == tokenData.id" [class.user-message]="m.userId === tokenData.id">{{ m.content }}</span>
+        <p class="message-info" *ngIf="!isGrouped(i)">{{ m.userId == tokenData.id ? 'You *' : m.userName }}</p>
+        <div class="message-content" [class.own]="m.userId == tokenData.id"
+          [class.user-message]="m.userId === tokenData.id">
+          <span class="message-content-text">{{ m.content }}</span>
+          <p class="message-content-date" [class.owna]="true">{{ m.createdAt }}</p>
+        </div>
       </div>
     </div>
     <div class="input-area">

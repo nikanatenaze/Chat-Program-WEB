@@ -93,7 +93,7 @@ export class Chat implements OnInit, OnDestroy {
         next: x => {
           const formatted = x.map(a => ({
             ...a,
-            createdAt: GlobalMethods.formatDate(a.createdAt, true),
+            createdAt: GlobalMethods.formatDate(a.createdAt, false, true),
             userName: this.getUserById(a.userId)?.name || 'Unknown'
           }));
           this.messagesData = formatted;
@@ -113,7 +113,7 @@ export class Chat implements OnInit, OnDestroy {
         next: x => {
           const formated = {
             ...x,
-            createdAt: GlobalMethods.formatDate(x.createdAt, true)
+            createdAt: GlobalMethods.formatDate(x.createdAt, false, true)
           }
           this.chatData = x
           res();
@@ -133,7 +133,7 @@ export class Chat implements OnInit, OnDestroy {
         this.chatHub.onCreateMessage(msg => {
           const formattedMsg = {
             ...msg,
-            createdAt: GlobalMethods.formatDate(msg.createdAt, true),
+            createdAt: GlobalMethods.formatDate(msg.createdAt, false, true),
             userName: this.getUserById(msg.userId)?.name || 'Unknown'
           };
           this.messagesData.push(formattedMsg);

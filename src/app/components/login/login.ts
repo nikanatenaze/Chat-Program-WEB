@@ -38,7 +38,7 @@ export class Login implements OnInit {
         }).then(() => {
           sessionStorage.setItem('token', x.token);
           this.regForm.reset();
-          this.router.navigate(["/"])
+          this.router.navigate(["/profile"])
         });
       },
       error(err) {
