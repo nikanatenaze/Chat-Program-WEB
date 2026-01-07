@@ -22,7 +22,6 @@ export class Navigation implements OnInit {
     public auth: Auth,
     private router: Router
   ) { }
-
   ngOnInit(): void {
     this.auth.userToken$.subscribe(token => {
       this.userToken = token;
@@ -32,8 +31,9 @@ export class Navigation implements OnInit {
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
         const url = event.urlAfterRedirects;
-        const shouldHide = url.startsWith('/chat/');
-        sessionStorage.setItem(this.STORAGE_KEY, String(shouldHide));
+        if (url.startsWith('/chat/')) {
+          sessionStorage.setItem(this.STORAGE_KEY, 'true');
+        }
         this.restoreNavState();
       });
   }

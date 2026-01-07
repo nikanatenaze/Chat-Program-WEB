@@ -31,6 +31,8 @@ export class Chat implements OnInit, OnDestroy {
   public loading = true;
   public isSending = false;
 
+  private readonly NAVIGATION_STORAGE_KEY = 'navHidden';
+
   constructor(
     private actRouter: ActivatedRoute,
     private router: Router,
@@ -42,6 +44,7 @@ export class Chat implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    sessionStorage.setItem(this.NAVIGATION_STORAGE_KEY, "true")
     this.actRouter.params.subscribe(params => {
       this.routerId = +params['id'];
       this.userService.getDataFromToken().subscribe(token => {

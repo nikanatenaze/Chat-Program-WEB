@@ -72,3 +72,46 @@
     background: #4da3ff;
     transform: translateY(-2px);
 }
+
+
+/* Mobile phones */
+@media (max-width: 420px) {
+    .not-found-container {
+        padding: 10px;
+    }
+
+    .card {
+        padding: 25px 15px;
+        border-width: 3px;
+        border-radius: 12px;
+    }
+
+    .error-code {
+        font-size: 56px;
+    }
+
+    .card h1 {
+        font-size: 20px;
+    }
+
+    .card p {
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+
+    .chat-bubble {
+        font-size: 12px;
+        padding: 8px 12px;
+        margin-bottom: 20px;
+    }
+
+    .chat-bubble::after {
+        left: 14px;
+        border-width: 5px 5px 0;
+    }
+
+    .home-btn {
+        padding: 8px 20px;
+        font-size: 13px;
+    }
+}

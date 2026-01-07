@@ -13,6 +13,7 @@
      pointer-events: none;
      transform: translateY(0);
      transition: transform 0.35s ease;
+     z-index: 10000000;
  }
 
  .navigaton-content {
@@ -25,6 +26,7 @@
      width: 70%;
      background-color: rgba(167, 160, 160, 0.438);
      backdrop-filter: blur(20px);
+     will-change: transform;
      height: 100%;
      padding: 13px;
  }
@@ -34,6 +36,7 @@
  }
 
  .up-down-btn {
+     z-index: 100000;
      pointer-events: auto;
      font-size: 16px;
      color: rgb(216, 215, 215);
@@ -138,6 +141,7 @@
  }
 
  /* responsive */
+
  /* Tablet */
  @media (max-width: 1024px) {
      .navigaton-content {
@@ -154,7 +158,7 @@
      }
  }
 
- /* Phones only */
+ /* Phones*/
  @media (max-width: 480px) {
      .navigaton {
          top: 5px;
@@ -210,7 +214,7 @@
      }
 
      .up-down-btn {
-        position: relative;
+         position: relative;
          top: 5px;
          font-size: 14px;
      }

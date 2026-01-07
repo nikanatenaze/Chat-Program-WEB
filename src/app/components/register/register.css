@@ -123,3 +123,67 @@
 .register-card a:hover {
   text-decoration: underline;
 }
+
+/* Tablets */
+@media (max-width: 768px) {
+    .register-card {
+        width: 90%;
+        max-width: 380px;
+        padding: 25px 15px;
+    }
+
+    .title {
+        font-size: 26px;
+    }
+
+    .title-desc {
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .input-wrapper,
+    .reg-button {
+        width: 90%;
+    }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+    .page {
+        padding: 15px;
+    }
+
+    .register-card {
+        width: 100%;
+        padding: 20px 12px;
+        border-width: 3px;
+    }
+
+    .title {
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .title-desc {
+        font-size: 13px;
+    }
+
+    .inputs {
+        gap: 12px;
+    }
+
+    .input {
+        height: 46px;
+        font-size: 14px;
+    }
+
+    .reg-button {
+        height: 46px;
+        margin-top: 30px;
+        font-size: 14px;
+    }
+
+    .register-card a {
+        font-size: 13px;
+    }
+}

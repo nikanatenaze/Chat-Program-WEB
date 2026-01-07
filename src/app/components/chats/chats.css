@@ -146,14 +146,14 @@
 }
 
 .no-content {
-  height: 100%;
-  min-height: 300px;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  align-items: center;
-  justify-content: center; 
-  text-align: center;
+    height: 100%;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .no-content p {
@@ -161,133 +161,38 @@
 }
 
 
-/* --- Responsive Styles --- */
+/* responsive */
 
-/* Tablets / Medium screens */
-@media (max-width: 1024px) {
+@media (max-width: 900px) {
     .chats-ui {
-        width: 70%;
-        max-height: 75vh;
-        padding: 18px;
+        width: 90%;
+        max-width: 90%;
     }
-
-    .ui-title {
-        font-size: 26px;
-    }
-
-    .create-new-button {
-        padding: 9px 14px;
-        font-size: 14px;
-    }
-
     .chat-name {
-        font-size: 16px;
-    }
-
-    .chat-id,
-    .chat-date {
-        font-size: 12px;
-    }
-
-    .chat-buttons .chat-button {
         font-size: 16px;
     }
 }
 
-/* Mobile / Small screens */
-@media (max-width: 768px) {
-    .chats-ui {
-        width: 90%;
-        height: auto;
-        max-height: 80vh;
-        padding: 15px;
+@media (max-width: 600px) {
+    .content {
+        padding: 10px;
     }
 
-    .title-div {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
+    .chats-ui {
+        width: 100%;
+        max-width: 100%;
+        padding: 14px;
+    }
+
+    .chat-list {
+        padding-right: 0;
+    }
+
+    .chat-card {
+        padding: 12px;
     }
 
     .ui-title {
         font-size: 24px;
-    }
-
-    .create-new-button {
-        width: 100%;
-        justify-content: center;
-        padding: 10px;
-        font-size: 15px;
-    }
-
-    .chat-list {
-        gap: 10px;
-    }
-
-    .chat-card {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 10px;
-        gap: 8px;
-    }
-
-    .chat-main {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 5px;
-    }
-
-    .chat-name {
-        font-size: 16px;
-    }
-
-    .chat-id,
-    .chat-date {
-        font-size: 12px;
-    }
-
-    .chat-buttons {
-        width: 100%;
-        justify-content: flex-end;
-    }
-
-    .chat-buttons .chat-button {
-        font-size: 16px;
-    }
-}
-
-/* Extra small phones */
-@media (max-width: 480px) {
-    .chats-ui {
-        width: 100%;
-        padding: 12px;
-        max-height: 85vh;
-    }
-
-    .ui-title {
-        font-size: 20px;
-    }
-
-    .create-new-button {
-        font-size: 14px;
-        padding: 8px;
-    }
-
-    .chat-card {
-        padding: 8px;
-        gap: 6px;
-    }
-
-    .chat-name {
-        font-size: 14px;
-    }
-
-    .chat-id,
-    .chat-date {
-        font-size: 11px;
-    }
-
-    .chat-buttons .chat-button {
-        font-size: 14px;
     }
 }

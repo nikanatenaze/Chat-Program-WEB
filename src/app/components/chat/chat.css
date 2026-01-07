@@ -70,8 +70,7 @@
     padding: 7px 10px;
     margin-bottom: 5px;
     border-radius: 2rem;
-    backdrop-filter: blur(10px);
-    background-color: rgba(32, 32, 32, 0.95);
+    background-color: rgb(32, 32, 32);
     color: rgb(240, 240, 240);
 }
 
@@ -235,4 +234,123 @@
     justify-content: center;
     width: 100%;
     height: 100vh;
+}
+
+/* responsive */
+
+/* Large screens (default is already fine) */
+@media (min-width: 1200px) {
+    .chat-container {
+        width: 40%;
+    }
+
+    .message-content {
+        max-width: 420px;
+    }
+
+    .input-area input {
+        width: 18vw;
+    }
+}
+
+/* Laptops / small desktops */
+@media (max-width: 1199px) {
+    .chat-container {
+        width: 55%;
+    }
+
+    .message-content {
+        max-width: 380px;
+    }
+
+    .input-area input {
+        width: 100%;
+    }
+}
+
+/* Tablets */
+@media (max-width: 992px) {
+    .content {
+        align-items: stretch;
+    }
+
+    .chat-container {
+        width: 75%;
+        height: 100%;
+        border-radius: 0;
+    }
+
+    .message-content {
+        max-width: 80%;
+    }
+
+    .input-area {
+        padding: 8px 12px;
+    }
+
+    .input-area input {
+        font-size: 15px;
+    }
+}
+
+/* Phones */
+@media (max-width: 576px) {
+    .content {
+        height: 100svh;
+    }
+
+    .chat-container {
+        width: 100%;
+        height: 100%;
+        padding: 8px;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    .chat-info {
+        padding: 6px 10px;
+        border-radius: 0.8rem;
+    }
+
+    .chat-title {
+        font-size: 16px;
+    }
+
+    .chat-info-buttons {
+        gap: 6px;
+        font-size: 16px;
+    }
+
+    .messages {
+        padding: 4px;
+    }
+
+    .message-content {
+        max-width: 90%;
+        padding: 6px 10px;
+    }
+
+    .message-content-text {
+        font-size: 15px;
+    }
+
+    .message-content-date {
+        font-size: 9px;
+    }
+
+    .input-area {
+        padding: 6px 10px;
+        margin: 6px 0;
+    }
+
+    .input-area input {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .input-area button {
+        padding: 8px;
+        font-size: 12px;
+    }
 }
