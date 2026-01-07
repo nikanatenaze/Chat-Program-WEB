@@ -11,6 +11,8 @@
      justify-content: center;
      transition: .3s all ease;
      pointer-events: none;
+     transform: translateY(0);
+     transition: transform 0.35s ease;
  }
 
  .navigaton-content {
@@ -40,7 +42,7 @@
  }
 
  .hidden-nav-content {
-     top: -75px !important;
+     transform: translateY(-96%);
  }
 
  .title {
@@ -136,53 +138,45 @@
  }
 
  /* responsive */
-
+ /* Tablet */
  @media (max-width: 1024px) {
      .navigaton-content {
          width: 90%;
-         padding: 12px;
+         gap: 10px;
      }
 
      .title p {
-         font-size: 21px;
+         font-size: 20px;
      }
 
      .buttons li {
-         font-size: 17px;
-     }
-
-     .gp-button {
-         font-size: 1rem;
-         height: 2.75rem;
+         font-size: 16px;
      }
  }
 
- @media (max-width: 768px) {
+ /* Phones only */
+ @media (max-width: 480px) {
      .navigaton {
-         top: auto;
-         bottom: 12px;
-         gap: 0;
-         pointer-events: auto;
+         top: 5px;
      }
 
      .navigaton-content {
-         width: 94%;
-         padding: 16px;
-         border-radius: 1.25rem;
+         width: 95%;
          flex-direction: column;
-         gap: 14px;
-         background-color: rgba(20, 20, 20, 0.85);
-         backdrop-filter: blur(25px);
+         align-items: center;
+         padding: 10px;
+         border-radius: 8px;
+         gap: 10px;
      }
 
      .title {
-         flex-direction: column;
-         gap: 6px;
+         width: 100%;
+         justify-content: space-between;
+         gap: 8px;
      }
 
      .title p {
          font-size: 17px;
-         opacity: 0.85;
      }
 
      .line {
@@ -190,85 +184,34 @@
      }
 
      .buttons {
+         flex-direction: column;
          width: 100%;
-         justify-content: space-between;
-         gap: 5px;
+         gap: 6px;
+         align-items: center;
      }
 
      .buttons li {
-        padding: 10px 5px;
-         flex: 1;
-         text-align: center;
          font-size: 15px;
-         border-radius: 12px;
-         background-color: rgba(255, 255, 255, 0.08);
+         text-align: center;
      }
 
      .guest-panel,
      .user-panel {
+         flex-direction: column;
          width: 100%;
-         justify-content: space-between;
+         gap: 8px;
+         align-items: center;
      }
 
      .gp-button {
-         flex: 1;
-         height: 3rem;
+         width: 100%;
          font-size: 0.95rem;
+         height: 2.5rem;
      }
 
      .up-down-btn {
-         display: none;
-     }
- }
-
-
- @media (max-width: 480px) {
-     .navigaton {
-         bottom: 0;
-     }
-
-     .navigaton-content {
-         width: 100%;
-         border-radius: 1.25rem 1.25rem 0 0;
-         padding: 14px 12px;
-     }
-
-     .title p {
-         font-size: 15px;
-     }
-
-     .buttons {
-         gap: 5px !important;
-     }
-
-     .buttons li {
-         font-size: 14px;
-         padding: 10px 5px;
-     }
-
-     .gp-button {
-         height: 2.75rem;
-         font-size: 0.85rem;
-         border-radius: 0.75rem;
-     }
- }
-
- @media (max-width: 360px) {
-     .buttons {
-         gap: 5px !important;
-     }
-
-     .buttons li {
-         font-size: 13px;
-         padding: 10px 5px;
-     }
-
-     .gp-button {
-         height: 2.5rem;
-         font-size: 0.8rem;
-     }
-
-     .title p {
+        position: relative;
+         top: 5px;
          font-size: 14px;
      }
  }
