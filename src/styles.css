@@ -7,6 +7,8 @@
 /* root */
 
 :root {
+  /* Gradients */
+  --border-gradient: linear-gradient(90deg, rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 50%, rgba(252, 176, 69, 1) 100%);
   /* Backgrounds */
   --dark-background-color: #212121;
   --background-color: #f0f2f5;
@@ -75,7 +77,8 @@ html {
 
 .border-gradient {
   transition: 0.3s all ease;
-  border-image: linear-gradient(90deg, rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 50%, rgba(252, 176, 69, 1) 100%) 1 !important;
+  border-image: var(--border-gradient) 1 !important;
+  border-radius: inherit;
 }
 
 .default-page-background {
@@ -89,7 +92,7 @@ html {
 }
 
 .text-gradient {
-  background: linear-gradient(90deg, rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 50%, rgba(252, 176, 69, 1) 100%);
+  background: var(--border-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

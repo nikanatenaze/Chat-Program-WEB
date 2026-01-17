@@ -1,14 +1,30 @@
-<section class="content default-page-background">
-    <div class="home-page">
-        <div class="title">
-            <span class="badge">Fast • Secure • Real-time</span>
-            <p class="text-gradient">The best messenger website.</p>
-            <p class="asd">Nikoloz's chat.</p>
-        </div>
-        <p class="description">ChatSphere brings your conversations to life with instant messaging that’s fast, reliable, and secure. Connect with friends, family, and colleagues seamlessly, share images, files, and videos effortlessly, and enjoy real-time communication no matter where you are. Advanced technology keeps your data protected while giving you the freedom to express yourself. Chat, collaborate, and stay close to the people who matter most with a messenger designed for speed, privacy, and ease of use.</p>
-        <div class="buttons">
-            <p class="button border-gradient" routerLink="/register">Get started</p>
-            <p class="button" (click)="openPage('https://github.com/nikanatenaze/Chat-Program-WEB')">Learn more</p>
+<div class="video-container">
+    <video autoplay muted loop playsinline #bgVid>
+        <source src="background.mp4" type="video/mp4">
+    </video>
+    <div class="overlay">
+        <section class="content">
+            <div class="home-page">
+                <div class="title">
+                    <span class="badge">Fast • Secure • Real-time</span>
+                    <p class="text-gradient">The best messenger website.</p>
+                    <p class="asd">Nikoloz's chat.</p>
+                </div>
+                <p class="description">Welcome to Solar Chats
+                    Connect with people from around the world, share ideas, make friends, and enjoy real-time
+                    conversations in a safe and friendly environment. Solar Chats is your space to chat, connect, and
+                    grow your network.</p>
+                <div class="buttons">
+                    <p class="button ctm-btn" routerLink="/register">Get started</p>
+                    <p class="button ctm-btn-2" (click)="scrollToSection()">Learn more</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<div class="home-page-about" id="aboutHpa">
+    <div class="hpa-content">
+        <div class="info-card">
         </div>
     </div>
-</section>
+</div>

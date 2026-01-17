@@ -1,14 +1,27 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild, viewChild } from '@angular/core';
 import { Auth } from '../../services/auth';
+import { ViewportScroller } from '@angular/common';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.html',
-  styleUrls: ['./home.css'], // <- corrected
+  styleUrls: ['./home.css'],
   standalone: false
 })
-export class Home {
+export class Home implements AfterViewInit {
+  @ViewChild("bgVid") bgVid!: ElementRef
+
+  constructor(private viewportScroller: ViewportScroller) { }
+
+  ngAfterViewInit(): void {
+    this.bgVid.nativeElement.playbackRate = 0.87;
+  }
+
   public openPage(url: string) {
     window.open(url, "_blank");
+  }
+
+  scrollToSection() {
+    this.viewportScroller.scrollToAnchor('aboutHpa');
   }
 }
