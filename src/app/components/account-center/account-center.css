@@ -1,0 +1,80 @@
+.content {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.content-ui {
+    width: 55%;
+    height: 65%;
+    background-color: #f8f9fa;
+    border-radius: 1.25rem;
+    display: flex;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+}
+
+.ui-panel {
+    width: 23%;
+    background-color: #ffffff;
+    border-right: 1px solid #dcdcdc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.panel-user-info {
+    width: 100%;
+    padding: 16px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid #dcdcdc;
+}
+
+.panel-user-info p {
+    font-weight: bold;
+    font-size: 21px;
+}
+
+.ui-panel button {
+    width: 90%;
+    margin-top: 12px;
+    padding: 10px;
+    border: none;
+    background-color: transparent;
+    font-size: 16px;
+    text-align: left;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.ui-panel button:hover {
+    background-color: #f1f3f5;
+}
+
+.ui-panel button.active {
+    background-color: #e7f1ff;
+    color: #0d6efd;
+    font-weight: 600;
+}
+
+.ui-content {
+    width: 77%;
+    padding: 24px;
+    overflow-y: auto;
+}
+
+.ui-content h2 {
+    margin-bottom: 10px;
+    font-size: 26px;
+}
+
+.ui-content p {
+    font-size: 16px;
+    color: #555;
+}

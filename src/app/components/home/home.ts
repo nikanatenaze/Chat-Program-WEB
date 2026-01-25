@@ -9,12 +9,14 @@ import { ViewportScroller } from '@angular/common';
   standalone: false
 })
 export class Home implements AfterViewInit {
-  @ViewChild("bgVid") bgVid!: ElementRef
+  @ViewChild("bgVid") bgVid!: ElementRef<HTMLVideoElement>
 
   constructor(private viewportScroller: ViewportScroller) { }
 
   ngAfterViewInit(): void {
     this.bgVid.nativeElement.playbackRate = 0.87;
+    this.bgVid.nativeElement.muted = true;
+    this.bgVid.nativeElement.play();
   }
 
   public openPage(url: string) {

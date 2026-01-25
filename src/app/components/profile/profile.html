@@ -1,6 +1,6 @@
 <section class="page default-page-background">
   <div class="profile-ui border-gradient" *ngIf="!loading && fetchedUser; else loadingTemplate">
-    <p class="title">User Details</p>
+    <p class="title">Profile</p>
     <div class="divider"></div>
 
     <div class="main-info">
@@ -23,8 +23,8 @@
     </div>
 
     <div class="buttons">
-      <button class="logout-btn" (click)="logout()">Logout</button>
-      <button class="delete-btn" (click)="deleteUser()">Delete</button>
+      <button class="logout-btn">Logout</button>
+      <button class="delete-btn">Delete</button>
     </div>
   </div>
 

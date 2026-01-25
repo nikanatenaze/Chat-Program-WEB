@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Auth } from '../../services/auth';
 import { User } from '../../services/user';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { finalize, map } from 'rxjs/operators';
 import { UserInterface } from '../../interfaces/user.interface';
@@ -17,9 +17,11 @@ import { firstValueFrom } from 'rxjs';
 export class Profile implements OnInit {
 
   public fetchedUser: UserInterface | null = null;
+  public routerId!:  number
   public loading = true;
 
   constructor(
+    private actRouter: ActivatedRoute,
     private userService: User,
     private router: Router,
     private auth: Auth,
@@ -27,14 +29,12 @@ export class Profile implements OnInit {
 
   async ngOnInit(): Promise<void> {
     try {
-      const tokenData = await firstValueFrom(this.userService.getDataFromToken())
-      const id = Number(tokenData.id)
-      // if (!id) {
-      //   this.router.navigate(['/']);
-      //   return;
-      // }
+      this.actRouter.params.subscribe(x => {
+        this.routerId = +x['id']
+      })
+      console.log(this.routerId);
 
-      this.userService.getUserById(Number(id))
+      this.userService.getUserById(Number(this.routerId))
         .pipe(
           map(x => {
             return {

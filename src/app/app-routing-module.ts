@@ -11,13 +11,15 @@ import { Chat } from './components/chat/chat';
 import { RouterGuard } from './classes/router-guard';
 import { AuthGuard } from './classes/auth-guard';
 import { AddUser } from './components/add-user/add-user';
+import { AccountCenter } from './components/account-center/account-center';
 
 const routes: Routes = [
   {path: "", component: Home},
   {path: "home", component: Home},
   {path: "register", component: Register, canActivate: [AuthGuard]},
   {path: "login", component: Login, canActivate: [AuthGuard]},
-  {path: "profile", component: Profile, canActivate: [RouterGuard]},
+  {path: "account-center", component: AccountCenter, canActivate: [RouterGuard]},
+  {path: "profile/:id", component: Profile},
   {path: "chats", component: Chats, canActivate: [RouterGuard]},
   {path: "chat/:id", component: Chat, canActivate: [RouterGuard]},
   {path: "chat-detail/:id", component: ChatDetails, canActivate: [RouterGuard]},

@@ -1,0 +1,27 @@
+<section class="content default-page-background">
+    <div class="content-ui">
+        <div class="ui-panel">
+            <div class="panel-user-info">
+                <p>Account Center</p>
+            </div>
+            <button [class.active]="activePage === 'profile'" (click)="setPage('profile')">Profile Details <i class="fa-solid fa-qrcode"></i></button>
+            <button [class.active]="activePage === 'configuration'" (click)="setPage('configuration')">Configuration <i class="fa-solid fa-pen-to-square"></i></button>
+            <button [class.active]="activePage === 'settings'" (click)="setPage('settings')">Settings <i class="fa-solid fa-gears"></i></button>
+        </div>
+
+        <div class="ui-content">
+            <ng-container *ngIf="activePage === 'profile'">
+                <h2>Profile Details</h2>
+                <p>Profile details content</p>
+            </ng-container>
+            <ng-container *ngIf="activePage === 'configuration'">
+                <h2>Configurations</h2>
+                <p>Configurations content</p>
+            </ng-container>
+            <ng-container *ngIf="activePage === 'settings'">
+                <h2>Settings</h2>
+                <p>Settings content</p>
+            </ng-container>
+        </div>
+    </div>
+</section>
