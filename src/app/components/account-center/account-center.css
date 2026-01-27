@@ -170,3 +170,144 @@
 .error.ng-animating {
     transition: opacity 0.3s ease-in-out;
 }
+
+/* responsive */
+@media (max-width: 1024px) {
+    .content-ui {
+        flex-direction: column;
+        width: 90%;
+        height: auto;
+        min-width: 600px;
+    }
+
+    .ui-panel {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        border-right: none;
+        border-bottom: 1px solid #dcdcdc;
+    }
+
+    .ui-panel button {
+        flex: 1 1 30%;
+        text-align: center;
+        margin: 4px 2px;
+        font-size: 14px;
+    }
+
+    .panel-user-info {
+        flex-direction: row;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .ui-content {
+        width: 100%;
+        min-width: 600px;
+        padding: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .content-ui {
+        flex-direction: column;
+        width: 95%;
+        height: auto;
+        min-width: 360px;
+        border-radius: 1rem;
+    }
+
+    .ui-panel {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        border-right: none;
+        border-bottom: 1px solid #dcdcdc;
+        padding: 8px 0;
+    }
+
+    .ui-panel button {
+        flex: 1 1 48%;
+        margin: 4px 1%;
+        text-align: center;
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .panel-user-info {
+        width: 100%;
+        flex-direction: row;
+        justify-content: center;
+        gap: 12px;
+        padding: 8px 0;
+    }
+
+    .panel-user-info p {
+        font-size: 18px;
+    }
+
+    .ui-content {
+        width: 100%;
+        padding: 16px;
+        min-width: 360px;
+    }
+
+    .card {
+        width: 100%;
+        padding: 16px;
+    }
+
+    .row input,
+    .row select {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .primary-btn,
+    .danger-btn,
+    .secondary-btn {
+        width: 100%;
+    }
+
+    .btns {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .content-ui {
+        min-width: 320px;
+    }
+
+    .ui-panel {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .ui-panel button {
+        width: 90%;
+        font-size: 13px;
+        margin: 4px 0;
+    }
+
+    .panel-user-info p {
+        font-size: 16px;
+    }
+
+    .ui-content {
+        min-width: 320px;
+        padding: 8px;
+    }
+
+    .card {
+        padding: 10px;
+    }
+
+    .btns {
+        flex-direction: column;
+        gap: 6px;
+    }
+}

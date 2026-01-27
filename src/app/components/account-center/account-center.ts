@@ -21,6 +21,7 @@ export class AccountCenter implements OnInit {
   public userData!: UserInterface
   public updateForm!: FormGroup
   // Baisic data
+  public loading = true;
   public activePage: string = 'profile';
   public minPaslen = GlobalData.PASSWORD_MIN_LENGTH
 
@@ -41,6 +42,9 @@ export class AccountCenter implements OnInit {
               name: x.name,
               email: x.email
             })
+            console.log(123);
+            this.loading = false
+            
           }
         })
       }
