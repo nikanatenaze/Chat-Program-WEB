@@ -3,6 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Auth } from '../../services/auth';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { GlobalData } from '../../classes/global-data';
 
 @Component({
   selector: 'app-register',
@@ -65,8 +66,8 @@ export class Register implements OnInit {
       ]),
       password: new FormControl('', [
         Validators.required,
-        Validators.minLength(6),
-        Validators.pattern('^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$')
+        Validators.minLength(GlobalData.PASSWORD_MIN_LENGTH),
+        Validators.pattern(GlobalData.PASSWORD_REGEX)
       ])
     });
   }

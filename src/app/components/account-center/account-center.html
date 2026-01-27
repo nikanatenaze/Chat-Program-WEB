@@ -4,23 +4,94 @@
             <div class="panel-user-info">
                 <p>Account Center</p>
             </div>
-            <button [class.active]="activePage === 'profile'" (click)="setPage('profile')">Profile Details <i class="fa-solid fa-qrcode"></i></button>
-            <button [class.active]="activePage === 'configuration'" (click)="setPage('configuration')">Configuration <i class="fa-solid fa-pen-to-square"></i></button>
-            <button [class.active]="activePage === 'settings'" (click)="setPage('settings')">Settings <i class="fa-solid fa-gears"></i></button>
+            <button [class.active]="activePage === 'profile'" (click)="setPage('profile')">Profile Details <i
+                    class="fa-solid fa-qrcode"></i></button>
+            <button [class.active]="activePage === 'appearance'" (click)="setPage('appearance')">Appearance <i
+                    class="fa-solid fa-pen-to-square"></i></button>
+            <button [class.active]="activePage === 'settings'" (click)="setPage('settings')">Settings <i
+                    class="fa-solid fa-gears"></i></button>
         </div>
 
         <div class="ui-content">
             <ng-container *ngIf="activePage === 'profile'">
                 <h2>Profile Details</h2>
-                <p>Profile details content</p>
+
+                <form [formGroup]="updateForm" (ngSubmit)="saveChanges()">
+                    <div class="row">
+                        <label>User Id</label>
+                        <input formControlName="id" type="text" />
+                    </div>
+
+                    <div class="row">
+                        <label>Username</label>
+                        <input formControlName="name" type="text" />
+                        <div class="error" *ngIf="updateForm.get('name')?.invalid && updateForm.get('name')?.touched">
+                            Username is required.
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <label>Email</label>
+                        <input formControlName="email" type="email" />
+                        <div class="error" *ngIf="updateForm.get('email')?.invalid && updateForm.get('email')?.touched">
+                            Please enter a valid email.
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <label>Password</label>
+                        <input formControlName="password" type="text" placeholder="New password" />
+                        <div class="error"
+                            *ngIf="updateForm.get('password')?.invalid && updateForm.get('password')?.touched">
+                            Password must be at least {{minPaslen}} characters.
+                        </div>
+                    </div>
+
+                    <button class="primary-btn" type="submit">Save Changes</button>
+                </form>
             </ng-container>
-            <ng-container *ngIf="activePage === 'configuration'">
-                <h2>Configurations</h2>
-                <p>Configurations content</p>
+
+            <ng-container *ngIf="activePage === 'appearance'">
+                <h2>Appearance</h2>
+                <div class="card">
+                    <div class="row">
+                        <label>Language</label>
+                        <select>
+                            <option>English</option>
+                            <option>Deutsch</option>
+                            <option>ქართული</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <label>Theme</label>
+                        <select>
+                            <option>Light</option>
+                            <option>Dark</option>
+                            <option>System theme</option>
+                        </select>
+                    </div>
+                    <button class="primary-btn">Apply</button>
+                </div>
             </ng-container>
+
             <ng-container *ngIf="activePage === 'settings'">
                 <h2>Settings</h2>
-                <p>Settings content</p>
+
+                <div class="card">
+                    <div class="row toggle">
+                        <label>Email Notifications</label>
+                        <input type="checkbox" checked/>
+                    </div>
+                    <div class="row toggle">
+                        <label>Two-Factor Authentication</label>
+                        <input type="checkbox"/>
+                    </div>
+                    <hr>
+                    <div class="btns">
+                        <button class="primary-btn" (click)="logout()">Logout</button>
+                        <button class="danger-btn" (click)="deleteUser()">Delete Account</button>
+                    </div>
+                </div>
             </ng-container>
         </div>
     </div>
