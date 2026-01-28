@@ -1,5 +1,5 @@
 <section class="content default-page-background">
-    <div class="content-ui">
+    <div class="content-ui" *ngIf="!loading; else loadingTmp">
         <div class="ui-panel">
             <div class="panel-user-info">
                 <p>Account Center</p>
@@ -26,7 +26,7 @@
                         <label>Username</label>
                         <input formControlName="name" type="text" />
                         <div class="error" *ngIf="updateForm.get('name')?.invalid && updateForm.get('name')?.touched">
-                            Username is required.
+                            Invalid Username
                         </div>
                     </div>
 
@@ -97,6 +97,6 @@
     </div>
 </section>
 
-<ng-template #loading>
+<ng-template #loadingTmp>
     <app-loader></app-loader>
 </ng-template>

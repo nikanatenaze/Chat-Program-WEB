@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 import { Auth } from '../../services/auth';
 import { Router } from '@angular/router';
 import { GlobalData } from '../../classes/global-data';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-account-center',
@@ -21,7 +22,7 @@ export class AccountCenter implements OnInit {
   public userData!: UserInterface
   public updateForm!: FormGroup
   // Baisic data
-  public loading = true;
+  loading: boolean = true;
   public activePage: string = 'profile';
   public minPaslen = GlobalData.PASSWORD_MIN_LENGTH
 
@@ -35,16 +36,15 @@ export class AccountCenter implements OnInit {
     this.userService.getDataFromToken().subscribe({
       next: x => {
         this.tokenData = x
-        this.userService.getUserById(this.tokenData.id).subscribe({
+        this.userService.getUserById(this.tokenData.id)
+        .pipe(finalize(() => (this.loading = false)))
+        .subscribe({
           next: x => {
             this.updateForm.patchValue({
               id: x.id,
               name: x.name,
               email: x.email
             })
-            console.log(123);
-            this.loading = false
-            
           }
         })
       }
