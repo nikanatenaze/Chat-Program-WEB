@@ -23,7 +23,7 @@
      align-items: center;
      justify-content: space-between;
      border-radius: .75rem;
-     width: 70%;
+     width: 60%;
      background-color: rgba(116, 111, 111, 0.5);
      backdrop-filter: blur(7px);
      will-change: transform;

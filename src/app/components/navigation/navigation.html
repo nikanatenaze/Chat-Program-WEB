@@ -6,7 +6,6 @@
             <ul class="buttons" *ngIf="!(auth.userToken$ | async); else userUl">
                 <li routerLink="/">Home</li>
                 <li routerLink="/about">About</li>
-                <li (click)="openPage('https://github.com/nikanatenaze/Chat-Program-WEB')">Archive</li>
             </ul>
         </div>
 
@@ -33,7 +32,7 @@
 <ng-template #userUl>
     <ul class="buttons" *ngIf="auth.userToken$ | async">
         <li routerLink="/">Home</li>
+        <li routerLink="/messenger">Messenger</li>
         <li routerLink="/chats">Chats</li>
-        <li (click)="openPage('https://github.com/nikanatenaze/Chat-Program-WEB')">Archive</li>
     </ul>
 </ng-template>

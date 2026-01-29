@@ -20,6 +20,7 @@ import { Chat } from './components/chat/chat';
 import { CommonModule } from '@angular/common';
 import { AddUser } from './components/add-user/add-user';
 import { AccountCenter } from './components/account-center/account-center';
+import { Messenger } from './components/messenger/messenger';
 
 @NgModule({
   declarations: [
@@ -37,6 +38,7 @@ import { AccountCenter } from './components/account-center/account-center';
     Chat,
     AddUser,
     AccountCenter,
+    Messenger,
   ],
   imports: [
     BrowserModule,

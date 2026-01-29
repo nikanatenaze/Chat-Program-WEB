@@ -12,6 +12,7 @@ import { RouterGuard } from './classes/router-guard';
 import { AuthGuard } from './classes/auth-guard';
 import { AddUser } from './components/add-user/add-user';
 import { AccountCenter } from './components/account-center/account-center';
+import { Messenger } from './components/messenger/messenger';
 
 const routes: Routes = [
   {path: "", component: Home},
@@ -24,6 +25,7 @@ const routes: Routes = [
   {path: "chat/:id", component: Chat, canActivate: [RouterGuard]},
   {path: "chat-detail/:id", component: ChatDetails, canActivate: [RouterGuard]},
   {path: "chat/:id/add-user", component: AddUser, canActivate: [RouterGuard]},
+  {path: "messenger", component: Messenger, canActivate: [RouterGuard]},
   {path: "**", component: ErrorComponent},
 ];
 

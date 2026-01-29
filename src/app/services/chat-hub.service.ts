@@ -7,24 +7,33 @@ import * as signalR from '@microsoft/signalr';
 export class ChatHubService {
   private hubConnection!: signalR.HubConnection;
 
+  // Start connection
   startConnection(token: string): Promise<void> {
-  this.hubConnection = new signalR.HubConnectionBuilder()
-    .withUrl('https://chat-program-api.onrender.com/chathub', {
-      accessTokenFactory: () => token
-    })
-    .withAutomaticReconnect()
-    .build();
+    if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
+      return Promise.resolve();
+    }
 
-  return this.hubConnection
-    .start()
-    .then(() => console.log('SignalR connected'))
-    .catch(err => console.error('SignalR error:', err));
-}
+    this.hubConnection = new signalR.HubConnectionBuilder()
+      .withUrl('https://chat-program-api.onrender.com/chathub', {
+        accessTokenFactory: () => token
+      })
+      .withAutomaticReconnect()
+      .build();
 
-  joinChat(chatId: number) {
-    return this.hubConnection.invoke('JoinChat', chatId);
+    return this.hubConnection
+      .start()
+      .then(() => console.log('SignalR connected'))
+      .catch(err => console.error('SignalR error:', err));
   }
 
+  // Join a chat group
+  joinChat(chatId: number): Promise<void> {
+    if (!this.hubConnection) return Promise.reject('Hub connection not started');
+    return this.hubConnection.invoke('JoinChat', chatId)
+      .catch(err => console.error('JoinChat error:', err));
+  }
+
+  // Event listeners
   onCreateMessage(callback: (message: any) => void) {
     this.hubConnection.on('CreateMessage', callback);
   }
@@ -37,9 +46,14 @@ export class ChatHubService {
     this.hubConnection.on('DeleteMessage', callback);
   }
 
+  onUserJoined(callback: (userId: string) => void) {
+    this.hubConnection.on('UserJoined', callback);
+  }
+
   stopConnection() {
-    if (this.hubConnection) {
-      this.hubConnection.stop();
+    if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
+      return this.hubConnection.stop();
     }
+    return Promise.resolve();
   }
 }
