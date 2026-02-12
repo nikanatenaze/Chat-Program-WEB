@@ -1,3 +1,4 @@
+import { Call } from '@angular/compiler';
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 
@@ -14,7 +15,7 @@ export class ChatHubService {
     }
 
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('https://chat-program-api.onrender.com/chathub', {
+      .withUrl('https://localhost:7173/main-hub', {
         accessTokenFactory: () => token
       })
       .withAutomaticReconnect()
@@ -43,7 +44,7 @@ export class ChatHubService {
   }
 
   onDeleteMessage(callback: (message: any) => void) {
-    this.hubConnection.on('DeleteMessage', callback);
+    this.hubConnection.on('RemoveMessage', callback);
   }
 
   onUserJoined(callback: (userId: string) => void) {

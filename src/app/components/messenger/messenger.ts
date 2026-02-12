@@ -1,7 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ChatHubService } from '../../services/chat-hub.service';
-import { GlobalData } from '../../classes/global-data';
-import { GlobalMethods } from '../../classes/global-methods';
+import { TokenModelInterface } from '../../interfaces/token-model.interface';
+import { User } from '../../services/user';
+import { ChatInterface } from '../../interfaces/chat.interface';
+import { UserInterface } from '../../interfaces/user.interface';
+import { ChatUserService } from '../../services/chat-user.service';
+import { MainHubService } from '../../services/main-hub.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-messenger',
@@ -11,31 +16,114 @@ import { GlobalMethods } from '../../classes/global-methods';
 })
 export class Messenger implements OnInit {
 
-  constructor(public chatHub: ChatHubService) { }
+  public token: string = sessionStorage.getItem("token") ?? '';
+  public tokenData!: TokenModelInterface
+  public userData!: UserInterface
+  public userChats$ = new BehaviorSubject<ChatInterface[]>([])
+
+  constructor(
+    public hub: MainHubService,
+    public userService: User,
+    public chatUserService: ChatUserService
+  ) { }
 
   ngOnInit(): void {
-    this.connection();
+    this.userService.getDataFromToken().subscribe(x => {
+      this.tokenData = x
+      this.build();
+    })
+
   }
 
-  private connection() {
-    const token = sessionStorage.getItem("token") ?? '';
-    this.chatHub.startConnection(token)
-      .then(() => {
-        console.log('✅ SignalR connected for chat users');
+  private async build() {
+    await this.fetchData()
+    await this.connection()
+  }
 
-        // Replace with your chatId from route or session
-        const chatId = Number(sessionStorage.getItem('currentChatId') ?? 11);
+  private async fetchData() {
+    try {
+      await this.fetchUser()
+      await this.fetchChats()
+    }
+    catch (error) {
 
-        this.chatHub.joinChat(chatId)
-          .then(() => console.log(`✅ Joined chat ${chatId}`))
-          .catch(err => console.error('Failed to join chat:', err));
-      })
-      .catch(err => console.error('SignalR connection failed:', err));
+    }
+  }
+
+  public send() {
+    var a = {
+      userId: this.userData.id,
+      chatId: 17
+    }
+    this.chatUserService.AddChatUser(a).subscribe({
+      next: x => {
+        console.log("succes");
+
+        console.log(x);
+
+      },
+      error: x => {
+        console.log(x);
+
+      }
+    })
+  }
+
+  private async connection() {
+    await this.hub.startConnection(this.token)
+    await this.hub.joinChatUsers(this.userData.id);
+
+    this.hub.onAddUser(data => {
+      const updated = [
+        ...this.userChats$.value,
+        data
+      ].sort((a, b) => a.id - b.id);
+
+      this.userChats$.next(updated);
+    });
+
+
+    this.hub.onRemoveUser(data => {
+      this.userChats$.next(
+        this.userChats$.value.filter(x => x.id !== data.id)
+      )
+    })
+
   }
 
   ngOnDestroy(): void {
-    this.chatHub.stopConnection()
+    this.hub.stopConnection()
       .then(() => console.log('SignalR disconnected'))
       .catch(err => console.error('SignalR disconnect error:', err));
+  }
+
+  // Data fetching methods
+
+  fetchUser(): Promise<void> {
+    return new Promise((res, rej) => {
+      this.userService.getUserById(this.tokenData.id).subscribe({
+        next: x => {
+          this.userData = x
+          res();
+        },
+        error(err) {
+          rej(err)
+        }
+      })
+    })
+  }
+
+  fetchChats(): Promise<void> {
+    return new Promise((res, rej) => {
+      this.chatUserService.GetChatsOfUser(this.userData.id).subscribe({
+        next: x => {
+          this.userChats$.next(x)
+          res()
+        },
+        error(err) {
+          rej(err)
+        }
+      })
+    })
   }
 }

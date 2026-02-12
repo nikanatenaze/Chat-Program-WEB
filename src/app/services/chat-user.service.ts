@@ -6,15 +6,15 @@ import { GlobalMethods } from '../classes/global-methods';
 import { MessageInterface } from '../interfaces/message.interface';
 import { ChatUserInterface } from '../interfaces/chat-user.interface';
 import { Observable } from 'rxjs';
+import { GlobalData } from '../classes/global-data';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChatUserService {
-  private api = GlobalMethods.GlobalApiUrl + "/ChatUser"
+  private api = GlobalData.localHostApiUrl + "/ChatUser"
   constructor(private http: HttpClient) { }
 
-  // ✅ RETURNS ARRAY
   GetChatsOfUser(id: number): Observable<ChatInterface[]> {
     return this.http.get<ChatInterface[]>(
       `${this.api}/GetChatsOfUser/${id}`,
@@ -22,7 +22,7 @@ export class ChatUserService {
     );
   }
 
-  // ✅ RETURNS ARRAY
+  
   GetUsersInChat(id: number): Observable<UserInterface[]> {
     return this.http.get<UserInterface[]>(
       `${this.api}/GetUsersInChat/${id}`,

@@ -6,9 +6,6 @@ import Swal from "sweetalert2";
 export class GlobalMethods {
 
     constructor(public userService: User, public auth: Auth) { }
-
-    static GlobalApiUrl = "https://chat-program-api.onrender.com/api"
-
     static getAuthHeaders() {
         const token = sessionStorage.getItem('token');
         return new HttpHeaders({

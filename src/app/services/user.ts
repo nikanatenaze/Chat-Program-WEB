@@ -3,12 +3,13 @@ import { Injectable } from '@angular/core';
 import { UserInterface } from '../interfaces/user.interface';
 import { GlobalMethods } from '../classes/global-methods';
 import { TokenModelInterface } from '../interfaces/token-model.interface';
+import { GlobalData } from '../classes/global-data';
 
 @Injectable({
   providedIn: 'root',
 })
 export class User {
-  private apiUrl = GlobalMethods.GlobalApiUrl + "/User"
+  private apiUrl = GlobalData.localHostApiUrl + "/User"
 
   constructor(private http: HttpClient) {}
 

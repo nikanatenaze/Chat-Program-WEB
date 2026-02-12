@@ -2,12 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MessageInterface } from '../interfaces/message.interface';
 import { GlobalMethods } from '../classes/global-methods';
+import { GlobalData } from '../classes/global-data';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MessageService {
-  private api = GlobalMethods.GlobalApiUrl + "/Message"
+  private api = GlobalData.localHostApiUrl + "/Message"
 
   constructor(private http: HttpClient) { }
 

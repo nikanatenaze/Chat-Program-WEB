@@ -3,12 +3,13 @@ import { Injectable } from '@angular/core';
 import { ChatInterface } from '../interfaces/chat.interface';
 import { GlobalMethods } from '../classes/global-methods';
 import { MessageInterface } from '../interfaces/message.interface';
+import { GlobalData } from '../classes/global-data';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChatService {
-  private api = GlobalMethods.GlobalApiUrl + "/Chat"
+  private api = GlobalData.localHostApiUrl + "/Chat"
   constructor(public http: HttpClient) { }
 
   GetChatById(id: number) {

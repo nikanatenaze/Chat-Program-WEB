@@ -10,7 +10,7 @@
                 </div>
                 <div aria-label="edit">
                     <span>
-                        <i class="fa-solid fa-plus"></i>
+                        <i class="fa-solid fa-plus" (click)="send()"></i>
                     </span>
                 </div>
             </div>
@@ -22,22 +22,10 @@
             </div>
         </div>
         <div class="chats">
-            <div class="chat">
+            <div class="chat" *ngFor="let i of userChats$ | async">
                 <div class="chat-title">
                     <img src="https://picsum.photos/191/300">
-                    <p>I have huge dick</p>
-                </div>
-            </div>
-            <div class="chat">
-                <div class="chat-title">
-                    <img src="https://picsum.photos/199/300">
-                    <p>Why my friends</p>
-                </div>
-            </div>
-            <div class="chat">
-                <div class="chat-title">
-                    <img src="https://picsum.photos/200/300">
-                    <p>Johhny's Chat</p>
+                    <p>{{i.name}}</p>
                 </div>
             </div>
         </div>

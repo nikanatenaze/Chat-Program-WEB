@@ -21,6 +21,7 @@ import { CommonModule } from '@angular/common';
 import { AddUser } from './components/add-user/add-user';
 import { AccountCenter } from './components/account-center/account-center';
 import { Messenger } from './components/messenger/messenger';
+import { TestComponent } from './components/test.component/test.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { Messenger } from './components/messenger/messenger';
     AddUser,
     AccountCenter,
     Messenger,
+    TestComponent,
   ],
   imports: [
     BrowserModule,
