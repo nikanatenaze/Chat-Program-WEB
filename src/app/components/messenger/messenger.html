@@ -1,33 +1,60 @@
-<section class="content">
+<section class="content default-page-background">
     <div class="panel-ui">
         <div class="title">
-            <p>Inbox <i class="fa-solid fa-inbox"></i></p>
-            <div class="title-buttons">
-                <div aria-label="edit">
-                    <span>
-                        <i class="fa-solid fa-pen-to-square"></i>
-                    </span>
-                </div>
-                <div aria-label="edit">
-                    <span>
-                        <i class="fa-solid fa-plus" (click)="send()"></i>
-                    </span>
-                </div>
+            <p>Chats</p>
+            <div aria-label="new" class="new">
+                <span (click)="createChatSwal()">Create <i class="fa-solid fa-plus"></i></span>
             </div>
         </div>
         <hr>
         <div class="search">
             <div class="search-input-div">
-                <input type="text" placeholder="Search for chats">
+                <input type="text" placeholder="Search.." (input)="onSearch($event.target.value)">
             </div>
         </div>
         <div class="chats">
-            <div class="chat" *ngFor="let i of userChats$ | async">
+            <div class="chat" *ngFor="let i of filteredChats$ | async">
+                <div class="chat-hover-icon" (click)="quitFromChatSwal(i.id); $event.stopPropagation()">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </div>
                 <div class="chat-title">
                     <img src="https://picsum.photos/191/300">
                     <p>{{i.name}}</p>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="chat-ui">
+        <div class="chat-header">
+            <div class="chat-header-user">
+                <img src="https://picsum.photos/200">
+                <div class="chat-header-info">
+                    <p class="chat-name">Static Chat</p>
+                    <span class="chat-status">online</span>
+                </div>
+            </div>
+        </div>
+        <div class="chat-messages">
+            <div class="message other">
+                <p>Hello 👋</p>
+                <span>12:21</span>
+            </div>
+
+            <div class="message me">
+                <p>Hey!</p>
+                <span>12:22</span>
+            </div>
+
+            <div class="message other">
+                <p>How are you?</p>
+                <span>12:22</span>
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" placeholder="Type a message...">
+            <button>
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
         </div>
     </div>
 </section>

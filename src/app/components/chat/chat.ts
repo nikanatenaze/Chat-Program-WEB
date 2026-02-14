@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy, AfterViewChecked } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ChatHubService } from '../../services/chat-hub.service';
 import { MessageService } from '../../services/message.service';
 import { ChatService } from '../../services/chat.service';
 import { User } from '../../services/user';
@@ -11,6 +10,7 @@ import { ChatInterface } from '../../interfaces/chat.interface';
 import { GlobalMethods } from '../../classes/global-methods';
 import { UserInterface } from '../../interfaces/user.interface';
 import Swal from 'sweetalert2';
+import { MainHubService } from '../../services/main-hub.service';
 
 @Component({
   selector: 'app-chat',
@@ -34,7 +34,7 @@ export class Chat implements OnInit, OnDestroy {
     private actRouter: ActivatedRoute,
     private router: Router,
     private userService: User,
-    private chatHub: ChatHubService,
+    private chatHub: MainHubService,
     private messagesService: MessageService,
     private chatUserService: ChatUserService,
     private chatService: ChatService

@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { UserInterface } from '../interfaces/user.interface';
-import { GlobalMethods } from '../classes/global-methods';
 import { GlobalData } from '../classes/global-data';
 
 interface LoginResponse {
@@ -14,7 +13,7 @@ interface LoginResponse {
   providedIn: 'root',
 })
 export class Auth {
-  private apiUrl = GlobalData.localHostApiUrl + "/Auth"
+  private apiUrl = GlobalData.RENDER_API_URL + "/Auth"
 
   private _userToken = new BehaviorSubject<string | null>(sessionStorage.getItem('token'));
   public userToken$ = this._userToken.asObservable();

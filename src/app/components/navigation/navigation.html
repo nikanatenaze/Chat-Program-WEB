@@ -5,7 +5,8 @@
             <div class="line"></div>
             <ul class="buttons" *ngIf="!(auth.userToken$ | async); else userUl">
                 <li routerLink="/">Home</li>
-                <li routerLink="/about">About</li>
+                <li routerLink="/project">Project</li>
+                <li routerLink="/features">Features</li>
             </ul>
         </div>
 

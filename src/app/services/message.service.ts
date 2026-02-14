@@ -8,7 +8,7 @@ import { GlobalData } from '../classes/global-data';
   providedIn: 'root',
 })
 export class MessageService {
-  private api = GlobalData.localHostApiUrl + "/Message"
+  private api = GlobalData.RENDER_API_URL + "/Message"
 
   constructor(private http: HttpClient) { }
 

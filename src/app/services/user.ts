@@ -9,7 +9,7 @@ import { GlobalData } from '../classes/global-data';
   providedIn: 'root',
 })
 export class User {
-  private apiUrl = GlobalData.localHostApiUrl + "/User"
+  private apiUrl = GlobalData.RENDER_API_URL + "/User"
 
   constructor(private http: HttpClient) {}
 

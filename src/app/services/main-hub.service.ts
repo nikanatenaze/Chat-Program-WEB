@@ -7,7 +7,8 @@ import { GlobalData } from '../classes/global-data';
 })
 export class MainHubService {
   private hubConnection!: signalR.HubConnection;
-  private hubUrl = GlobalData.localHostUrl + "main-hub"
+  private hubUrl = GlobalData.RENDER_URL + "/main-hub"
+
   // Baisic signalR methods
   startConnection(token: string): Promise<void> {
     if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
@@ -79,7 +80,7 @@ export class MainHubService {
   // Chat, messages listeners
   onCreateMessage(callback: (message: any) => void) {
     if (!this.hubConnection) return;
-    this.hubConnection.on("CreateMessage", callback); // just pass callback
+    this.hubConnection.on("CreateMessage", callback);
   }
 
   onEditMessage(callback: (message: any) => void) {

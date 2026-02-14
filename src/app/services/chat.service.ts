@@ -9,7 +9,7 @@ import { GlobalData } from '../classes/global-data';
   providedIn: 'root',
 })
 export class ChatService {
-  private api = GlobalData.localHostApiUrl + "/Chat"
+  private api = GlobalData.RENDER_API_URL + "/Chat"
   constructor(public http: HttpClient) { }
 
   GetChatById(id: number) {

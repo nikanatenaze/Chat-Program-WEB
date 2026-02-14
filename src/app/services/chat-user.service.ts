@@ -3,8 +3,6 @@ import { Injectable } from '@angular/core';
 import { ChatInterface } from '../interfaces/chat.interface';
 import { UserInterface } from '../interfaces/user.interface';
 import { GlobalMethods } from '../classes/global-methods';
-import { MessageInterface } from '../interfaces/message.interface';
-import { ChatUserInterface } from '../interfaces/chat-user.interface';
 import { Observable } from 'rxjs';
 import { GlobalData } from '../classes/global-data';
 
@@ -12,7 +10,7 @@ import { GlobalData } from '../classes/global-data';
   providedIn: 'root',
 })
 export class ChatUserService {
-  private api = GlobalData.localHostApiUrl + "/ChatUser"
+  private api = GlobalData.RENDER_API_URL + "/ChatUser"
   constructor(private http: HttpClient) { }
 
   GetChatsOfUser(id: number): Observable<ChatInterface[]> {

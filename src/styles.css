@@ -7,6 +7,16 @@
 /* root */
 
 :root {
+  /* Glass styles */
+  --glass-bg: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.18),
+      rgba(255, 255, 255, 0.04));
+
+  --glass-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.25),
+    inset 0 1px rgba(255, 255, 255, 0.3);
+
+  --glass-blur: blur(25px);
   /* Gradients */
   --border-gradient: linear-gradient(90deg, rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 50%, rgba(252, 176, 69, 1) 100%);
   /* Backgrounds */
