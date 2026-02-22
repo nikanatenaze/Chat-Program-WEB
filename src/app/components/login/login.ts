@@ -4,6 +4,7 @@ import { Auth } from '../../services/auth';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { GlobalData } from '../../classes/global-data';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +15,7 @@ import { GlobalData } from '../../classes/global-data';
 export class Login implements OnInit {
   public regForm!: FormGroup;
 
-  constructor(public auth: Auth, public router: Router) { }
+  constructor(public auth: Auth, public router: Router, public notifi: NotificationService) { }
 
   ngOnInit(): void {
     this.GetFormGroup()
@@ -30,26 +31,15 @@ export class Login implements OnInit {
 
     this.auth.login(formData).subscribe({
       next: (x) => {
-        Swal.fire({
-          position: "top-end",
-          icon: "success",
-          title: "Successfuly loged in",
-          showConfirmButton: false,
-          timer: 1500
-        }).then(() => {
-          sessionStorage.setItem('token', x.token);
-          this.regForm.reset();
-          this.router.navigate(["/account-center"])
-        });
+        sessionStorage.setItem('token', x.token);
+        this.regForm.reset();
+        this.notifi.success("Loged in successfuly!");
+        this.router.navigate(["/account-center"])
       },
-      error(err) {
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: `${err.error}`,
-          footer: '<a href="https://github.com/nikanatenaze/Chat-Program-WEB" target="_blank">Do you want visit project repository?</a>'
-        });
-
+      error: (err) => {
+        console.log(err);
+        
+        this.notifi.error(`Error while login: ${err.error}`)
       },
     })
   }

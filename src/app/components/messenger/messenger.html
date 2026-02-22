@@ -1,60 +1,110 @@
-<section class="content default-page-background">
-    <div class="panel-ui">
-        <div class="title">
-            <p>Chats</p>
-            <div aria-label="new" class="new">
-                <span (click)="createChatSwal()">Create <i class="fa-solid fa-plus"></i></span>
-            </div>
-        </div>
-        <hr>
-        <div class="search">
-            <div class="search-input-div">
-                <input type="text" placeholder="Search.." (input)="onSearch($event.target.value)">
-            </div>
-        </div>
-        <div class="chats">
-            <div class="chat" *ngFor="let i of filteredChats$ | async">
-                <div class="chat-hover-icon" (click)="quitFromChatSwal(i.id); $event.stopPropagation()">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+<div class="video-container">
+    <video autoplay muted loop playsinline preload="auto">
+        <source src="background.mp4" type="video/mp4">
+    </video>
+    <div class="overlay">
+
+        <section class="content">
+
+            <!-- LEFT PANEL -->
+            <div class="panel-ui">
+                <div class="title">
+                    <p>Chats</p>
+                    <div class="new">
+                        <span (click)="createChatSwal()">Create <i class="fa-solid fa-plus"></i></span>
+                    </div>
                 </div>
-                <div class="chat-title">
-                    <img src="https://picsum.photos/191/300">
-                    <p>{{i.name}}</p>
+
+                <hr>
+
+                <div class="search">
+                    <div class="search-input-div">
+                        <input type="text" placeholder="Search.." (input)="onSearch($event.target.value)">
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    <div class="chat-ui">
-        <div class="chat-header">
-            <div class="chat-header-user">
-                <img src="https://picsum.photos/200">
-                <div class="chat-header-info">
-                    <p class="chat-name">Static Chat</p>
-                    <span class="chat-status">online</span>
+
+                <div class="chats" *ngIf="!chatsLoading; else loadingChats">
+                    <div class="chat" (click)="selectChat(i.id)" *ngFor="let i of filteredChats$ | async">
+                        <div class="chat-hover-icon" (click)="quitFromChatSwal(i.id); $event.stopPropagation()">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        </div>
+
+                        <div class="chat-title">
+                            <img src="https://picsum.photos/191/300">
+                            <p>{{i.name}}</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="chat-messages">
-            <div class="message other">
-                <p>Hello 👋</p>
-                <span>12:21</span>
             </div>
 
-            <div class="message me">
-                <p>Hey!</p>
-                <span>12:22</span>
-            </div>
+            <!-- CHAT UI -->
 
-            <div class="message other">
-                <p>How are you?</p>
-                <span>12:22</span>
-            </div>
-        </div>
-        <div class="chat-input">
-            <input type="text" placeholder="Type a message...">
-            <button>
-                <i class="fa-solid fa-paper-plane"></i>
-            </button>
-        </div>
+            <ng-container *ngIf="chatLoading; else chatOrEmpty">
+                <ng-container *ngTemplateOutlet="loadingChat"></ng-container>
+            </ng-container>
+
+            <ng-template #chatOrEmpty>
+                <div class="chat-ui chat-ui-chat-st" *ngIf="selectedChat; else clear">
+
+                    <div class="chat-header">
+                        <div class="chat-header-user">
+                            <img src="https://picsum.photos/200">
+                            <div class="chat-header-info">
+                                <p class="chat-name">{{selectedChat.name}}</p>
+                                <span class="chat-status">online</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-messages">
+                        <div class="msg" *ngFor="let i of selectedChatMessages$.value; let idx = index">
+                            <div class="sender" *ngIf="shouldShowSender(idx)">
+                                {{ getUserName(i.userId) }}
+                            </div>
+                            <div class="message" [class.other]="!i.isWriter" [class.me]="i.isWriter">
+                                <p>{{i.content}}</p>
+                                <span>{{i.createdAt}}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input">
+                        <input type="text" [(ngModel)]="newMessage" placeholder="Type a message..."
+                            (keydown.enter)="sendMessage()">
+                        <button (click)="sendMessage()">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </ng-template>
+
+        </section>
+
     </div>
-</section>
+</div>
+
+<!-- templates -->
+
+<ng-template #clear>
+    <div class="chat-ui chat-ui-chat-none">
+        <p class="text-gradient not-selec-text">Select chat to start messaging</p>
+        <p>or <span class="cr-ch" (click)="createChatSwal()">create</span> first chat right now!</p>
+    </div>
+</ng-template>
+
+<ng-template #loadingChat>
+    <div class="chat-ui chat-ui-chat-none">
+        <ng-container *ngTemplateOutlet="loader"></ng-container>
+    </div>
+</ng-template>
+
+<ng-template #loadingChats>
+    <div class="chats-load">
+        <ng-container *ngTemplateOutlet="loader"></ng-container>
+    </div>
+</ng-template>
+
+<ng-template #loader>
+    <div class="loader"></div>
+</ng-template>

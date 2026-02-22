@@ -9,12 +9,16 @@ import { BehaviorSubject } from 'rxjs';
 import Swal from 'sweetalert2';
 import { GlobalMethods } from '../../classes/global-methods';
 import { ChatService } from '../../services/chat.service';
+import { MessageInterface } from '../../interfaces/message.interface';
+import { MessageService } from '../../services/message.service';
+import { Notyf } from 'notyf';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-messenger',
-  standalone: false,
   templateUrl: './messenger.html',
-  styleUrl: './messenger.css',
+  standalone: false,
+  styleUrls: ['./messenger.css'], // <- fix here
 })
 export class Messenger implements OnInit {
 
@@ -22,17 +26,35 @@ export class Messenger implements OnInit {
   public tokenData!: TokenModelInterface
   public userData!: UserInterface
   public userChats$ = new BehaviorSubject<ChatInterface[]>([])
-  public selectedChat!: ChatInterface
   public searchTerm$ = new BehaviorSubject<string>('');
   public filteredChats$ = new BehaviorSubject<ChatInterface[]>([]);
+  public newMessage = '';
 
+  // loadings
+  public chatLoading = false;
+  public chatsLoading = true;
+  public isSending = false;
+
+  //selected
+  public selectedChat: ChatInterface | null = null;
+  public selectedChatMessages$ = new BehaviorSubject<MessageInterface[]>([]);
+
+  //users
+  private usersMap = new Map<number, string>();
+
+  // audios
+  private receiveAudio = new Audio('message-recive-sound.mp3');
 
   constructor(
     public hub: MainHubService,
     public userService: User,
     public chatUserService: ChatUserService,
-    public chatService: ChatService
-  ) { }
+    public chatService: ChatService,
+    public messageService: MessageService,
+    public notification: NotificationService
+  ) {
+
+  }
 
   ngOnInit(): void {
     this.userService.getDataFromToken().subscribe(x => {
@@ -58,29 +80,11 @@ export class Messenger implements OnInit {
     }
   }
 
-  public send() {
-    var a = {
-      userId: this.userData.id,
-      chatId: 17
-    }
-    this.chatUserService.AddChatUser(a).subscribe({
-      next: x => {
-        console.log("succes");
-
-        console.log(x);
-
-      },
-      error: x => {
-        console.log(x);
-
-      }
-    })
-  }
-
   private async connection() {
     await this.hub.startConnection(this.token)
     await this.hub.joinChatUsers(this.userData.id);
 
+    // Chat-user SignalR Config
     this.hub.onAddUser(data => {
       const updated = [
         ...this.userChats$.value,
@@ -89,8 +93,8 @@ export class Messenger implements OnInit {
 
       this.userChats$.next(updated);
       this.applyFilter();
+      this.notification.success(`You have been added to a ${data.name}  chat!`)
     });
-
 
     this.hub.onRemoveUser(data => {
       this.userChats$.next(
@@ -99,6 +103,27 @@ export class Messenger implements OnInit {
       this.applyFilter();
     })
 
+    // message SignalR Config
+    this.hub.onCreateMessage(data => {
+      const updated = [
+        ...this.selectedChatMessages$.value,
+        this.mapMessage(data)
+      ]
+
+      if (!this.isWriter(data)) {
+        this.receiveAudio.currentTime = 0;
+        this.receiveAudio.volume = 0.4
+        this.receiveAudio.play();
+      }
+
+      this.selectedChatMessages$.next(updated)
+      this.scrollToBottom()
+    })
+
+    this.hub.onDeleteMessage(data => {
+      const updated = this.selectedChatMessages$.value.filter(msg => msg.id !== data.id);
+      this.selectedChatMessages$.next(updated);
+    });
   }
 
   ngOnDestroy(): void {
@@ -129,6 +154,7 @@ export class Messenger implements OnInit {
         next: x => {
           this.userChats$.next(x);
           this.applyFilter();
+          this.chatsLoading = false
           res()
         },
         error(err) {
@@ -136,6 +162,83 @@ export class Messenger implements OnInit {
         }
       })
     })
+  }
+
+  // chat UI methods
+  public selectChat(id: number) {
+    this.chatLoading = true;
+    this.selectedChat = null;
+    this.selectedChatMessages$.next([]);
+
+    this.chatUserService.CheckUserInChat(id, this.userData.id).subscribe(isInChat => {
+
+      if (!isInChat) {
+        this.chatLoading = false;
+        return;
+      }
+
+      this.chatService.GetChatById(id).subscribe(chat => {
+        this.selectedChat = chat;
+
+        this.chatUserService.GetUsersInChat(chat.id).subscribe(users => {
+          users.forEach(u => {
+            this.usersMap.set(u.id, u.name);
+          });
+        });
+
+        this.hub.leaveChat(chat.id);
+        this.hub.joinChat(chat.id);
+
+        this.chatService.GetChatMessages(chat.id).subscribe(messages => {
+          const updated = messages.map(x => ({
+            ...x,
+            createdAt: GlobalMethods.formatDate(x.createdAt, false, true),
+            isWriter: this.isWriter(x),
+            userName: x.userName
+          }));
+
+          this.selectedChatMessages$.next(updated);
+          this.chatLoading = false;
+          this.scrollToBottom()
+        });
+      });
+    });
+  }
+
+  shouldShowSender(index: number): boolean {
+    const messages = this.selectedChatMessages$.value;
+    const current = messages[index];
+
+    if (current.isWriter) return false;
+
+    if (index === 0) return true;
+
+    const prev = messages[index - 1];
+
+    return current.userId !== prev.userId;
+  }
+
+  private isWriter(data: MessageInterface): boolean {
+    return data.userId === this.userData.id;
+  }
+
+  private mapMessage(data: MessageInterface): MessageInterface {
+    return {
+      ...data,
+      createdAt: GlobalMethods.formatDate(data.createdAt, false, true),
+      isWriter: this.isWriter(data),
+    };
+  }
+
+  getUserName(userId: number): string {
+    return this.usersMap.get(userId) ?? 'Unknown';
+  }
+
+  private scrollToBottom() {
+    setTimeout(() => {
+      const container = document.querySelector('.chat-messages');
+      if (container) container.scrollTop = container.scrollHeight;
+    }, 50);
   }
 
   // chat-list UI methods
@@ -155,9 +258,66 @@ export class Messenger implements OnInit {
   }
 
   // chat UI methods
+  public sendMessage() {
+    if (this.selectedChat) {
+      if (this.isSending) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Stop spamming!",
+          footer: '<a href="#">Why do I have this issue?</a>'
+        });
+        return;
+      };
+      if (!this.newMessage.trim()) return;
 
+      this.isSending = true;
+      const payload = {
+        content: this.newMessage,
+        userId: this.tokenData.id,
+        chatId: this.selectedChat?.id
+      };
+
+      this.messageService.CreateMessage(payload).subscribe({
+        next: () => {
+          this.newMessage = ''
+          this.isSending = false;
+        },
+        error: err => {
+          console.error(err)
+          this.isSending = false;
+        }
+      });
+    }
+    this.scrollToBottom()
+  }
 
   // swals
+
+  showUserAddedAlert(name: string) {
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: `${name} added to chat!`,
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true
+    });
+  }
+
+  showUserRemovedAlert(name: string) {
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'success',
+      title: `${name} removed from chat!`,
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true
+    });
+  }
+
   createChatSwal() {
     Swal.fire({
       title: 'Create Chat',
@@ -206,23 +366,12 @@ export class Messenger implements OnInit {
 
         this.chatService.CreateChat(p).subscribe({
           next: xa => {
-            this.chatUserService.AddChatUser({ userId: xa.createdByUserId, chatId: xa.id })
-              .subscribe(x => {
-                Swal.fire({
-                  title: "Success!",
-                  text: "Successfuly created new chat!",
-                  icon: "success"
-                });
-              })
+            this.chatUserService.AddChatUser({ userId: xa.createdByUserId, chatId: xa.id }).subscribe(x => {
 
+            })
           },
-          error: x => {
-            Swal.fire({
-              icon: "error",
-              title: "Oops...",
-              text: `${x}`,
-              footer: '<a href="#">Why do I have this issue?</a>'
-            });
+          error: () => {
+            this.notification.error("Successfuly created new chat!")
           }
         })
       }
@@ -240,13 +389,17 @@ export class Messenger implements OnInit {
       confirmButtonText: "Yes, I want quit"
     }).then((result) => {
       if (result.isConfirmed) {
+        console.log(this.selectedChat);
+        
+        if (id == this.selectedChat?.id) {
+          this.selectedChat == null
+        }
         this.chatUserService.RemoveChatUser({ userId: this.tokenData.id, chatId: id }).subscribe({
           next: () => {
-            Swal.fire({
-              title: "Quited!",
-              text: "You have successfuly quited the chat.",
-              icon: "success"
-            })
+            this.notification.success("Successfuly quited from chat")
+          },
+          error: () => {
+            this.notification.error("Some error happend!")
           }
         })
       }

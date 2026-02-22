@@ -4,6 +4,7 @@ import { Auth } from '../../services/auth';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { GlobalData } from '../../classes/global-data';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-register',
@@ -14,7 +15,7 @@ import { GlobalData } from '../../classes/global-data';
 export class Register implements OnInit {
   public regForm!: FormGroup;
 
-  constructor(public auth: Auth, public router: Router) { }
+  constructor(public auth: Auth, public router: Router, public notifi: NotificationService) { }
 
   ngOnInit(): void {
     this.GetFormGroup()
@@ -30,16 +31,9 @@ export class Register implements OnInit {
 
     this.auth.register(formData).subscribe({
       next: (x) => {
-        Swal.fire({
-          position: "top-end",
-          icon: "success",
-          title: "Successfuly registred",
-          showConfirmButton: false,
-          timer: 1500
-        }).then(() => {
-          this.regForm.reset();
-          this.router.navigate(['/login'])
-        });
+        this.notifi.success("Registred account successfuly!")
+        this.regForm.reset();
+        this.router.navigate(['/login'])
       },
       error(err) {
         Swal.fire({

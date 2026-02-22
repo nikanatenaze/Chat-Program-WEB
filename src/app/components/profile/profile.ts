@@ -7,6 +7,7 @@ import { finalize, map } from 'rxjs/operators';
 import { UserInterface } from '../../interfaces/user.interface';
 import { GlobalMethods } from '../../classes/global-methods';
 import { firstValueFrom } from 'rxjs';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-profile',
@@ -25,6 +26,7 @@ export class Profile implements OnInit {
     private userService: User,
     private router: Router,
     private auth: Auth,
+    private notify: NotificationService
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -71,10 +73,7 @@ export class Profile implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.auth.logout();
-        Swal.fire({
-          title: "Logged out!",
-          icon: "success"
-        }).then(() => this.router.navigate(['/']));
+        this.notify.success("Loged out successfuly!")
       }
     });
   }

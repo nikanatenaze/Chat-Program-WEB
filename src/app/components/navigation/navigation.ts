@@ -31,7 +31,7 @@ export class Navigation implements OnInit {
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
         const url = event.urlAfterRedirects;
-        if (url.startsWith('/chat/')) {
+        if (url.startsWith('/chat/') || url.startsWith("/messenger")) {
           sessionStorage.setItem(this.STORAGE_KEY, 'true');
         }
         this.restoreNavState();

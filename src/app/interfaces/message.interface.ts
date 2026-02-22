@@ -5,4 +5,5 @@ export interface MessageInterface {
     userId: number
     chatId: number
     userName?: string;
+    isWriter: boolean
 }

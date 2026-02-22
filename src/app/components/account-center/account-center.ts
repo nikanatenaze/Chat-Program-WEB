@@ -9,6 +9,7 @@ import { Auth } from '../../services/auth';
 import { Router } from '@angular/router';
 import { GlobalData } from '../../classes/global-data';
 import { finalize } from 'rxjs';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-account-center',
@@ -27,7 +28,12 @@ export class AccountCenter implements OnInit {
   public minPaslen = GlobalData.PASSWORD_MIN_LENGTH
 
 
-  constructor(public userService: User, public auth: Auth, public router: Router) {
+  constructor(
+    public userService: User,
+    public auth: Auth,
+    public router: Router,
+    public notifi: NotificationService
+  ) {
 
   }
 
@@ -37,16 +43,16 @@ export class AccountCenter implements OnInit {
       next: x => {
         this.tokenData = x
         this.userService.getUserById(this.tokenData.id)
-        .pipe(finalize(() => (this.loading = false)))
-        .subscribe({
-          next: x => {
-            this.updateForm.patchValue({
-              id: x.id,
-              name: x.name,
-              email: x.email
-            })
-          }
-        })
+          .pipe(finalize(() => (this.loading = false)))
+          .subscribe({
+            next: x => {
+              this.updateForm.patchValue({
+                id: x.id,
+                name: x.name,
+                email: x.email
+              })
+            }
+          })
       }
     })
   }
@@ -82,12 +88,7 @@ export class AccountCenter implements OnInit {
 
   saveChanges() {
     if (this.updateForm.invalid) {
-      // Show alert if form is invalid
-      Swal.fire({
-        icon: 'error',
-        title: 'Invalid prompts!',
-        text: 'Please check password or another prompts before atempting one more time.'
-      });
+      this.notifi.error("Wrong prompt!")
       return;
     }
 
@@ -103,20 +104,11 @@ export class AccountCenter implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.userService.updateUser(form).subscribe({
-          next: x => {
-            Swal.fire({
-              title: "Updated successfuly!",
-              text: "Your data has been patched!",
-              icon: "success"
-            })
+          next: () => {
+            this.notifi.success("Updated your data successfuly!")
           },
-          error(x) {
-            Swal.fire({
-              icon: "error",
-              title: "Oops...",
-              text: `${x.error}`,
-              footer: '<a href="#">Why do I have this issue?</a>'
-            });
+          error: (x) => {
+            this.notifi.error(`Error while updateing: ${x.error}`)
           }
         })
       }
@@ -126,23 +118,9 @@ export class AccountCenter implements OnInit {
   // settings methods
 
   logout(): void {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "After this you have to login again!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, logout!"
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.auth.logout();
-        Swal.fire({
-          title: "Logged out!",
-          icon: "success"
-        }).then(() => this.router.navigate(['/']));
-      }
-    });
+    this.auth.logout();
+    this.notifi.success("Loged out successfuly!")
+    this.router.navigate(["/"])
   }
 
   deleteUser(): void {
@@ -174,14 +152,9 @@ export class AccountCenter implements OnInit {
 
         this.userService.deleteUser(payload).subscribe({
           next: () => {
-            Swal.fire(
-              'Deleted!',
-              'Your account has been deleted.',
-              'success'
-            ).then(() => {
-              this.auth.logout()
-              this.router.navigate(["/"])
-            });
+            this.notifi.success("Deleted your account successfuly!")
+            this.auth.logout()
+            this.router.navigate(["/"])
           },
           error: (err) => {
             Swal.fire(
