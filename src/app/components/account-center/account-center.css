@@ -171,6 +171,14 @@
     transition: opacity 0.3s ease-in-out;
 }
 
+.centr-div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+}
+
 /* responsive */
 @media (max-width: 1024px) {
     .content-ui {

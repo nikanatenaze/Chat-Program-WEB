@@ -95,16 +95,12 @@
 
 <ng-template #loadingChat>
     <div class="chat-ui chat-ui-chat-none">
-        <ng-container *ngTemplateOutlet="loader"></ng-container>
+        <div class="content-loader"></div>
     </div>
 </ng-template>
 
 <ng-template #loadingChats>
     <div class="chats-load">
-        <ng-container *ngTemplateOutlet="loader"></ng-container>
+        <div class="content-loader"></div>
     </div>
-</ng-template>
-
-<ng-template #loader>
-    <div class="loader"></div>
 </ng-template>

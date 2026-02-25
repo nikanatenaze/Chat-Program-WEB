@@ -7,6 +7,7 @@ import { Notyf } from 'notyf';
 export class NotificationService {
   // audios
   private receiveAudio = new Audio('notyf-sound-effect.mp3');
+  private errorAudio = new Audio('notyf-error-sound-effect.mp3')
 
   private notyf = new Notyf({
     duration: 3500,
@@ -20,12 +21,12 @@ export class NotificationService {
 
   success(message: string) {
     this.notyf.success(message);
-    this.audioEffect()
+    this.playAudio(this.receiveAudio)
   }
 
   error(message: string) {
     this.notyf.error(message);
-    this.audioEffect()
+    this.playAudio(this.errorAudio, 0.3)
   }
 
   info(message: string) {
@@ -34,7 +35,7 @@ export class NotificationService {
       message: message,
       background: '#3b82f6'
     });
-    this.audioEffect()
+    this.playAudio(this.receiveAudio)
   }
 
   warning(message: string) {
@@ -43,12 +44,12 @@ export class NotificationService {
       message: message,
       background: '#f59e0b'
     });
-    this.audioEffect()
+    this.playAudio(this.receiveAudio)
   }
 
-  private audioEffect() {
-    this.receiveAudio.volume = 0.4
-    this.receiveAudio.currentTime = 0;
-    this.receiveAudio.play()
+  private playAudio(audio: HTMLAudioElement, volume = 0.4, time = 0) {
+    audio.volume = volume
+    audio.currentTime = time;
+    audio.play()
   }
 }

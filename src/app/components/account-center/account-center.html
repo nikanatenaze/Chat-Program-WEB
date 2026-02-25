@@ -1,5 +1,5 @@
 <section class="content default-page-background">
-    <div class="content-ui" *ngIf="!loading; else loadingTmp">
+    <div class="content-ui">
         <div class="ui-panel">
             <div class="panel-user-info">
                 <p>Account Center</p>
@@ -14,41 +14,49 @@
 
         <div class="ui-content">
             <ng-container *ngIf="activePage === 'profile'">
-                <h2>Profile Details </h2>
 
-                <form [formGroup]="updateForm" (ngSubmit)="saveChanges()">
-                    <div class="row">
-                        <label>User Id</label>
-                        <input formControlName="id" type="text" />
-                    </div>
+                <ng-container *ngIf="!loading; else loader">
 
-                    <div class="row">
-                        <label>Username</label>
-                        <input formControlName="name" type="text" />
-                        <div class="error" *ngIf="updateForm.get('name')?.invalid && updateForm.get('name')?.touched">
-                            Invalid Username
+                    <h2>Profile Details</h2>
+
+                    <form [formGroup]="updateForm" (ngSubmit)="saveChanges()">
+                        <div class="row">
+                            <label>User Id</label>
+                            <input formControlName="id" type="text" />
                         </div>
-                    </div>
 
-                    <div class="row">
-                        <label>Email</label>
-                        <input formControlName="email" type="email" />
-                        <div class="error" *ngIf="updateForm.get('email')?.invalid && updateForm.get('email')?.touched">
-                            Please enter a valid email.
+                        <div class="row">
+                            <label>Username</label>
+                            <input formControlName="name" type="text" />
+                            <div class="error"
+                                *ngIf="updateForm.get('name')?.invalid && updateForm.get('name')?.touched">
+                                Invalid Username
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="row">
-                        <label>Password</label>
-                        <input formControlName="password" type="text" placeholder="New password" />
-                        <div class="error"
-                            *ngIf="updateForm.get('password')?.invalid && updateForm.get('password')?.touched">
-                            Password must be at least {{minPaslen}} characters.
+                        <div class="row">
+                            <label>Email</label>
+                            <input formControlName="email" type="email" />
+                            <div class="error"
+                                *ngIf="updateForm.get('email')?.invalid && updateForm.get('email')?.touched">
+                                Please enter a valid email.
+                            </div>
                         </div>
-                    </div>
 
-                    <button class="primary-btn" type="submit">Save Changes</button>
-                </form>
+                        <div class="row">
+                            <label>Password</label>
+                            <input formControlName="password" type="text" placeholder="New password" />
+                            <div class="error"
+                                *ngIf="updateForm.get('password')?.invalid && updateForm.get('password')?.touched">
+                                Password must be at least {{minPaslen}} characters.
+                            </div>
+                        </div>
+
+                        <button class="primary-btn" type="submit">Save Changes</button>
+                    </form>
+
+                </ng-container>
+
             </ng-container>
 
             <ng-container *ngIf="activePage === 'appearance'">
@@ -80,11 +88,11 @@
                 <div class="card">
                     <div class="row toggle">
                         <label>Email Notifications</label>
-                        <input type="checkbox" checked/>
+                        <input type="checkbox" checked />
                     </div>
                     <div class="row toggle">
                         <label>Two-Factor Authentication</label>
-                        <input type="checkbox"/>
+                        <input type="checkbox" />
                     </div>
                     <hr>
                     <div class="btns">
@@ -97,6 +105,8 @@
     </div>
 </section>
 
-<ng-template #loadingTmp>
-    <app-loader></app-loader>
+<ng-template #loader>
+    <div class="centr-div">
+        <div class="content-loader"></div>
+    </div>
 </ng-template>
