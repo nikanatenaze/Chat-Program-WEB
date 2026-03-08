@@ -48,20 +48,24 @@ export class User {
   }
 
   updateUser(prompt: { name: string, email: string }) {
-    console.log(GlobalMethods.getAuthHeaders());
     return this.http.patch(this.apiUrl + `/Update`, prompt, {
       headers: GlobalMethods.getAuthHeaders()
     })
   }
 
-  deleteUser(password: string) {
-    // Build object to match backend DTO
-    const body = { password }; // lowercase 'password' matches DeleteUserDTO on backend
+  removeProfileImage() {
+    return this.http.delete(this.apiUrl + `/RemoveProfilePicture`, {
+      headers: GlobalMethods.getAuthHeaders(),
+      responseType: 'text'
+    })
+  }
 
-    // Use http.request to send DELETE with body
+  deleteUser(password: string) {
+    const body = { password };
+
     return this.http.request('delete', this.apiUrl + '/Delete', {
       body,
-      headers: GlobalMethods.getAuthHeaders() // includes Content-Type: application/json
+      headers: GlobalMethods.getAuthHeaders()
     });
   }
 }

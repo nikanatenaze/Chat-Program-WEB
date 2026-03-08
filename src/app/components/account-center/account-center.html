@@ -14,8 +14,9 @@
                 </div>
 
                 <div *ngIf="!loading; else skeletonText">
-                    <div class="sidebar-name">{{ updateForm.get('name')?.value || 'Your Name' }}</div>
-                    <div class="sidebar-email">{{ updateForm.get('email')?.value || 'your@email.com' }}</div>
+                    <!-- ✅ Now uses displayName/displayEmail — only updates after server confirms save -->
+                    <div class="sidebar-name">{{ displayName || 'Your Name' }}</div>
+                    <div class="sidebar-email">{{ displayEmail || 'your@email.com' }}</div>
                 </div>
                 <ng-template #skeletonText>
                     <div class="skel-lines">

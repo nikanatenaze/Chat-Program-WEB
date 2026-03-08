@@ -27,6 +27,10 @@ export class AccountCenter implements OnInit {
   activePage = 'profile';
   minPasLen = GlobalData.PASSWORD_MIN_LENGTH;
 
+  // Sidebar display values — only update after server confirms save
+  displayName = '';
+  displayEmail = '';
+
   // Avatar
   avatarPreview: string | null = null;
   avatarFile: File | null = null;
@@ -34,11 +38,10 @@ export class AccountCenter implements OnInit {
   readonly DEFAULT_AVATAR = 'default-user-image.jpg';
 
   get nameInitial(): string {
-    const name = this.updateForm?.get('name')?.value as string;
-    return name ? name.charAt(0).toUpperCase() : '?';
+    return this.displayName ? this.displayName.charAt(0).toUpperCase() : '?';
   }
 
-  get displayAvatar(): string {
+  get displayAvatarSrc(): string {
     return this.avatarPreview ?? this.DEFAULT_AVATAR;
   }
 
@@ -61,6 +64,11 @@ export class AccountCenter implements OnInit {
             next: (user: UserInterface) => {
               this.updateForm.patchValue({ name: user.name, email: user.email });
               this.userData = user;
+
+              // Set sidebar display values from server data
+              this.displayName = user.name;
+              this.displayEmail = user.email;
+
               if (user.profileImageUrl) {
                 this.avatarPreview = user.profileImageUrl;
               }
@@ -110,6 +118,9 @@ export class AccountCenter implements OnInit {
       const form = this.updateForm.getRawValue();
       this.userService.updateUser(form).subscribe({
         next: () => {
+          // Only update sidebar after server confirms success
+          this.displayName = this.updateForm.get('name')?.value;
+          this.displayEmail = this.updateForm.get('email')?.value;
           this.notifi.success('Profile updated successfully!');
         },
         error: err => {
@@ -163,7 +174,7 @@ export class AccountCenter implements OnInit {
     });
   }
 
-  // Avatar 
+  // Avatar
 
   onAvatarSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -184,14 +195,13 @@ export class AccountCenter implements OnInit {
 
     this.avatarFile = file;
     const reader = new FileReader();
-    reader.onload = () => (this.avatarPreview = reader.result as string);
-    reader.readAsDataURL(file);
 
-    // fetch
     this.userService.updateProfileImage(file).subscribe({
       next: (res: any) => {
         this.notifi.success('Profile photo updated!');
         this.avatarPreview = res.imageUrl ?? this.avatarPreview;
+        reader.onload = () => (this.avatarPreview = reader.result as string);
+        reader.readAsDataURL(file);
       },
       error: err => {
         this.notifi.error(`Upload failed: ${err?.error?.message ?? 'Unknown error'}`);
@@ -201,12 +211,21 @@ export class AccountCenter implements OnInit {
     });
   }
 
-
   removeAvatar(): void {
-    GlobalMethods.notImplemented()
+    this.userService.removeProfileImage().subscribe({
+      next: (res: any) => {
+        this.notifi.success("Successfuly removed profile picture!")
+        this.avatarPreview = this.userData?.profileImageUrl ?? null;
+        this.avatarFile = null;
+      },
+      error: err => {
+        
+        this.notifi.error(`Remove failed: ${err?.error?.message ?? 'Unknown error'}`);
+      }
+    })
   }
 
-  // ── Settings ────────────────────────────────────────────────
+  // Settings
 
   logout(): void {
     this.auth.logout();

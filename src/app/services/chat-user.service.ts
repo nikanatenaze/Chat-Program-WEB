@@ -13,9 +13,9 @@ export class ChatUserService {
   private api = GlobalData.RENDER_API_URL + "/ChatUser"
   constructor(private http: HttpClient) { }
 
-  GetChatsOfUser(id: number): Observable<ChatInterface[]> {
+  GetChatsOfUser(): Observable<ChatInterface[]> {
     return this.http.get<ChatInterface[]>(
-      `${this.api}/GetChatsOfUser/${id}`,
+      `${this.api}/GetChatsOfUser`,
       { headers: GlobalMethods.getAuthHeaders() }
     );
   }

@@ -35,7 +35,7 @@ export class Chats implements OnInit {
       }
 
       this.chatUserService
-        .GetChatsOfUser(this.userId)
+        .GetChatsOfUser()
         .pipe(finalize(() => (this.loading = false)))
         .subscribe({
           next: chats => {
@@ -56,9 +56,9 @@ export class Chats implements OnInit {
     }
   }
 
-  loadUserChats(userId: number): void {
+  loadUserChats(): void {
     this.chatUserService
-      .GetChatsOfUser(userId)
+      .GetChatsOfUser()
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
         next: chats => {

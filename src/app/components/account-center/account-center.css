@@ -1,4 +1,4 @@
-/* ── Host wrapper ── */
+/* Host wrapper */
 .content {
   width: 100%;
   min-height: 100vh;
@@ -8,7 +8,7 @@
   padding: 24px;
 }
 
-/* ── Shell ── */
+/* Shell */
 .ac-shell {
   width: 100%;
   max-width: 880px;
@@ -24,7 +24,7 @@
   overflow: hidden;
 }
 
-/* ── Sidebar ── */
+/* Sidebar */
 .sidebar {
   width: 220px;
   min-width: 220px;
@@ -177,7 +177,7 @@
   letter-spacing: 0.04em;
 }
 
-/* ── Content area ── */
+/* Content area */
 .content-area {
   flex: 1;
   padding: 34px 34px 28px;
@@ -209,7 +209,7 @@
   }
 }
 
-/* ── Page header ── */
+/* Page header */
 .pg-badge {
   display: inline-flex;
   align-items: center;
@@ -241,7 +241,7 @@
   line-height: 1.5;
 }
 
-/* ── Avatar upload section ── */
+/* Avatar upload section */
 .avatar-section {
   display: flex;
   align-items: center;
@@ -404,7 +404,7 @@
   font-size: 10px;
 }
 
-/* ── Form footer ── */
+/* Form footer */
 .form-footer {
   margin-top: 26px;
   padding-top: 18px;
@@ -415,7 +415,7 @@
   align-items: center;
 }
 
-/* ── Buttons (all inline values, no var()) ── */
+/* Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -502,7 +502,7 @@
   font-size: 12.5px;
 }
 
-/* ── Settings card ── */
+/* Settings card */
 .settings-card {
   background: rgba(255, 255, 255, 0.022);
   border: 1px solid rgba(255, 255, 255, 0.065);
@@ -542,7 +542,7 @@
   margin-top: 2px;
 }
 
-/* ── Custom toggle ── */
+/* Custom toggle */
 .toggle {
   position: relative;
   width: 40px;
@@ -588,7 +588,7 @@
   background: #fff;
 }
 
-/* ── Danger zone ── */
+/* Danger zone */
 .danger-zone {
   background: rgba(239, 68, 68, 0.035);
   border: 1px solid rgba(239, 68, 68, 0.1);
@@ -627,7 +627,7 @@
   align-items: center;
 }
 
-/* ── Loader (uses your .content-loader from global) ── */
+/* Loader */
 .loader-wrap {
   display: flex;
   align-items: center;
@@ -636,7 +636,7 @@
   height: 100%;
 }
 
-/* ── Skeleton loader ── */
+/* Skeleton loader */
 @keyframes shimmer {
   0% {
     background-position: -200% center;
@@ -682,7 +682,7 @@
   opacity: 0.7;
 }
 
-/* ── Responsive ── */
+/*  Responsive */
 @media (max-width: 680px) {
   .ac-shell {
     flex-direction: column;

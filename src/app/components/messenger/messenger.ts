@@ -150,7 +150,7 @@ export class Messenger implements OnInit {
 
   fetchChats(): Promise<void> {
     return new Promise((res, rej) => {
-      this.chatUserService.GetChatsOfUser(this.userData.id).subscribe({
+      this.chatUserService.GetChatsOfUser().subscribe({
         next: x => {
           this.userChats$.next(x);
           this.applyFilter();
@@ -170,37 +170,29 @@ export class Messenger implements OnInit {
     this.selectedChat = null;
     this.selectedChatMessages$.next([]);
 
-    this.chatUserService.CheckUserInChat(id, this.userData.id).subscribe(isInChat => {
+    this.chatService.GetChatById(id).subscribe(chat => {
+      this.selectedChat = chat;
 
-      if (!isInChat) {
+      this.chatUserService.GetUsersInChat(chat.id).subscribe(users => {
+        users.forEach(u => {
+          this.usersMap.set(u.id, u.name);
+        });
+      });
+
+      this.hub.leaveChat(chat.id);
+      this.hub.joinChat(chat.id);
+
+      this.chatService.GetChatMessages(chat.id).subscribe(messages => {
+        const updated = messages.map(x => ({
+          ...x,
+          createdAt: GlobalMethods.formatDate(x.createdAt, false, true),
+          isWriter: this.isWriter(x),
+          userName: x.userName
+        }));
+
+        this.selectedChatMessages$.next(updated);
         this.chatLoading = false;
-        return;
-      }
-
-      this.chatService.GetChatById(id).subscribe(chat => {
-        this.selectedChat = chat;
-
-        this.chatUserService.GetUsersInChat(chat.id).subscribe(users => {
-          users.forEach(u => {
-            this.usersMap.set(u.id, u.name);
-          });
-        });
-
-        this.hub.leaveChat(chat.id);
-        this.hub.joinChat(chat.id);
-
-        this.chatService.GetChatMessages(chat.id).subscribe(messages => {
-          const updated = messages.map(x => ({
-            ...x,
-            createdAt: GlobalMethods.formatDate(x.createdAt, false, true),
-            isWriter: this.isWriter(x),
-            userName: x.userName
-          }));
-
-          this.selectedChatMessages$.next(updated);
-          this.chatLoading = false;
-          this.scrollToBottom()
-        });
+        this.scrollToBottom()
       });
     });
   }
@@ -390,7 +382,7 @@ export class Messenger implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         console.log(this.selectedChat);
-        
+
         if (id == this.selectedChat?.id) {
           this.selectedChat == null
         }

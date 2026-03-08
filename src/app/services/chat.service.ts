@@ -30,6 +30,14 @@ export class ChatService {
     })
   }
 
+  uploadChatImage(chatId: number, file: File) {
+    const formData = new FormData();
+    formData.append('ChatId', chatId.toString());
+    formData.append('Image', file);
+
+    return this.http.post<{ ImageUrl: string }>('/api/Chat/UploadChatImage', formData);
+  }
+
   ChatVerification(prompt: { id: number, password: string }) {
     return this.http.post(this.api + `/ChatVerification`, prompt, {
       headers: GlobalMethods.getAuthHeaders()
