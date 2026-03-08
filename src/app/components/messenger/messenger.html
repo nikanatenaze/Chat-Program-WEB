@@ -6,12 +6,13 @@
 
         <section class="content">
 
-            <!-- LEFT PANEL -->
+            <!-- ═══════════════ LEFT PANEL ═══════════════ -->
             <div class="panel-ui">
+
                 <div class="title">
                     <p>Chats</p>
-                    <div class="new">
-                        <span (click)="createChatSwal()">Create <i class="fa-solid fa-plus"></i></span>
+                    <div class="new" (click)="createChatSwal()">
+                        New <i class="fa-solid fa-plus"></i>
                     </div>
                 </div>
 
@@ -19,83 +20,293 @@
 
                 <div class="search">
                     <div class="search-input-div">
-                        <input type="text" placeholder="Search.." (input)="onSearch($event.target.value)">
+                        <input type="text" placeholder="Search…" (input)="onSearch($event)">
                     </div>
                 </div>
 
                 <div class="chats" *ngIf="!chatsLoading; else loadingChats">
-                    <div class="chat" (click)="selectChat(i.id)" *ngFor="let i of filteredChats$ | async">
-                        <div class="chat-hover-icon" (click)="quitFromChatSwal(i.id); $event.stopPropagation()">
-                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                        </div>
-
+                    <div class="chat" *ngFor="let i of filteredChats$ | async" (click)="selectChat(i.id)"
+                        [class.active-chat]="selectedChat?.id === i.id">
                         <div class="chat-title">
-                            <img src="https://picsum.photos/191/300">
-                            <p>{{i.name}}</p>
+                            <div class="chat-list-avatar">
+                                <img *ngIf="i.chatImageUrl" [src]="i.chatImageUrl" alt="{{ i.name }}">
+                                <div *ngIf="!i.chatImageUrl" class="chat-list-initials">
+                                    {{ i.name.charAt(0).toUpperCase() }}
+                                </div>
+                            </div>
+                            <p>{{ i.name }}</p>
+                        </div>
+                        <div class="chat-hover-icon" (click)="quitFromChatSwal(i.id); $event.stopPropagation()"
+                            title="Leave chat">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
                         </div>
                     </div>
                 </div>
+
             </div>
 
-            <!-- CHAT UI -->
+            <!-- ═══════════════ CHAT AREA ═══════════════ -->
 
-            <ng-container *ngIf="chatLoading; else chatOrEmpty">
-                <ng-container *ngTemplateOutlet="loadingChat"></ng-container>
-            </ng-container>
+            <div class="chat-ui" *ngIf="selectedChat || chatLoading; else clear">
 
-            <ng-template #chatOrEmpty>
-                <div class="chat-ui chat-ui-chat-st" *ngIf="selectedChat; else clear">
-
-                    <div class="chat-header">
-                        <div class="chat-header-user">
-                            <img src="https://picsum.photos/200">
-                            <div class="chat-header-info">
-                                <p class="chat-name">{{selectedChat.name}}</p>
-                                <span class="chat-status">online</span>
+                <!-- Real header — always shown once a chat is selected or loading -->
+                <div class="chat-header" *ngIf="selectedChat">
+                    <div class="chat-header-user">
+                        <div class="chat-header-avatar">
+                            <img *ngIf="selectedChat.chatImageUrl" [src]="selectedChat.chatImageUrl"
+                                alt="{{ selectedChat.name }}">
+                            <div *ngIf="!selectedChat.chatImageUrl" class="chat-header-initials">
+                                {{ selectedChat.name.charAt(0).toUpperCase() }}
                             </div>
+                        </div>
+                        <div class="chat-header-info">
+                            <p class="chat-name">{{ selectedChat.name }}</p>
+                            <span class="chat-status">online</span>
+                        </div>
+                    </div>
+                    <div class="chat-header-actions">
+                        <button class="header-btn" (click)="openAddUserPanel()" title="Add user">
+                            <i class="fa-solid fa-user-plus"></i>
+                        </button>
+                        <button class="header-btn" (click)="chatSettingsSwal()" title="Chat settings">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ── ADD USER PANEL OVERLAY ── -->
+                <div class="add-user-overlay" *ngIf="showAddUserPanel" (click)="closeAddUserPanel()"></div>
+                <div class="add-user-panel" *ngIf="showAddUserPanel">
+
+                    <div class="aup-header">
+                        <div class="aup-title">
+                            <i class="fa-solid fa-user-plus"></i>
+                            Add People
+                        </div>
+                        <button class="aup-close" (click)="closeAddUserPanel()">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <!-- Selected chips -->
+                    <div class="aup-chips" *ngIf="addUserSelectedList.length">
+                        <div class="aup-chip" *ngFor="let u of addUserSelectedList">
+                            <!-- Chip avatar: photo if available, else initial -->
+                            <div class="aup-chip-avatar">
+                                <img *ngIf="u.profileImageUrl" [src]="u.profileImageUrl" class="aup-chip-img"
+                                    [alt]="u.name">
+                                <span *ngIf="!u.profileImageUrl">{{ u.name.charAt(0).toUpperCase() }}</span>
+                            </div>
+                            <span>{{ u.name }}</span>
+                            <button class="aup-chip-remove" (click)="removeAddUserChip(u.id)">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
                         </div>
                     </div>
 
-                    <div class="chat-messages">
-                        <div class="msg" *ngFor="let i of selectedChatMessages$.value; let idx = index">
-                            <div class="sender" *ngIf="shouldShowSender(idx)">
-                                {{ getUserName(i.userId) }}
-                            </div>
-                            <div class="message" [class.other]="!i.isWriter" [class.me]="i.isWriter">
-                                <p>{{i.content}}</p>
-                                <span>{{i.createdAt}}</span>
-                            </div>
+                    <!-- Search input -->
+                    <div class="aup-search">
+                        <i class="fa-solid fa-magnifying-glass aup-search-icon"></i>
+                        <input type="text" class="aup-search-input" placeholder="Search by username…"
+                            [value]="addUserSearch" (input)="onAddUserSearch($event)" autocomplete="off">
+                        <div class="aup-spinner" *ngIf="addUserSearching">
+                            <i class="fa-solid fa-circle-notch fa-spin"></i>
                         </div>
                     </div>
 
-                    <div class="chat-input">
-                        <input type="text" [(ngModel)]="newMessage" placeholder="Type a message..."
-                            (keydown.enter)="sendMessage()">
-                        <button (click)="sendMessage()">
-                            <i class="fa-solid fa-paper-plane"></i>
+                    <!-- Results -->
+                    <div class="aup-results">
+
+                        <div class="aup-empty" *ngIf="!addUserSearching && addUserSearch && !addUserResults.length">
+                            <i class="fa-solid fa-user-slash"></i>
+                            No users found
+                        </div>
+
+                        <div class="aup-empty aup-hint" *ngIf="!addUserSearch">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            Start typing to search
+                        </div>
+
+                        <div class="aup-user-row" *ngFor="let u of addUserResults" (click)="toggleAddUserSelect(u)"
+                            [class.aup-user-selected]="addUserSelected.has(u.id)">
+                            <!-- User avatar: photo if available, else initial -->
+                            <div class="aup-user-avatar">
+                                <img *ngIf="u.profileImageUrl" [src]="u.profileImageUrl" class="aup-user-img"
+                                    [alt]="u.name">
+                                <span *ngIf="!u.profileImageUrl">{{ u.name.charAt(0).toUpperCase() }}</span>
+                            </div>
+                            <div class="aup-user-info">
+                                <div class="aup-user-name">{{ u.name }}</div>
+                                <div class="aup-user-email">{{ u.email }}</div>
+                            </div>
+                            <div class="aup-check">
+                                <i class="fa-solid fa-check" *ngIf="addUserSelected.has(u.id)"></i>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="aup-footer">
+                        <button class="aup-btn-cancel" (click)="closeAddUserPanel()">Cancel</button>
+                        <button class="aup-btn-add" [disabled]="!addUserSelected.size || addUserAdding"
+                            (click)="confirmAddUsers()">
+                            <ng-container *ngIf="!addUserAdding">
+                                <i class="fa-solid fa-user-plus"></i>
+                                Add {{ addUserSelected.size || '' }}
+                                {{ addUserSelected.size === 1 ? 'Person' : addUserSelected.size > 1 ? 'People' : '' }}
+                            </ng-container>
+                            <ng-container *ngIf="addUserAdding">
+                                <i class="fa-solid fa-circle-notch fa-spin"></i> Adding…
+                            </ng-container>
                         </button>
                     </div>
 
                 </div>
-            </ng-template>
+
+                <!-- Skeleton header (shown only while loading before selectedChat resolves) -->
+                <div class="chat-header" *ngIf="chatLoading && !selectedChat">
+                    <div class="chat-header-user">
+                        <div class="skel skel-av-sm"></div>
+                        <div style="display:flex;flex-direction:column;gap:6px;">
+                            <div class="skel skel-line-name"></div>
+                            <div class="skel skel-line-status"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── MESSAGES AREA ── -->
+
+                <!-- Skeleton messages -->
+                <div class="chat-messages skel-messages-area" *ngIf="chatLoading">
+
+                    <div class="skel-msg-row">
+                        <div class="skel skel-av-xs"></div>
+                        <div class="skel-bubble-wrap" style="width:28%;">
+                            <div class="skel skel-text-line" style="width:100%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="skel-msg-row skel-row-me">
+                        <div class="skel-bubble-wrap" style="width:55%;">
+                            <div class="skel skel-text-line" style="width:100%;"></div>
+                            <div class="skel skel-text-line" style="width:70%;margin-top:7px;"></div>
+                        </div>
+                    </div>
+
+                    <div class="skel-msg-row">
+                        <div class="skel skel-av-xs"></div>
+                        <div class="skel-bubble-wrap" style="width:48%;">
+                            <div class="skel skel-text-line" style="width:100%;"></div>
+                            <div class="skel skel-text-line" style="width:65%;margin-top:7px;"></div>
+                        </div>
+                    </div>
+
+                    <div class="skel-msg-row skel-row-me">
+                        <div class="skel-bubble-wrap" style="width:22%;">
+                            <div class="skel skel-text-line" style="width:100%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="skel-msg-row">
+                        <div class="skel skel-av-xs"></div>
+                        <div class="skel-bubble-wrap" style="width:32%;">
+                            <div class="skel skel-text-line" style="width:100%;"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Real messages -->
+                <div class="chat-messages" *ngIf="!chatLoading">
+                    <ng-container *ngIf="selectedChatMessages$ | async as messages">
+                        <div class="msg" *ngFor="let i of messages; let idx = index">
+
+                            <div class="sender" *ngIf="shouldShowSender(messages, idx)">
+                                {{ getUserName(i) }}
+                            </div>
+
+                            <div class="msg-row" [class.me-row]="i.isWriter">
+
+                                <div class="msg-avatar" *ngIf="!i.isWriter">
+                                    <ng-container *ngIf="shouldShowAvatar(messages, idx); else avatarSpacer">
+                                        <img *ngIf="getUserAvatar(i.userId)" [src]="getUserAvatar(i.userId)"
+                                            class="avatar-img" [alt]="i.userName">
+                                        <div *ngIf="!getUserAvatar(i.userId)" class="avatar-initials">
+                                            {{ getInitial(i) }}
+                                        </div>
+                                    </ng-container>
+                                    <ng-template #avatarSpacer>
+                                        <div class="avatar-spacer"></div>
+                                    </ng-template>
+                                </div>
+
+                                <div class="message-wrapper">
+
+                                    <!-- Normal view -->
+                                    <ng-container *ngIf="editingMessageId !== i.id">
+                                        <div class="bubble-group" [class.bubble-group-me]="i.isWriter">
+                                            <div class="msg-actions" *ngIf="i.isWriter">
+                                                <button class="msg-action-btn" (click)="startEdit(i)" title="Edit">
+                                                    <i class="fa-solid fa-pen"></i>
+                                                </button>
+                                                <button class="msg-action-btn danger" (click)="deleteMessage(i.id)"
+                                                    title="Delete">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </div>
+                                            <div class="message" [class.other]="!i.isWriter" [class.me]="i.isWriter">
+                                                <p>{{ i.content }}</p>
+                                                <span>{{ i.createdAt }}</span>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+
+                                    <!-- Inline edit -->
+                                    <ng-container *ngIf="editingMessageId === i.id">
+                                        <div class="edit-bubble">
+                                            <textarea [id]="'edit-input-' + i.id" class="edit-textarea"
+                                                [(ngModel)]="editContent"
+                                                (keydown.enter)="$event.preventDefault(); saveEdit(i.id)"
+                                                (keydown.escape)="cancelEdit()" rows="2"></textarea>
+                                            <div class="edit-actions">
+                                                <button class="edit-btn save" (click)="saveEdit(i.id)">
+                                                    <i class="fa-solid fa-check"></i> Save
+                                                </button>
+                                                <button class="edit-btn cancel" (click)="cancelEdit()">
+                                                    <i class="fa-solid fa-xmark"></i> Cancel
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+
+                <!-- Real input — always shown -->
+                <div class="chat-input">
+                    <input type="text" [(ngModel)]="newMessage" placeholder="Type a message…"
+                        (keydown.enter)="sendMessage()" [disabled]="chatLoading">
+                    <button (click)="sendMessage()" [disabled]="isSending || chatLoading">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+
+            </div>
 
         </section>
-
     </div>
 </div>
 
-<!-- templates -->
+<!-- Templates -->
 
 <ng-template #clear>
     <div class="chat-ui chat-ui-chat-none">
-        <p class="text-gradient not-selec-text">Select chat to start messaging</p>
-        <p>or <span class="cr-ch" (click)="createChatSwal()">create</span> first chat right now!</p>
-    </div>
-</ng-template>
-
-<ng-template #loadingChat>
-    <div class="chat-ui chat-ui-chat-none">
-        <div class="content-loader"></div>
+        <p class="text-gradient not-selec-text">Select a chat to start messaging</p>
+        <p>or <span class="cr-ch" (click)="createChatSwal()">create</span> your first chat right now!</p>
     </div>
 </ng-template>
 

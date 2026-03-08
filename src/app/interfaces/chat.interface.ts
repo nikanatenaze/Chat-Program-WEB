@@ -3,6 +3,7 @@ export interface ChatInterface {
     name: string
     hasPassword: boolean
     password: string
+    chatImageUrl?: string
     createdAt: string
     createdByUserId: number
 }

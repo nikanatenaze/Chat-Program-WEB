@@ -14,7 +14,6 @@
                 </div>
 
                 <div *ngIf="!loading; else skeletonText">
-                    <!-- ✅ Now uses displayName/displayEmail — only updates after server confirms save -->
                     <div class="sidebar-name">{{ displayName || 'Your Name' }}</div>
                     <div class="sidebar-email">{{ displayEmail || 'your@email.com' }}</div>
                 </div>

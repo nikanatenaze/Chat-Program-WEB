@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, tap, throwError } from 'rxjs';
 import { UserInterface } from '../interfaces/user.interface';
 import { GlobalData } from '../classes/global-data';
 
@@ -8,6 +8,11 @@ interface LoginResponse {
   token: string;
   refreshToken: string;
   user?: UserInterface;
+}
+
+interface RefreshResponse {
+  accessToken: string;
+  refreshToken: string;
 }
 
 @Injectable({
@@ -20,7 +25,7 @@ export class Auth {
   private _userRefreshToken = new BehaviorSubject<string | null>(sessionStorage.getItem('refresh_token'));
   public userToken$ = this._userToken.asObservable();
   public refreshToken$ = this._userRefreshToken.asObservable();
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   login(data: { email: string; password: string }): Observable<LoginResponse> {
     return new Observable(observer => {
@@ -49,11 +54,41 @@ export class Auth {
     this._userToken.next(null);
   }
 
+  refreshToken(): Observable<RefreshResponse> {  // 👈 RefreshResponse
+    const refreshToken = this.getRefreshToken();
+    const accessToken = this.getToken();
+
+    console.log('=== REFRESH DEBUG ===');
+    console.log('accessToken:', accessToken);
+    console.log('refreshToken:', refreshToken);
+    console.log('body being sent:', { accessToken, refreshToken });
+    if (!refreshToken) {
+      this.logout();
+      return throwError(() => new Error('No refresh token available'));
+    }
+
+    return this.http.post<RefreshResponse>(`${this.apiUrl}/refresh`, {
+      accessToken,
+      refreshToken
+    }).pipe(
+      tap((res) => {
+        sessionStorage.setItem('token', res.accessToken);      // 👈 accessToken
+        sessionStorage.setItem('refresh_token', res.refreshToken);
+        this._userToken.next(res.accessToken);                 // 👈 accessToken
+        this._userRefreshToken.next(res.refreshToken);
+      }),
+      catchError((err) => {
+        this.logout();
+        return throwError(() => err);
+      })
+    );
+  }
+
   getToken(): string | null {
-    return sessionStorage.getItem('token'); 
+    return sessionStorage.getItem('token');
   }
 
   getRefreshToken(): string | null {
-    return sessionStorage.getItem('refresh_token'); 
+    return sessionStorage.getItem('refresh_token');
   }
 }

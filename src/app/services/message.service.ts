@@ -30,10 +30,9 @@ export class MessageService {
     })
   }
 
-  DeleteMessage(propmt: { id: number, userId: number }) {
-    return this.http.delete<MessageInterface>(this.api + `Delete`, {
+  DeleteMessage(id: number) {
+    return this.http.delete<MessageInterface>(this.api + `/Delete/${id}`, {
       headers: GlobalMethods.getAuthHeaders(),
-      body: propmt
     })
   }
 }

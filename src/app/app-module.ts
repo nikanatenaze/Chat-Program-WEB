@@ -6,7 +6,7 @@ import { App } from './app';
 import { Home } from './components/home/home';
 import { Navigation } from './components/navigation/navigation';
 import { Footer } from './components/footer/footer';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
 import { Register } from './components/register/register';
 import { Login } from './components/login/login';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -22,6 +22,7 @@ import { AddUser } from './components/add-user/add-user';
 import { AccountCenter } from './components/account-center/account-center';
 import { Messenger } from './components/messenger/messenger';
 import { TestComponent } from './components/test.component/test.component';
+import { AuthInterceptor } from './classes/auth-interceptor.class';
 
 @NgModule({
   declarations: [
@@ -49,10 +50,11 @@ import { TestComponent } from './components/test.component/test.component';
     ReactiveFormsModule,
     FormsModule,
     CommonModule,
-    SweetAlert2Module.forRoot()
+    SweetAlert2Module.forRoot(),
   ],
   providers: [
-    provideBrowserGlobalErrorListeners()
+    provideBrowserGlobalErrorListeners(),
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
   ],
   bootstrap: [App]
 })
