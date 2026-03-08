@@ -6,21 +6,23 @@ import Swal from "sweetalert2";
 export class GlobalMethods {
 
     constructor(public userService: User, public auth: Auth) { }
-    static getAuthHeaders() {
-        const token = sessionStorage.getItem('token');
-        return new HttpHeaders({
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        });
-    }
 
+    static getAuthHeaders(skipContentType: boolean = false) {
+        const token = sessionStorage.getItem('token');
+        const headersConfig: any = { 'Authorization': `Bearer ${token}` };
+        if (!skipContentType) {
+            headersConfig['Content-Type'] = 'application/json';
+        }
+        return new HttpHeaders(headersConfig);
+    }
+    
     static getToken() {
         return sessionStorage.getItem('token');
     }
 
     static formatDate(dateString: string, withTime: boolean = false, onlyTime: boolean = false) {
         let cleanDate = dateString.split('.')[0];
-        
+
         const isoString = cleanDate.replace(' ', 'T') + 'Z';
         const date = new Date(isoString);
 

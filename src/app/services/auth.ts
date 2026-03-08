@@ -6,6 +6,7 @@ import { GlobalData } from '../classes/global-data';
 
 interface LoginResponse {
   token: string;
+  refreshToken: string;
   user?: UserInterface;
 }
 
@@ -16,8 +17,9 @@ export class Auth {
   private apiUrl = GlobalData.RENDER_API_URL + "/Auth"
 
   private _userToken = new BehaviorSubject<string | null>(sessionStorage.getItem('token'));
+  private _userRefreshToken = new BehaviorSubject<string | null>(sessionStorage.getItem('refresh_token'));
   public userToken$ = this._userToken.asObservable();
-
+  public refreshToken$ = this._userRefreshToken.asObservable();
   constructor(private http: HttpClient) {}
 
   login(data: { email: string; password: string }): Observable<LoginResponse> {
@@ -26,6 +28,7 @@ export class Auth {
         next: (res) => {
           if (res.token) {
             sessionStorage.setItem('token', res.token);
+            sessionStorage.setItem('refresh_token', res.refreshToken);
             this._userToken.next(res.token);
           }
           observer.next(res);
@@ -42,10 +45,15 @@ export class Auth {
 
   logout() {
     sessionStorage.removeItem('token');
+    sessionStorage.removeItem('refresh_token')
     this._userToken.next(null);
   }
 
   getToken(): string | null {
     return sessionStorage.getItem('token'); 
+  }
+
+  getRefreshToken(): string | null {
+    return sessionStorage.getItem('refresh_token'); 
   }
 }

@@ -1,112 +1,243 @@
 <section class="content default-page-background">
-    <div class="content-ui">
-        <div class="ui-panel">
-            <div class="panel-user-info">
-                <p>Account Center</p>
+    <div class="ac-shell">
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="av-ring">
+                    <ng-container *ngIf="!loading; else skeletonAvatar">
+                        <img *ngIf="avatarPreview" [src]="avatarPreview" class="av-img" alt="Profile photo" />
+                        <div *ngIf="!avatarPreview" class="av-initials">{{ nameInitial }}</div>
+                    </ng-container>
+                    <ng-template #skeletonAvatar>
+                        <div class="skel skel-avatar"></div>
+                    </ng-template>
+                    <span class="online-dot" *ngIf="!loading"></span>
+                </div>
+
+                <div *ngIf="!loading; else skeletonText">
+                    <div class="sidebar-name">{{ updateForm.get('name')?.value || 'Your Name' }}</div>
+                    <div class="sidebar-email">{{ updateForm.get('email')?.value || 'your@email.com' }}</div>
+                </div>
+                <ng-template #skeletonText>
+                    <div class="skel-lines">
+                        <div class="skel skel-name"></div>
+                        <div class="skel skel-email"></div>
+                    </div>
+                </ng-template>
             </div>
-            <button [class.active]="activePage === 'profile'" (click)="setPage('profile')">
-                Profile Details <i class="fa-solid fa-qrcode"></i></button>
-            <button [class.active]="activePage === 'appearance'" (click)="setPage('appearance')">
-                Appearance <i class="fa-solid fa-pen-to-square"></i></button>
-            <button [class.active]="activePage === 'settings'" (click)="setPage('settings')">
-                Settings<i class="fa-solid fa-gears"></i></button>
-        </div>
 
-        <div class="ui-content">
+            <nav class="sidebar-nav">
+                <button class="nav-btn" [class.active]="activePage === 'profile'" (click)="setPage('profile')">
+                    <i class="fa-solid fa-circle-user ni"></i> Profile Details
+                </button>
+                <button class="nav-btn" [class.active]="activePage === 'appearance'" (click)="setPage('appearance')">
+                    <i class="fa-solid fa-pen-to-square ni"></i> Appearance
+                </button>
+                <button class="nav-btn" [class.active]="activePage === 'settings'" (click)="setPage('settings')">
+                    <i class="fa-solid fa-gears ni"></i> Settings
+                </button>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <span class="ver">Account Center: v0.1</span>
+            </div>
+        </aside>
+
+        <main class="content-area">
+
             <ng-container *ngIf="activePage === 'profile'">
-
                 <ng-container *ngIf="!loading; else loader">
+                    <div class="page">
 
-                    <h2>Profile Details</h2>
-
-                    <form [formGroup]="updateForm" (ngSubmit)="saveChanges()">
-                        <div class="row">
-                            <label>User Id</label>
-                            <input formControlName="id" type="text" />
+                        <div class="pg-badge">
+                            <i class="fa-solid fa-circle-user"></i> Profile
+                        </div>
+                        <div class="pg-title">Profile Details</div>
+                        <div class="pg-desc">
+                            Update your name, email and profile photo.
                         </div>
 
-                        <div class="row">
-                            <label>Username</label>
-                            <input formControlName="name" type="text" />
-                            <div class="error"
-                                *ngIf="updateForm.get('name')?.invalid && updateForm.get('name')?.touched">
-                                Invalid Username
+                        <!-- Avatar upload card -->
+                        <div class="avatar-section">
+                            <div class="av-big">
+                                <img *ngIf="avatarPreview" [src]="avatarPreview" class="av-img-big" alt="Profile" />
+                                <div *ngIf="!avatarPreview" class="av-big-initials">
+                                    {{ nameInitial }}
+                                </div>
+                                <label for="av-input" class="av-upload-overlay">
+                                    <i class="fa-solid fa-camera"></i>
+                                </label>
+                                <input type="file" id="av-input" accept="image/*" style="display:none"
+                                    (change)="onAvatarSelected($event)" />
+                            </div>
+                            <div>
+                                <div class="av-info-title">Profile Photo</div>
+                                <div class="av-info-hint">
+                                    JPG, PNG or GIF · Max 2 MB<br />
+                                    Hover the avatar to upload.
+                                </div>
+                                <div class="av-btns">
+                                    <label for="av-input" class="btn btn-soft-purple btn-sm" style="cursor:pointer;">
+                                        <i class="fa-solid fa-upload"></i> Upload
+                                    </label>
+                                    <button class="btn btn-soft-danger btn-sm" [disabled]="!avatarPreview"
+                                        (click)="removeAvatar()">
+                                        <i class="fa-solid fa-trash"></i> Remove
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="row">
-                            <label>Email</label>
-                            <input formControlName="email" type="email" />
-                            <div class="error"
-                                *ngIf="updateForm.get('email')?.invalid && updateForm.get('email')?.touched">
-                                Please enter a valid email.
+                        <form [formGroup]="updateForm" (ngSubmit)="saveChanges()">
+                            <div class="fields">
+
+                                <div class="field">
+                                    <label>Username</label>
+                                    <input formControlName="name" type="text" placeholder="Your username" />
+                                    <span class="field-err"
+                                        *ngIf="updateForm.get('name')?.invalid && updateForm.get('name')?.touched">
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+                                        Username must be 3–20 characters.
+                                    </span>
+                                </div>
+
+                                <div class="field">
+                                    <label>Email Address</label>
+                                    <input formControlName="email" type="email" placeholder="your@email.com" />
+                                    <span class="field-err"
+                                        *ngIf="updateForm.get('email')?.invalid && updateForm.get('email')?.touched">
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+                                        Please enter a valid email address.
+                                    </span>
+                                </div>
+
                             </div>
-                        </div>
 
-                        <div class="row">
-                            <label>Password</label>
-                            <input formControlName="password" type="text" placeholder="New password" />
-                            <div class="error"
-                                *ngIf="updateForm.get('password')?.invalid && updateForm.get('password')?.touched">
-                                Password must be at least {{minPaslen}} characters.
+                            <div class="form-footer">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                                </button>
+                                <button type="button" class="btn btn-soft-purple" (click)="changePassword()">
+                                    <i class="fa-solid fa-lock"></i> Change Password
+                                </button>
                             </div>
-                        </div>
+                        </form>
 
-                        <button class="primary-btn" type="submit">Save Changes</button>
-                    </form>
-
+                    </div>
                 </ng-container>
-
             </ng-container>
 
+            <!--  APPEARANCE PAGE -->
             <ng-container *ngIf="activePage === 'appearance'">
-                <h2>Appearance</h2>
-                <div class="card">
-                    <div class="row">
-                        <label>Language</label>
-                        <select>
-                            <option>English</option>
-                            <option>Deutsch</option>
-                            <option>ქართული</option>
-                        </select>
+                <div class="page">
+                    <div class="pg-badge">
+                        <i class="fa-solid fa-palette"></i> Appearance
                     </div>
-                    <div class="row">
-                        <label>Theme</label>
-                        <select>
-                            <option>Light</option>
-                            <option>Dark</option>
-                            <option>System theme</option>
-                        </select>
+                    <div class="pg-title">Client Appearance</div>
+                    <div class="pg-desc">
+                        Personalise your language and theme preferences.
                     </div>
-                    <button class="primary-btn">Apply</button>
+
+                    <div class="fields">
+                        <div class="field">
+                            <label>Language</label>
+                            <select>
+                                <option>English</option>
+                                <option>Deutsch</option>
+                                <option>ქართული</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Theme</label>
+                            <select>
+                                <option>Dark</option>
+                                <option>Light</option>
+                                <option>System default</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-footer">
+                        <button class="btn btn-primary">
+                            <i class="fa-solid fa-check"></i> Apply
+                        </button>
+                    </div>
                 </div>
             </ng-container>
 
+            <!-- SETTINGS PAGE -->
             <ng-container *ngIf="activePage === 'settings'">
-                <h2>Settings</h2>
+                <div class="page">
+                    <div class="pg-badge">
+                        <i class="fa-solid fa-gears"></i> Settings
+                    </div>
+                    <div class="pg-title">Baisic Settings</div>
+                    <div class="pg-desc">
+                        Manage notifications, security and account actions.
+                    </div>
 
-                <div class="card">
-                    <div class="row toggle">
-                        <label>Email Notifications</label>
-                        <input type="checkbox" checked />
+                    <div class="settings-card">
+                        <div class="s-row">
+                            <div>
+                                <div class="s-row-label">Email Notifications</div>
+                                <div class="s-row-desc">Receive updates and alerts via email.</div>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" checked />
+                                <span class="track"></span>
+                            </label>
+                        </div>
+                        <div class="s-row">
+                            <div>
+                                <div class="s-row-label">Two-Factor Authentication</div>
+                                <div class="s-row-desc">Add an extra layer of security.</div>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" />
+                                <span class="track"></span>
+                            </label>
+                        </div>
+                        <div class="s-row">
+                            <div>
+                                <div class="s-row-label">Activity Log</div>
+                                <div class="s-row-desc">Track login and account activity.</div>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" checked />
+                                <span class="track"></span>
+                            </label>
+                        </div>
                     </div>
-                    <div class="row toggle">
-                        <label>Two-Factor Authentication</label>
-                        <input type="checkbox" />
+
+                    <!-- Danger Zone -->
+                    <div class="danger-zone">
+                        <div class="dz-header">
+                            <i class="fa-solid fa-triangle-exclamation" style="color:#f87171;font-size:13px;"></i>
+                            <span class="dz-title">Danger Zone</span>
+                        </div>
+                        <div class="dz-desc">
+                            These actions are permanent and cannot be reversed.
+                            Please proceed with caution.
+                        </div>
+                        <div class="dz-btns">
+                            <button class="btn btn-ghost" (click)="logout()">
+                                <i class="fa-solid fa-right-from-bracket"></i> Logout
+                            </button>
+                            <button class="btn btn-soft-danger" (click)="deleteUser()">
+                                <i class="fa-solid fa-trash"></i> Delete Account
+                            </button>
+                        </div>
                     </div>
-                    <hr>
-                    <div class="btns">
-                        <button class="primary-btn" (click)="logout()">Logout</button>
-                        <button class="danger-btn" (click)="deleteUser()">Delete Account</button>
-                    </div>
+
                 </div>
             </ng-container>
-        </div>
+
+        </main>
     </div>
 </section>
 
+<!-- Loader template -->
 <ng-template #loader>
-    <div class="centr-div">
+    <div class="loader-wrap">
         <div class="content-loader"></div>
     </div>
 </ng-template>

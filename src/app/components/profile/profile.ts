@@ -79,54 +79,7 @@ export class Profile implements OnInit {
   }
 
   deleteUser(): void {
-    Swal.fire({
-      title: 'Confirm account deletion',
-      text: 'Enter your password to delete your account',
-      input: 'password',
-      inputPlaceholder: 'Password',
-      inputAttributes: {
-        autocapitalize: 'off',
-        autocorrect: 'off'
-      },
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Delete',
-      confirmButtonColor: '#d33',
-      inputValidator: (value) => {
-        if (!value) {
-          return 'Password is required';
-        }
-        return null;
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        const payload = {
-          id: this.fetchedUser!.id,
-          password: result.value
-        };
-
-        this.userService.deleteUser(payload).subscribe({
-          next: () => {
-            Swal.fire(
-              'Deleted!',
-              'Your account has been deleted.',
-              'success'
-            ).then(() => {
-              sessionStorage.removeItem('token')
-              this.auth.logout()
-              this.router.navigate(["/"])
-            });
-          },
-          error: (err) => {
-            Swal.fire(
-              'Error',
-              err?.error?.message || 'Wrong password',
-              'error'
-            );
-          }
-        });
-      }
-    });
+    
   }
 
 }
