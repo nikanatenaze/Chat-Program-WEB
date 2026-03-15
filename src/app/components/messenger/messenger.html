@@ -6,12 +6,15 @@
 
         <section class="content">
 
+            <!-- Mobile drawer overlay — tapping it closes the sidebar -->
+            <div class="panel-overlay" *ngIf="panelOpen" (click)="closePanelMobile()"></div>
+
             <!-- ═══════════════ LEFT PANEL ═══════════════ -->
-            <div class="panel-ui">
+            <div class="panel-ui" [class.panel-open]="panelOpen">
 
                 <div class="title">
                     <p>Chats</p>
-                    <div class="new" (click)="createChatSwal()">
+                    <div class="new" (click)="openCreateChatModal()">
                         New <i class="fa-solid fa-plus"></i>
                     </div>
                 </div>
@@ -49,9 +52,13 @@
 
             <div class="chat-ui" *ngIf="selectedChat || chatLoading; else clear">
 
-                <!-- Real header — always shown once a chat is selected or loading -->
+                <!-- Header: shown once we have a chat selected -->
                 <div class="chat-header" *ngIf="selectedChat">
                     <div class="chat-header-user">
+                        <!-- Hamburger — only visible on mobile -->
+                        <button class="panel-toggle-btn" (click)="openPanelMobile()" title="Chats">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
                         <div class="chat-header-avatar">
                             <img *ngIf="selectedChat.chatImageUrl" [src]="selectedChat.chatImageUrl"
                                 alt="{{ selectedChat.name }}">
@@ -88,10 +95,9 @@
                         </button>
                     </div>
 
-                    <!-- Selected chips -->
+                    <!-- Chips showing who's been selected -->
                     <div class="aup-chips" *ngIf="addUserSelectedList.length">
                         <div class="aup-chip" *ngFor="let u of addUserSelectedList">
-                            <!-- Chip avatar: photo if available, else initial -->
                             <div class="aup-chip-avatar">
                                 <img *ngIf="u.profileImageUrl" [src]="u.profileImageUrl" class="aup-chip-img"
                                     [alt]="u.name">
@@ -104,7 +110,7 @@
                         </div>
                     </div>
 
-                    <!-- Search input -->
+                    <!-- Search bar -->
                     <div class="aup-search">
                         <i class="fa-solid fa-magnifying-glass aup-search-icon"></i>
                         <input type="text" class="aup-search-input" placeholder="Search by username…"
@@ -114,7 +120,7 @@
                         </div>
                     </div>
 
-                    <!-- Results -->
+                    <!-- Search results -->
                     <div class="aup-results">
 
                         <div class="aup-empty" *ngIf="!addUserSearching && addUserSearch && !addUserResults.length">
@@ -129,7 +135,6 @@
 
                         <div class="aup-user-row" *ngFor="let u of addUserResults" (click)="toggleAddUserSelect(u)"
                             [class.aup-user-selected]="addUserSelected.has(u.id)">
-                            <!-- User avatar: photo if available, else initial -->
                             <div class="aup-user-avatar">
                                 <img *ngIf="u.profileImageUrl" [src]="u.profileImageUrl" class="aup-user-img"
                                     [alt]="u.name">
@@ -146,7 +151,7 @@
 
                     </div>
 
-                    <!-- Footer -->
+                    <!-- Confirm / cancel -->
                     <div class="aup-footer">
                         <button class="aup-btn-cancel" (click)="closeAddUserPanel()">Cancel</button>
                         <button class="aup-btn-add" [disabled]="!addUserSelected.size || addUserAdding"
@@ -164,9 +169,12 @@
 
                 </div>
 
-                <!-- Skeleton header (shown only while loading before selectedChat resolves) -->
+                <!-- Skeleton header while the chat is loading -->
                 <div class="chat-header" *ngIf="chatLoading && !selectedChat">
                     <div class="chat-header-user">
+                        <button class="panel-toggle-btn" (click)="openPanelMobile()" title="Chats">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
                         <div class="skel skel-av-sm"></div>
                         <div style="display:flex;flex-direction:column;gap:6px;">
                             <div class="skel skel-line-name"></div>
@@ -175,9 +183,9 @@
                     </div>
                 </div>
 
-                <!-- ── MESSAGES AREA ── -->
+                <!-- ── MESSAGES ── -->
 
-                <!-- Skeleton messages -->
+                <!-- Skeleton bubbles while messages load -->
                 <div class="chat-messages skel-messages-area" *ngIf="chatLoading">
 
                     <div class="skel-msg-row">
@@ -217,8 +225,8 @@
 
                 </div>
 
-                <!-- Real messages -->
-                <div class="chat-messages" *ngIf="!chatLoading">
+                <!-- Live messages -->
+                <div class="chat-messages" #messagesContainer *ngIf="!chatLoading" (scroll)="onMessagesScroll($event)">
                     <ng-container *ngIf="selectedChatMessages$ | async as messages">
                         <div class="msg" *ngFor="let i of messages; let idx = index">
 
@@ -243,7 +251,7 @@
 
                                 <div class="message-wrapper">
 
-                                    <!-- Normal view -->
+                                    <!-- Normal bubble -->
                                     <ng-container *ngIf="editingMessageId !== i.id">
                                         <div class="bubble-group" [class.bubble-group-me]="i.isWriter">
                                             <div class="msg-actions" *ngIf="i.isWriter">
@@ -262,7 +270,7 @@
                                         </div>
                                     </ng-container>
 
-                                    <!-- Inline edit -->
+                                    <!-- Inline edit mode -->
                                     <ng-container *ngIf="editingMessageId === i.id">
                                         <div class="edit-bubble">
                                             <textarea [id]="'edit-input-' + i.id" class="edit-textarea"
@@ -286,7 +294,14 @@
                     </ng-container>
                 </div>
 
-                <!-- Real input — always shown -->
+                <!-- Scroll-to-bottom FAB — shows up when you've scrolled away from the latest messages -->
+                <button class="scroll-to-bottom-btn" *ngIf="showScrollToBottom && !chatLoading"
+                    (click)="scrollToBottom()" title="Jump to latest">
+                    <i class="fa-solid fa-chevron-down"></i>
+                    <span>Latest</span>
+                </button>
+
+                <!-- Message input bar -->
                 <div class="chat-input">
                     <input type="text" [(ngModel)]="newMessage" placeholder="Type a message…"
                         (keydown.enter)="sendMessage()" [disabled]="chatLoading">
@@ -301,12 +316,130 @@
     </div>
 </div>
 
-<!-- Templates -->
+<!-- ═══════════════ CREATE CHAT MODAL ═══════════════ -->
+<div class="ccm-backdrop" *ngIf="showCreateChatModal" (click)="closeCreateChatModal()"></div>
+<div class="ccm-modal" *ngIf="showCreateChatModal">
+
+    <div class="ccm-header">
+        <div class="ccm-title">
+            <i class="fa-solid fa-comments"></i>
+            New Chat
+        </div>
+        <button class="aup-close" (click)="closeCreateChatModal()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <!-- Chat name -->
+    <div class="ccm-field-group">
+        <label class="ccm-label">Chat name</label>
+        <input type="text" class="ccm-input" placeholder="e.g. Project Gamma, Weekend Plans…"
+            [(ngModel)]="createChatName" maxlength="60">
+    </div>
+
+    <!-- Password toggle -->
+    <div class="ccm-field-group">
+        <label class="ccm-toggle-row">
+            <span class="ccm-toggle-track" [class.ccm-toggle-on]="createChatHasPassword"
+                (click)="createChatHasPassword = !createChatHasPassword">
+                <span class="ccm-toggle-thumb"></span>
+            </span>
+            <span class="ccm-label" style="margin:0;">Password protected</span>
+        </label>
+        <input *ngIf="createChatHasPassword" type="password" class="ccm-input ccm-input-pw"
+            placeholder="Enter password…" [(ngModel)]="createChatPassword">
+    </div>
+
+    <div class="ccm-divider"></div>
+
+    <!-- People picker (same look as Add People panel) -->
+    <div class="ccm-section-label">
+        <i class="fa-solid fa-user-group"></i>
+        Add people to this chat
+    </div>
+
+    <!-- Selected chips -->
+    <div class="aup-chips" *ngIf="createChatSelectedList.length" style="padding:0 0 10px 0; border:none;">
+        <div class="aup-chip" *ngFor="let u of createChatSelectedList">
+            <div class="aup-chip-avatar">
+                <img *ngIf="u.profileImageUrl" [src]="u.profileImageUrl" class="aup-chip-img" [alt]="u.name">
+                <span *ngIf="!u.profileImageUrl">{{ u.name.charAt(0).toUpperCase() }}</span>
+            </div>
+            <span>{{ u.name }}</span>
+            <button class="aup-chip-remove" (click)="removeCreateChatChip(u.id)">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- User search -->
+    <div class="aup-search">
+        <i class="fa-solid fa-magnifying-glass aup-search-icon"></i>
+        <input type="text" class="aup-search-input" placeholder="Search by username…" [value]="createChatUserSearch"
+            (input)="onCreateChatUserSearch($event)" autocomplete="off">
+        <div class="aup-spinner" *ngIf="createChatUserSearching">
+            <i class="fa-solid fa-circle-notch fa-spin"></i>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div class="ccm-results">
+
+        <div class="aup-empty" *ngIf="!createChatUserSearching && createChatUserSearch && !createChatUserResults.length"
+            style="padding: 16px 0;">
+            <i class="fa-solid fa-user-slash"></i>
+            No users found
+        </div>
+
+        <div class="aup-empty aup-hint" *ngIf="!createChatUserSearch" style="padding: 16px 0; font-size:12px;">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Search to add people
+        </div>
+
+        <div class="aup-user-row" *ngFor="let u of createChatUserResults" (click)="toggleCreateChatUser(u)"
+            [class.aup-user-selected]="createChatSelected.has(u.id)">
+            <div class="aup-user-avatar">
+                <img *ngIf="u.profileImageUrl" [src]="u.profileImageUrl" class="aup-user-img" [alt]="u.name">
+                <span *ngIf="!u.profileImageUrl">{{ u.name.charAt(0).toUpperCase() }}</span>
+            </div>
+            <div class="aup-user-info">
+                <div class="aup-user-name">{{ u.name }}</div>
+                <div class="aup-user-email">{{ u.email }}</div>
+            </div>
+            <div class="aup-check">
+                <i class="fa-solid fa-check" *ngIf="createChatSelected.has(u.id)"></i>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="ccm-footer">
+        <button class="aup-btn-cancel" (click)="closeCreateChatModal()">Cancel</button>
+        <button class="aup-btn-add" [disabled]="!createChatName.trim() || createChatCreating"
+            (click)="confirmCreateChat()">
+            <ng-container *ngIf="!createChatCreating">
+                <i class="fa-solid fa-plus"></i>
+                Create Chat
+            </ng-container>
+            <ng-container *ngIf="createChatCreating">
+                <i class="fa-solid fa-circle-notch fa-spin"></i> Creating…
+            </ng-container>
+        </button>
+    </div>
+
+</div>
+
+<!-- ── Fallback: no chat selected ── -->
 
 <ng-template #clear>
     <div class="chat-ui chat-ui-chat-none">
+        <!-- Hamburger in the corner so the user can still open the sidebar -->
+        <button class="panel-toggle-btn panel-toggle-floating" (click)="openPanelMobile()" title="Chats">
+            <i class="fa-solid fa-bars"></i>
+        </button>
         <p class="text-gradient not-selec-text">Select a chat to start messaging</p>
-        <p>or <span class="cr-ch" (click)="createChatSwal()">create</span> your first chat right now!</p>
+        <p>or <span class="cr-ch" (click)="openCreateChatModal()">create</span> your first chat right now!</p>
     </div>
 </ng-template>
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { TokenModelInterface } from '../../interfaces/token-model.interface';
 import { UserInterface } from '../../interfaces/user.interface';
 import { ChatInterface } from '../../interfaces/chat.interface';
@@ -21,27 +21,30 @@ import { GlobalMethods } from '../../classes/global-methods';
 })
 export class Messenger implements OnInit, OnDestroy {
 
+  // Auth / user basics
   public token: string = sessionStorage.getItem('token') ?? '';
   public tokenData!: TokenModelInterface;
   public userData!: UserInterface;
 
+  // Chat list streams
   public userChats$ = new BehaviorSubject<ChatInterface[]>([]);
   public filteredChats$ = new BehaviorSubject<ChatInterface[]>([]);
   public selectedChatMessages$ = new BehaviorSubject<MessageInterface[]>([]);
 
+  // Search & compose state
   public searchTerm = '';
   public newMessage = '';
 
-  // State flags
+  // Loading / in-flight flags
   public chatLoading = false;
   public chatsLoading = true;
   public isSending = false;
 
-  // Inline edit state
+  // Inline message editing
   public editingMessageId: number | null = null;
   public editContent = '';
 
-  // Add-user panel state
+  // "Add people" slide-up panel (inside an open chat)
   public showAddUserPanel = false;
   public addUserSearch = '';
   public addUserResults: UserInterface[] = [];
@@ -50,14 +53,33 @@ export class Messenger implements OnInit, OnDestroy {
   public addUserAdding = false;
   private addUserDebounce: any;
 
-  // Selected chat
+  // "Create chat" modal state
+  public showCreateChatModal = false;
+  public createChatName = '';
+  public createChatHasPassword = false;
+  public createChatPassword = '';
+  public createChatUserSearch = '';
+  public createChatUserResults: UserInterface[] = [];
+  public createChatSelected = new Map<number, UserInterface>();
+  public createChatUserSearching = false;
+  public createChatCreating = false;
+  private createChatDebounce: any;
+
+  // Scroll-to-bottom FAB
+  public showScrollToBottom = false;
+  @ViewChild('messagesContainer') messagesContainerRef!: ElementRef<HTMLDivElement>;
+
+  // Mobile sidebar drawer state
+  public panelOpen = false;
+
+  // Currently open chat
   public selectedChat: ChatInterface | null = null;
 
-  // Users in current chat
+  // Avatar / name lookup maps for people in the active chat
   private usersImageMap = new Map<number, string | null>();
   private usersNameMap = new Map<number, string>();
 
-  // Audio
+  // Incoming-message sound
   private receiveAudio = new Audio('message-recive-sound.mp3');
 
   constructor(
@@ -69,9 +91,10 @@ export class Messenger implements OnInit, OnDestroy {
     public notification: NotificationService
   ) { }
 
-  // Lifecycle
+  // ─── Lifecycle ───────────────────────────────────────────────────────────────
 
   ngOnInit(): void {
+    // Grab our own user info from the JWT, then kick off the rest of startup
     this.userService.getDataFromToken().subscribe(x => {
       this.tokenData = x;
       this.build();
@@ -79,12 +102,13 @@ export class Messenger implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // Always clean up the SignalR connection when we leave
     this.hub.stopConnection()
       .then(() => console.log('SignalR disconnected'))
       .catch(err => console.error('SignalR disconnect error:', err));
   }
 
-  // Initialisation
+  // ─── Startup ─────────────────────────────────────────────────────────────────
 
   private async build() {
     await this.fetchData();
@@ -97,7 +121,7 @@ export class Messenger implements OnInit, OnDestroy {
       await this.fetchUser();
       await this.fetchChats();
     } catch (err) {
-      console.error('Init fetch error:', err);
+      console.error('Failed to load initial data:', err);
     }
   }
 
@@ -124,13 +148,14 @@ export class Messenger implements OnInit, OnDestroy {
     });
   }
 
-  // SignalR
+  // ─── SignalR ─────────────────────────────────────────────────────────────────
 
   private async connectSignalR() {
     await this.hub.startConnection(this.token);
+    // Join the personal "chat-user" channel so we hear add/remove events
     await this.hub.joinChatUsers(this.userData.id);
 
-    // Chat-user events
+    // Someone added us to a chat — update the sidebar list
     this.hub.onAddUser(data => {
       const updated = [...this.userChats$.value, data].sort((a, b) => a.id - b.id);
       this.userChats$.next(updated);
@@ -138,16 +163,18 @@ export class Messenger implements OnInit, OnDestroy {
       this.notification.success(`You were added to "${data.name}"!`);
     });
 
+    // We were removed from a chat — drop it from the sidebar
     this.hub.onRemoveUser(data => {
       this.userChats$.next(this.userChats$.value.filter(x => x.id !== data.id));
       this.applyFilter();
     });
 
-    // Message events
+    // A new message arrived in the active chat
     this.hub.onCreateMessage(data => {
       const mapped = this.mapMessage(data);
       this.selectedChatMessages$.next([...this.selectedChatMessages$.value, mapped]);
 
+      // Play a subtle receive sound for messages from other people
       if (!mapped.isWriter) {
         this.receiveAudio.currentTime = 0;
         this.receiveAudio.volume = 0.4;
@@ -156,12 +183,14 @@ export class Messenger implements OnInit, OnDestroy {
       this.scrollToBottom();
     });
 
+    // A message was deleted — remove it from the local list
     this.hub.onDeleteMessage(data => {
       this.selectedChatMessages$.next(
         this.selectedChatMessages$.value.filter(m => m.id !== data.id)
       );
     });
 
+    // A message was edited — swap in the updated content
     this.hub.onEditMessage(data => {
       const updated = this.selectedChatMessages$.value.map(m =>
         m.id === data.id ? { ...m, content: data.content } : m
@@ -170,11 +199,13 @@ export class Messenger implements OnInit, OnDestroy {
     });
   }
 
-  // Chat selection
+  // ─── Chat selection ───────────────────────────────────────────────────────────
 
   public selectChat(id: number) {
     this.closeAddUserPanel();
+    this.closePanelMobile(); // close the sidebar drawer on mobile after picking a chat
 
+    // Reset everything so the skeleton shows while the new chat loads
     this.chatLoading = true;
     this.selectedChat = null;
     this.selectedChatMessages$.next([]);
@@ -183,15 +214,18 @@ export class Messenger implements OnInit, OnDestroy {
 
     this.chatService.GetChatById(id).subscribe(chat => {
       this.selectedChat = chat;
+      // Leave the previous SignalR chat group and join the new one
       this.hub.leaveChat(chat.id);
       this.hub.joinChat(chat.id);
 
+      // Preload avatars & names for everyone in this chat
       this.chatUserService.GetUsersInChat(chat.id).subscribe(users => {
         users.forEach(u => {
           this.usersImageMap.set(u.id, u.profileImageUrl ?? null);
           this.usersNameMap.set(u.id, u.name);
         });
 
+        // Fetch the message history
         this.chatService.GetChatMessages(chat.id).subscribe(messages => {
           this.selectedChatMessages$.next(
             messages.map(x => this.mapMessage(x))
@@ -203,6 +237,7 @@ export class Messenger implements OnInit, OnDestroy {
     });
   }
 
+  // Normalise a raw message from the server into our local shape
   private mapMessage(data: MessageInterface): MessageInterface {
     return {
       ...data,
@@ -211,8 +246,9 @@ export class Messenger implements OnInit, OnDestroy {
     };
   }
 
-  // Message helpers
+  // ─── Message display helpers ─────────────────────────────────────────────────
 
+  /** Show the sender's name above the first bubble in a consecutive group */
   shouldShowSender(messages: MessageInterface[], index: number): boolean {
     const current = messages[index];
     if (current.isWriter) return false;
@@ -220,6 +256,7 @@ export class Messenger implements OnInit, OnDestroy {
     return messages[index - 1].userId !== current.userId;
   }
 
+  /** Show the avatar only on the last bubble of a consecutive group */
   shouldShowAvatar(messages: MessageInterface[], index: number): boolean {
     const current = messages[index];
     if (current.isWriter) return false;
@@ -237,9 +274,11 @@ export class Messenger implements OnInit, OnDestroy {
 
     if (message.userName) return message.userName;
 
+    // Lazily fetch the user if we somehow don't have them cached yet
     this.userService.getUserById(message.userId).subscribe(u => {
       this.usersNameMap.set(u.id, u.name);
       this.usersImageMap.set(u.id, u.profileImageUrl ?? null);
+      // Nudge the stream to trigger a re-render with the now-resolved name
       this.selectedChatMessages$.next([...this.selectedChatMessages$.value]);
     });
 
@@ -250,7 +289,8 @@ export class Messenger implements OnInit, OnDestroy {
     return this.getUserName(message).charAt(0).toUpperCase();
   }
 
-  // Chat list
+  // ─── Chat list search ─────────────────────────────────────────────────────────
+
   onSearch(event: Event) {
     this.searchTerm = (event.target as HTMLInputElement).value;
     this.applyFilter();
@@ -263,7 +303,7 @@ export class Messenger implements OnInit, OnDestroy {
     );
   }
 
-  // Send / delete messages
+  // ─── Sending messages ─────────────────────────────────────────────────────────
 
   public sendMessage() {
     if (!this.selectedChat || !this.newMessage.trim()) return;
@@ -294,9 +334,12 @@ export class Messenger implements OnInit, OnDestroy {
     this.scrollToBottom();
   }
 
+  // ─── Inline editing ───────────────────────────────────────────────────────────
+
   public startEdit(message: MessageInterface) {
     this.editingMessageId = message.id;
     this.editContent = message.content;
+    // Focus the textarea and move the cursor to the end
     setTimeout(() => {
       const el = document.getElementById(`edit-input-${message.id}`) as HTMLTextAreaElement;
       if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
@@ -343,53 +386,141 @@ export class Messenger implements OnInit, OnDestroy {
     });
   }
 
-  // Swals
+  // ─── Create chat modal ────────────────────────────────────────────────────────
 
-  createChatSwal() {
-    Swal.fire({
-      title: 'Create Chat',
-      html: `
-        <input type="text" id="chatName" class="swal2-input" placeholder="Chat Name">
-        <div style="text-align:left;margin:10px 16px;">
-          <label><input type="checkbox" id="hasPassword" style="margin-right:6px;">Chat has password</label>
-        </div>
-        <input type="password" id="chatPassword" class="swal2-input" placeholder="Password" style="display:none;">
-      `,
-      focusConfirm: false,
-      showCancelButton: true,
-      confirmButtonText: 'Create',
-      didOpen: () => {
-        const cb = document.getElementById('hasPassword') as HTMLInputElement;
-        const pw = document.getElementById('chatPassword') as HTMLInputElement;
-        cb.addEventListener('change', () => { pw.style.display = cb.checked ? 'block' : 'none'; });
-      },
-      preConfirm: () => {
-        const name = (document.getElementById('chatName') as HTMLInputElement).value.trim();
-        const hasPassword = (document.getElementById('hasPassword') as HTMLInputElement).checked;
-        const password = (document.getElementById('chatPassword') as HTMLInputElement).value;
-        if (!name) { Swal.showValidationMessage('Chat name is required'); return false; }
-        if (hasPassword && !password) { Swal.showValidationMessage('Password is required'); return false; }
-        return { name, hasPassword, password: hasPassword ? password : null };
-      },
-    }).then(result => {
-      if (!result.isConfirmed) return;
-      const payload = { ...result.value, createdByUserId: Number(this.userData.id) };
+  openCreateChatModal() {
+    this.showCreateChatModal = true;
+    // Reset every field so the modal feels fresh each time
+    this.createChatName = '';
+    this.createChatHasPassword = false;
+    this.createChatPassword = '';
+    this.createChatUserSearch = '';
+    this.createChatUserResults = [];
+    this.createChatSelected.clear();
+  }
 
-      this.chatService.CreateChat(payload).subscribe({
-        next: xa => {
-          this.notification.success('Chat created successfully!');
-          this.chatUserService.AddChatUser({ userId: xa.createdByUserId, chatId: xa.id }).subscribe({
-            next: () => {
-              const updated = [...this.userChats$.value, xa].sort((a, b) => a.id - b.id);
-              this.userChats$.next(updated);
-              this.applyFilter();
-            }
+  closeCreateChatModal() {
+    this.showCreateChatModal = false;
+    clearTimeout(this.createChatDebounce);
+  }
+
+  /** Debounced user search inside the "create chat" modal */
+  onCreateChatUserSearch(event: Event) {
+    this.createChatUserSearch = (event.target as HTMLInputElement).value;
+    clearTimeout(this.createChatDebounce);
+    const term = this.createChatUserSearch.trim();
+    if (!term) { this.createChatUserResults = []; return; }
+
+    this.createChatUserSearching = true;
+    this.createChatDebounce = setTimeout(() => {
+      this.userService.searchUserByName(term).subscribe({
+        next: tokens => {
+          if (!tokens.length) {
+            this.createChatUserResults = [];
+            this.createChatUserSearching = false;
+            return;
+          }
+          forkJoin(tokens.map(t => this.userService.getUserById(t.id))).subscribe({
+            next: users => {
+              // Exclude ourselves from the list — no point adding the creator twice
+              this.createChatUserResults = users.filter(u => u.id !== this.userData.id);
+              this.createChatUserSearching = false;
+            },
+            error: () => { this.createChatUserSearching = false; }
           });
         },
-        error: () => this.notification.error('Failed to create chat.'),
+        error: () => { this.createChatUserSearching = false; }
       });
+    }, 280);
+  }
+
+  toggleCreateChatUser(user: UserInterface) {
+    if (this.createChatSelected.has(user.id)) {
+      this.createChatSelected.delete(user.id);
+    } else {
+      this.createChatSelected.set(user.id, user);
+    }
+    // Replace the map reference so Angular change detection picks it up
+    this.createChatSelected = new Map(this.createChatSelected);
+  }
+
+  removeCreateChatChip(userId: number) {
+    this.createChatSelected.delete(userId);
+    this.createChatSelected = new Map(this.createChatSelected);
+  }
+
+  get createChatSelectedList(): UserInterface[] {
+    return Array.from(this.createChatSelected.values());
+  }
+
+  confirmCreateChat() {
+    const name = this.createChatName.trim();
+    if (!name) return;
+    if (this.createChatHasPassword && !this.createChatPassword) {
+      this.notification.error('Please enter a password or turn off the password toggle.');
+      return;
+    }
+
+    this.createChatCreating = true;
+    const payload = {
+      name,
+      hasPassword: this.createChatHasPassword,
+      password: this.createChatHasPassword ? this.createChatPassword : null,
+      createdByUserId: Number(this.userData.id),
+    };
+
+    this.chatService.CreateChat(payload as any).subscribe({
+      next: newChat => {
+        this.notification.success('Chat created!');
+
+        // Add the creator as the first member
+        this.chatUserService.AddChatUser({ userId: newChat.createdByUserId, chatId: newChat.id }).subscribe({
+          next: () => {
+            const updated = [...this.userChats$.value, newChat].sort((a, b) => a.id - b.id);
+            this.userChats$.next(updated);
+            this.applyFilter();
+
+            // Now add everyone the user selected during creation
+            const invitees = Array.from(this.createChatSelected.values());
+            if (!invitees.length) {
+              this.createChatCreating = false;
+              this.closeCreateChatModal();
+              return;
+            }
+
+            let done = 0;
+            let failed = 0;
+            invitees.forEach(user => {
+              this.chatUserService.AddChatUser({ userId: user.id, chatId: newChat.id }).subscribe({
+                next: () => {
+                  done++;
+                  if (done + failed === invitees.length) {
+                    this.createChatCreating = false;
+                    if (failed) this.notification.error(`${failed} invite${failed > 1 ? 's' : ''} failed.`);
+                    this.closeCreateChatModal();
+                  }
+                },
+                error: () => {
+                  failed++;
+                  if (done + failed === invitees.length) {
+                    this.createChatCreating = false;
+                    if (failed) this.notification.error(`${failed} invite${failed > 1 ? 's' : ''} failed.`);
+                    this.closeCreateChatModal();
+                  }
+                }
+              });
+            });
+          }
+        });
+      },
+      error: () => {
+        this.notification.error('Failed to create chat.');
+        this.createChatCreating = false;
+      },
     });
   }
+
+  // ─── Chat settings ────────────────────────────────────────────────────────────
 
   chatSettingsSwal() {
     if (!this.selectedChat) return;
@@ -433,6 +564,8 @@ export class Messenger implements OnInit, OnDestroy {
       });
     });
   }
+
+  // ─── Add-people panel (inside open chat) ─────────────────────────────────────
 
   openAddUserPanel() {
     if (!this.selectedChat) return;
@@ -507,6 +640,7 @@ export class Messenger implements OnInit, OnDestroy {
     users.forEach(user => {
       this.chatUserService.AddChatUser({ userId: user.id, chatId }).subscribe({
         next: () => {
+          // Cache the new member locally so their name/avatar shows right away
           this.usersNameMap.set(user.id, user.name);
           this.usersImageMap.set(user.id, user.profileImageUrl ?? null);
           done++;
@@ -527,6 +661,8 @@ export class Messenger implements OnInit, OnDestroy {
     this.closeAddUserPanel();
   }
 
+  // ─── Leave chat ───────────────────────────────────────────────────────────────
+
   quitFromChatSwal(id: number) {
     Swal.fire({
       title: 'Quit chat?',
@@ -539,6 +675,7 @@ export class Messenger implements OnInit, OnDestroy {
     }).then(result => {
       if (!result.isConfirmed) return;
 
+      // If we're leaving the currently open chat, clear it immediately
       if (id === this.selectedChat?.id) {
         this.selectedChat = null;
         this.selectedChatMessages$.next([]);
@@ -551,12 +688,35 @@ export class Messenger implements OnInit, OnDestroy {
     });
   }
 
-  // Utility
+  // ─── Mobile sidebar drawer ────────────────────────────────────────────────────
 
-  private scrollToBottom() {
+  openPanelMobile() {
+    this.panelOpen = true;
+  }
+
+  closePanelMobile() {
+    this.panelOpen = false;
+  }
+
+  // ─── Scroll helpers ───────────────────────────────────────────────────────────
+
+  /** Listen to the messages container's scroll position and toggle the FAB */
+  onMessagesScroll(event: Event) {
+    const el = event.target as HTMLDivElement;
+    // Show the button when the user has scrolled more than 150px from the bottom
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    this.showScrollToBottom = distanceFromBottom > 150;
+  }
+
+  /** Programmatically jump to the latest messages */
+  public scrollToBottom() {
     setTimeout(() => {
-      const container = document.querySelector('.chat-messages');
-      if (container) container.scrollTop = container.scrollHeight;
+      const container = this.messagesContainerRef?.nativeElement
+        ?? document.querySelector('.chat-messages');
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+        this.showScrollToBottom = false;
+      }
     }, 50);
   }
 }

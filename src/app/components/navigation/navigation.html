@@ -1,39 +1,105 @@
 <nav class="navigaton" #navigation>
+
+    <!-- ── Main bar ── -->
     <div class="navigaton-content navigaton-content-shadow" #navContent>
+
         <div class="title">
             <p class="title-t" routerLink="/">Nikoloz's Chat</p>
             <div class="line"></div>
+
+            <!-- Desktop nav links -->
             <ul class="buttons" *ngIf="!(auth.userToken$ | async); else userUl">
-                <li routerLink="/">Home</li>
-                <li routerLink="/project">Project</li>
-                <li routerLink="/features">Features</li>
+                <li routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:true}">Home</li>
+                <li routerLink="/project" routerLinkActive="active-link">Project</li>
+                <li routerLink="/features" routerLinkActive="active-link">Features</li>
             </ul>
         </div>
 
+        <!-- Desktop guest buttons -->
         <div class="guest-panel" *ngIf="!(auth.userToken$ | async); else userPanel">
             <div class="gp-button custom-btn-1" routerLink="/login">
-                <p>Login <i class="fa-solid fa-user"></i></p>
+                <i class="fa-regular fa-user"></i>
+                <span>Login</span>
             </div>
-            <div class="gp-button custom-btn-2 border-gradient" routerLink="/register">
-                <p>Register →</p>
+            <div class="gp-button custom-btn-2" routerLink="/register">
+                <span>Get started</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </div>
+        </div>
+
+        <!-- Mobile trigger pill (visible ≤ 860px) -->
+        <div class="mobile-menu-btn" [class.open]="mobileOpen" (click)="toggleMobileMenu()" #mobileBtn>
+            <span>Menu</span>
+            <i class="fa-solid fa-chevron-down"></i>
+        </div>
+
+    </div>
+
+    <!-- ── Mobile dropdown ── -->
+    <div class="mobile-dropdown" [class.open]="mobileOpen" #mobileDropdown>
+
+        <!-- Links (guest) -->
+        <ng-container *ngIf="!(auth.userToken$ | async); else userMobLinks">
+            <div class="mob-link" routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:true}"
+                (click)="closeMobileMenu()">Home</div>
+            <div class="mob-link" routerLink="/project" routerLinkActive="active-link" (click)="closeMobileMenu()">
+                Project</div>
+            <div class="mob-link" routerLink="/features" routerLinkActive="active-link" (click)="closeMobileMenu()">
+                Features</div>
+        </ng-container>
+
+        <div class="mob-divider"></div>
+
+        <!-- Actions (guest) -->
+        <div class="mob-actions" *ngIf="!(auth.userToken$ | async); else userMobActions">
+            <div class="gp-button custom-btn-1" routerLink="/login" (click)="closeMobileMenu()">
+                <i class="fa-regular fa-user"></i><span>Login</span>
+            </div>
+            <div class="gp-button custom-btn-2" routerLink="/register" (click)="closeMobileMenu()">
+                <span>Get started</span><i class="fa-solid fa-arrow-right"></i>
             </div>
         </div>
     </div>
-    <i class="up-down-btn fa-solid fa-chevron-up" (click)="toggleHiddeNav()" #toggleHideButton></i>
+
+    <!-- ── Collapse chevron ── -->
+    <i class="up-down-btn fa-solid fa-chevron-up" (click)="toggleHiddeNav()" #toggleHideButton>
+    </i>
+
 </nav>
+
+<!-- ─── ng-templates ─── -->
+
+<ng-template #userUl>
+    <ul class="buttons" *ngIf="auth.userToken$ | async">
+        <li routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:true}">Home</li>
+        <li routerLink="/messenger" routerLinkActive="active-link">Messenger</li>
+        <li routerLink="/chats" routerLinkActive="active-link">Chats</li>
+    </ul>
+</ng-template>
 
 <ng-template #userPanel>
     <div class="user-panel" *ngIf="auth.userToken$ | async">
         <div class="gp-button custom-btn-1" routerLink="/account-center">
-            <p>Account <i class="fa-solid fa-user"></i></p>
+            <i class="fa-regular fa-circle-user"></i>
+            <span>Account</span>
         </div>
     </div>
 </ng-template>
 
-<ng-template #userUl>
-    <ul class="buttons" *ngIf="auth.userToken$ | async">
-        <li routerLink="/">Home</li>
-        <li routerLink="/messenger">Messenger</li>
-        <li routerLink="/chats">Chats</li>
-    </ul>
+<ng-template #userMobLinks>
+    <ng-container *ngIf="auth.userToken$ | async">
+        <div class="mob-link" routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:true}"
+            (click)="closeMobileMenu()">Home</div>
+        <div class="mob-link" routerLink="/messenger" routerLinkActive="active-link" (click)="closeMobileMenu()">
+            Messenger</div>
+        <div class="mob-link" routerLink="/chats" routerLinkActive="active-link" (click)="closeMobileMenu()">Chats</div>
+    </ng-container>
+</ng-template>
+
+<ng-template #userMobActions>
+    <div class="mob-actions" *ngIf="auth.userToken$ | async">
+        <div class="gp-button custom-btn-1" routerLink="/account-center" (click)="closeMobileMenu()">
+            <i class="fa-regular fa-circle-user"></i><span>Account</span>
+        </div>
+    </div>
 </ng-template>

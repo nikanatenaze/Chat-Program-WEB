@@ -1,14 +1,9 @@
-/* ═══════════════════════════════════════════════
-   MESSENGER — full stylesheet
-   Uses global CSS variables from global.css
-   ═══════════════════════════════════════════════ */
-
 hr {
     border: none;
     border-top: 1px solid var(--border);
 }
 
-/* ── Video background ───────────────────────── */
+/* ── Video background ── */
 
 .video-container {
     position: relative;
@@ -43,7 +38,7 @@ hr {
     z-index: 1;
 }
 
-/* ── Overlay ────────────────────────────────── */
+/* ── Dark overlay on top of the video ── */
 
 .overlay {
     width: 100%;
@@ -53,7 +48,7 @@ hr {
     z-index: 2;
 }
 
-/* ── Layout ─────────────────────────────────── */
+/* ── Main layout ── */
 
 .content {
     padding: 20px;
@@ -63,9 +58,7 @@ hr {
     gap: 12px;
 }
 
-/* ═══════════════════════════════════════════════
-   LEFT PANEL
-   ═══════════════════════════════════════════════ */
+/* ── LEFT PANEL ── */
 
 .panel-ui {
     display: flex;
@@ -76,7 +69,7 @@ hr {
     flex-shrink: 0;
     height: 100%;
     font-family: "Oxygen", sans-serif;
-    background: rgba(14, 16, 24, 0.700);
+    background: rgba(22, 25, 37, 0.7);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(28px);
     border: 1px solid var(--border-mid);
@@ -119,7 +112,7 @@ hr {
     transform: scale(1.04);
 }
 
-/* ── Search ─────────────────────────────────── */
+/* ── Search bar ── */
 
 .search {
     margin-top: 10px;
@@ -154,7 +147,7 @@ hr {
     outline: none;
 }
 
-/* ── Chat list ──────────────────────────────── */
+/* ── Chat list ── */
 
 .chats {
     margin-top: 10px;
@@ -260,9 +253,7 @@ hr {
     color: var(--danger);
 }
 
-/* ═══════════════════════════════════════════════
-   CHAT UI (right panel)
-   ═══════════════════════════════════════════════ */
+/* ── RIGHT: chat area ── */
 
 .chat-ui {
     font-family: "Oxygen", sans-serif;
@@ -270,7 +261,7 @@ hr {
     height: 100%;
     border-radius: var(--r-xl);
     overflow: hidden;
-    background: rgba(14, 16, 24, 0.700);
+    background: rgba(22, 25, 37, 0.7);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(28px);
     border: 1px solid var(--border-mid);
@@ -280,7 +271,7 @@ hr {
     position: relative;
 }
 
-/* ── Header ─────────────────────────────────── */
+/* ── Chat header ── */
 
 .chat-header {
     padding: 12px 16px;
@@ -338,8 +329,6 @@ hr {
     color: var(--green);
 }
 
-/* Header action buttons */
-
 .chat-header-actions {
     display: flex;
     align-items: center;
@@ -372,7 +361,7 @@ hr {
     transform: scale(0.94);
 }
 
-/* ── Messages ───────────────────────────────── */
+/* ── Messages area ── */
 
 .chat-messages {
     flex: 1;
@@ -408,7 +397,7 @@ hr {
     flex-direction: row-reverse;
 }
 
-/* ── Avatar column ──────────────────────────── */
+/* ── Avatar column ── */
 
 .msg-avatar {
     width: 30px;
@@ -446,7 +435,7 @@ hr {
     flex-shrink: 0;
 }
 
-/* ── Bubble ─────────────────────────────────── */
+/* ── Message bubble ── */
 
 .message-wrapper {
     display: flex;
@@ -498,7 +487,7 @@ hr {
     filter: brightness(1.1);
 }
 
-/* Sender label */
+/* Sender label above first bubble in a group */
 
 .sender {
     font-size: 11px;
@@ -514,7 +503,7 @@ hr {
     display: none;
 }
 
-/* ── Chat input ─────────────────────────────── */
+/* ── Input bar ── */
 
 .chat-input {
     display: flex;
@@ -575,6 +564,49 @@ hr {
     cursor: not-allowed;
 }
 
+/* ── Scroll-to-bottom FAB ── */
+
+.scroll-to-bottom-btn {
+    position: absolute;
+    bottom: 68px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 26px;
+    padding: 0 12px;
+    border-radius: 13px;
+    border: 1px solid var(--border-mid);
+    background: rgba(22, 25, 37, 0.82);
+    backdrop-filter: blur(8px);
+    color: var(--sub);
+    font-size: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: color .15s, background .15s, border-color .15s;
+    z-index: 5;
+    animation: fab-pop-in 0.2s cubic-bezier(0.34, 1.5, 0.64, 1);
+}
+
+.scroll-to-bottom-btn:hover {
+    color: var(--accent);
+    background: rgba(22, 25, 37, 0.92);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+@keyframes fab-pop-in {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.7);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+}
+
 /* ═══════════════════════════════════════════════
    EMPTY / LOADING STATES
    ═══════════════════════════════════════════════ */
@@ -608,7 +640,7 @@ hr {
 }
 
 /* ═══════════════════════════════════════════════
-   SKELETON LOADING
+   SKELETON LOADING ANIMATION
    ═══════════════════════════════════════════════ */
 
 @keyframes shimmer {
@@ -810,7 +842,7 @@ hr {
     border-color: rgba(239, 68, 68, 0.3);
 }
 
-/* ── Inline edit bubble ─────────────────────── */
+/* ── Inline edit bubble ── */
 
 .edit-bubble {
     display: flex;
@@ -881,7 +913,9 @@ hr {
     border: 1px solid var(--border-mid);
 }
 
-/*    ADD USER PANEL */
+/* ═══════════════════════════════════════════════
+   ADD PEOPLE PANEL (inside chat)
+   ═══════════════════════════════════════════════ */
 
 .add-user-overlay {
     position: absolute;
@@ -933,8 +967,6 @@ hr {
     }
 }
 
-/* Panel header */
-
 .aup-header {
     display: flex;
     align-items: center;
@@ -980,7 +1012,7 @@ hr {
     border-color: rgba(239, 68, 68, 0.3);
 }
 
-/* Selected chips */
+/* Selected chips row */
 
 .aup-chips {
     display: flex;
@@ -1054,7 +1086,7 @@ hr {
     color: var(--danger);
 }
 
-/* Search bar */
+/* Search inside panel */
 
 .aup-search {
     display: flex;
@@ -1211,7 +1243,7 @@ hr {
     border-color: var(--accent);
 }
 
-/* Footer */
+/* Panel footer */
 
 .aup-footer {
     display: flex;
@@ -1269,7 +1301,7 @@ hr {
     transform: none;
 }
 
-/* Profile photo inside avatar circles */
+/* Profile photos inside small avatar circles */
 .aup-chip-img,
 .aup-user-img {
     width: 100%;
@@ -1277,4 +1309,471 @@ hr {
     object-fit: cover;
     border-radius: 50%;
     display: block;
+}
+
+/* ═══════════════════════════════════════════════
+   CREATE CHAT MODAL
+   ═══════════════════════════════════════════════ */
+
+/* Full-screen backdrop */
+.ccm-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    animation: aup-fade-in 0.18s ease;
+}
+
+/* The modal card itself */
+.ccm-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 420px;
+    max-height: 88vh;
+    border-radius: var(--r-xl);
+    background: rgba(14, 16, 24, 0.98);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    border: 1px solid var(--border-mid);
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(99, 102, 241, 0.1);
+    z-index: 101;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: ccm-drop-in 0.24s cubic-bezier(0.34, 1.4, 0.64, 1);
+    font-family: "Oxygen", sans-serif;
+}
+
+@keyframes ccm-drop-in {
+    from {
+        opacity: 0;
+        transform: translate(-50%, calc(-50% - 18px)) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+/* Modal header */
+.ccm-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.ccm-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    letter-spacing: 0.1px;
+}
+
+.ccm-title i {
+    color: var(--accent);
+    font-size: 14px;
+}
+
+/* Fields */
+.ccm-field-group {
+    padding: 14px 20px 0;
+    flex-shrink: 0;
+}
+
+.ccm-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 7px;
+}
+
+.ccm-input {
+    width: 100%;
+    height: 40px;
+    border-radius: var(--r-lg);
+    border: 1px solid var(--border-mid);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    padding: 0 14px;
+    transition: border-color .2s, background .2s;
+    box-sizing: border-box;
+}
+
+.ccm-input:focus {
+    outline: none;
+    border-color: rgba(99, 102, 241, 0.5);
+    background: rgba(99, 102, 241, 0.06);
+}
+
+.ccm-input::placeholder {
+    color: var(--muted);
+}
+
+/* Password field — slides in */
+.ccm-input-pw {
+    margin-top: 8px;
+    animation: ccm-slide-down 0.18s ease;
+}
+
+@keyframes ccm-slide-down {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Toggle switch */
+.ccm-toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.ccm-toggle-track {
+    width: 36px;
+    height: 20px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-mid);
+    display: flex;
+    align-items: center;
+    padding: 0 3px;
+    cursor: pointer;
+    transition: background .2s, border-color .2s;
+    flex-shrink: 0;
+}
+
+.ccm-toggle-on {
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+}
+
+.ccm-toggle-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: white;
+    transition: transform .2s cubic-bezier(0.34, 1.5, 0.64, 1);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.ccm-toggle-on .ccm-toggle-thumb {
+    transform: translateX(16px);
+}
+
+/* Divider */
+.ccm-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 16px 20px 0;
+    flex-shrink: 0;
+}
+
+/* "Add people" section heading */
+.ccm-section-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 14px 20px 10px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
+}
+
+/* Search bar inside the create-chat modal — add side padding so it lines up */
+.ccm-modal .aup-search {
+    margin: 0 20px 4px;
+    border-radius: var(--r-lg);
+    border: 1px solid var(--border-mid) !important;
+    padding: 8px 14px;
+}
+
+.ccm-section-label i {
+    color: var(--accent);
+    font-size: 11px;
+}
+
+/* Scrollable results inside the modal */
+.ccm-results {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 12px;
+    min-height: 80px;
+    max-height: 220px;
+    /* breathing room between individual user rows */
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ccm-results::-webkit-scrollbar {
+    width: 4px;
+}
+
+.ccm-results::-webkit-scrollbar-thumb {
+    background: var(--border-mid);
+    border-radius: 2px;
+}
+
+/* Modal footer */
+.ccm-footer {
+    display: flex;
+    gap: 8px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+    margin-top: auto;
+}
+
+/* Chips & search inside the modal inherit aup- styles above — no extra rules needed */
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE — TABLET  (≤ 768px)
+   Panel collapses into a slide-over drawer and
+   the chat area fills the full width.
+   ═══════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+
+    /* The two-column layout stacks — the chat area takes everything */
+    .content {
+        padding: 0;
+        gap: 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Left panel becomes a full-height slide-over drawer */
+    .panel-ui {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 280px;
+        height: 100%;
+        z-index: 20;
+        border-radius: 0;
+        border-right: 1px solid var(--border-mid);
+        border-left: none;
+        border-top: none;
+        border-bottom: none;
+        transform: translateX(-100%);
+        transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        /* Keep the glass effect even when off-screen */
+        background: rgba(14, 16, 24, 0.97);
+    }
+
+    /* .panel-open is toggled by the TS component on mobile */
+    .panel-ui.panel-open {
+        transform: translateX(0);
+    }
+
+    /* Dim overlay behind the open drawer */
+    .panel-overlay {
+        display: block !important;
+    }
+
+    /* Chat area fills the viewport */
+    .chat-ui {
+        border-radius: 0;
+        border: none;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* A hamburger button to open the drawer */
+    .panel-toggle-btn {
+        display: flex !important;
+    }
+
+    /* The chat header gets a little more breathing room on small screens */
+    .chat-header {
+        padding: 10px 12px;
+    }
+
+    /* Make the Add-People panel full width on mobile */
+    .add-user-panel {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        border-radius: var(--r-xl) var(--r-xl) 0 0;
+        max-height: 75vh;
+    }
+
+    /* Create-chat modal goes full-width on small screens */
+    .ccm-modal {
+        width: 100%;
+        max-width: 100%;
+        height: 100%;
+        max-height: 100%;
+        top: 0;
+        left: 0;
+        transform: none;
+        border-radius: 0;
+        animation: ccm-slide-up-mobile 0.26s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes ccm-slide-up-mobile {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Give the results list room to breathe vertically */
+    .ccm-results {
+        max-height: none;
+        flex: 1;
+    }
+}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE — MOBILE  (≤ 480px)
+   Tighter spacing, smaller avatars, narrower
+   message bubbles, compact input bar.
+   ═══════════════════════════════════════════════ */
+
+@media (max-width: 480px) {
+
+    /* Shrink the sidebar drawer a touch on very small phones */
+    .panel-ui {
+        width: 260px;
+    }
+
+    /* Smaller chat list avatars */
+    .chat-list-avatar,
+    .chat-list-initials {
+        width: 36px;
+        height: 36px;
+    }
+
+    /* Chat list font */
+    .chat-title p {
+        font-size: 13px;
+    }
+
+    /* Header avatar */
+    .chat-header-avatar,
+    .chat-header-initials {
+        width: 34px;
+        height: 34px;
+    }
+
+    /* Bubbles can go wider on small screens since there's less horizontal space */
+    .message-wrapper {
+        max-width: 78%;
+    }
+
+    /* Slightly smaller bubble text */
+    .message {
+        font-size: 13px;
+        padding: 8px 11px;
+    }
+
+    /* Compact input bar */
+    .chat-input {
+        padding: 8px 10px;
+        gap: 6px;
+    }
+
+    .chat-input input {
+        height: 36px;
+        font-size: 13px;
+    }
+
+    .chat-input button {
+        width: 36px;
+        height: 36px;
+        font-size: 13px;
+    }
+
+    /* Sender label sits a bit closer on narrow screens */
+    .sender {
+        margin-left: 34px;
+    }
+
+    /* The "Latest" pill stays visible but doesn't crowd the input */
+    .scroll-to-bottom-btn {
+        bottom: 60px;
+    }
+
+    /* Header title slightly smaller */
+    .title p {
+        font-size: 19px;
+    }
+}
+
+/* ═══════════════════════════════════════════════
+   PANEL OVERLAY & TOGGLE BUTTON
+   These are hidden on desktop and shown on tablet/mobile.
+   ═══════════════════════════════════════════════ */
+
+/* Floating hamburger in the empty-state screen */
+.panel-toggle-floating {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+}
+
+/* Dark overlay that appears behind the open drawer */
+.panel-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 19;
+    animation: aup-fade-in 0.18s ease;
+}
+
+/* Hamburger / back button shown in the chat header on mobile */
+.panel-toggle-btn {
+    display: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--sub);
+    font-size: 13px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s, color .2s;
+    flex-shrink: 0;
+}
+
+.panel-toggle-btn:hover {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-color: rgba(99, 102, 241, 0.3);
 }
