@@ -1,29 +1,61 @@
+<!-- login.html -->
 <section class="page default-page-background">
-  <form [formGroup]="regForm" class="register-card border-gradient" (ngSubmit)="Login()">
+  <canvas #starsCanvas class="stars-canvas"></canvas>
+  <div class="glow-blob"></div>
+
+  <form [formGroup]="regForm" class="register-card" (ngSubmit)="Login()">
+
+    <div class="orbit">
+      <div class="orbit-dot"></div>
+    </div>
+
     <p class="title">Welcome back</p>
     <p class="title-desc">Are you ready?</p>
 
     <div class="inputs">
+
       <!-- Email -->
       <div class="input-wrapper" [class.error-field]="regForm.get('email')?.touched && regForm.get('email')?.invalid">
-        <input formControlName="email" class="input" type="email" placeholder="Email">
+        <div class="input-inner">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <rect x="2" y="4" width="20" height="16" rx="3" />
+            <path d="M2 8l10 6 10-6" />
+          </svg>
+          <input formControlName="email" class="input" type="email" placeholder="Email">
+        </div>
         <div class="error-message" *ngIf="regForm.get('email')?.touched && regForm.get('email')?.invalid">
           <span *ngIf="regForm.get('email')?.errors?.['required']">Email is required</span>
           <span *ngIf="regForm.get('email')?.errors?.['email']">Invalid email format</span>
         </div>
       </div>
+
       <!-- Password -->
-      <div class="input-wrapper" [class.error-field]="regForm.get('password')?.touched && regForm.get('password')?.invalid">
-        <input formControlName="password" class="input" type="password" placeholder="Password">
+      <div class="input-wrapper"
+        [class.error-field]="regForm.get('password')?.touched && regForm.get('password')?.invalid">
+        <div class="input-inner">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <rect x="5" y="11" width="14" height="10" rx="2" />
+            <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+          </svg>
+          <input formControlName="password" class="input" type="password" placeholder="Password">
+        </div>
         <div class="error-message" *ngIf="regForm.get('password')?.touched && regForm.get('password')?.invalid">
           <span *ngIf="regForm.get('password')?.errors?.['required']">Password is required</span>
           <span *ngIf="regForm.get('password')?.errors?.['minlength']">Minimum 6 characters</span>
-          <span *ngIf="regForm.get('password')?.errors?.['pattern']">Must include uppercase, lowercase, and number</span>
+          <span *ngIf="regForm.get('password')?.errors?.['pattern']">Must include uppercase, lowercase, and
+            number</span>
         </div>
       </div>
+
     </div>
 
-    <button type="submit" class="reg-button" [disabled]="regForm.invalid">Login</button>
-    <a routerLink="/register">I haven't account</a>
+    <button type="submit" class="reg-button" [disabled]="regForm.invalid">
+      <span>Sign In</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    </button>
+
+    <a routerLink="/register" class="login-link">I don't have an account</a>
   </form>
 </section>

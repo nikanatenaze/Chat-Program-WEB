@@ -14,6 +14,7 @@ import { AddUser } from './components/add-user/add-user';
 import { AccountCenter } from './components/account-center/account-center';
 import { Messenger } from './components/messenger/messenger';
 import { TestComponent } from './components/test.component/test.component';
+import { ProjectInfoComponent } from './components/project-info.component/project-info.component';
 
 const routes: Routes = [
   {path: "", component: Home},
@@ -28,6 +29,7 @@ const routes: Routes = [
   {path: "add-user/:id", component: AddUser, canActivate: [RouterGuard]},
   {path: "test", component: TestComponent},
   {path: "messenger", component: Messenger, canActivate: [RouterGuard]},
+  {path: "project-info", component: ProjectInfoComponent},
   {path: "**", component: ErrorComponent},
 ];
 

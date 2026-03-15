@@ -10,8 +10,7 @@
             <!-- Desktop nav links -->
             <ul class="buttons" *ngIf="!(auth.userToken$ | async); else userUl">
                 <li routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:true}">Home</li>
-                <li routerLink="/project" routerLinkActive="active-link">Project</li>
-                <li routerLink="/features" routerLinkActive="active-link">Features</li>
+                <li routerLink="/project-info" routerLinkActive="active-link">Project</li>
             </ul>
         </div>
 
@@ -42,10 +41,8 @@
         <ng-container *ngIf="!(auth.userToken$ | async); else userMobLinks">
             <div class="mob-link" routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:true}"
                 (click)="closeMobileMenu()">Home</div>
-            <div class="mob-link" routerLink="/project" routerLinkActive="active-link" (click)="closeMobileMenu()">
+            <div class="mob-link" routerLink="/project-info" routerLinkActive="active-link" (click)="closeMobileMenu()">
                 Project</div>
-            <div class="mob-link" routerLink="/features" routerLinkActive="active-link" (click)="closeMobileMenu()">
-                Features</div>
         </ng-container>
 
         <div class="mob-divider"></div>
@@ -72,8 +69,8 @@
 <ng-template #userUl>
     <ul class="buttons" *ngIf="auth.userToken$ | async">
         <li routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:true}">Home</li>
+        <li routerLink="/project-info" routerLinkActive="active-link">Project</li>
         <li routerLink="/messenger" routerLinkActive="active-link">Messenger</li>
-        <li routerLink="/chats" routerLinkActive="active-link">Chats</li>
     </ul>
 </ng-template>
 
@@ -90,9 +87,10 @@
     <ng-container *ngIf="auth.userToken$ | async">
         <div class="mob-link" routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:true}"
             (click)="closeMobileMenu()">Home</div>
+        <div class="mob-link" routerLink="/project-info" routerLinkActive="active-link" (click)="closeMobileMenu()">
+            Project</div>
         <div class="mob-link" routerLink="/messenger" routerLinkActive="active-link" (click)="closeMobileMenu()">
             Messenger</div>
-        <div class="mob-link" routerLink="/chats" routerLinkActive="active-link" (click)="closeMobileMenu()">Chats</div>
     </ng-container>
 </ng-template>
 

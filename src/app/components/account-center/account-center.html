@@ -1,4 +1,8 @@
+<!-- account-center.html -->
 <section class="content default-page-background">
+    <canvas #starsCanvas class="stars-canvas"></canvas>
+    <div class="glow-blob"></div>
+
     <div class="ac-shell">
         <aside class="sidebar">
             <div class="sidebar-top">
@@ -38,7 +42,7 @@
             </nav>
 
             <div class="sidebar-bottom">
-                <span class="ver">Account Center: v0.1</span>
+                <span class="ver">Account Center: SQ09</span>
             </div>
         </aside>
 
@@ -126,7 +130,7 @@
                 </ng-container>
             </ng-container>
 
-            <!--  APPEARANCE PAGE -->
+            <!-- APPEARANCE PAGE -->
             <ng-container *ngIf="activePage === 'appearance'">
                 <div class="page">
                     <div class="pg-badge">
@@ -170,7 +174,7 @@
                     <div class="pg-badge">
                         <i class="fa-solid fa-gears"></i> Settings
                     </div>
-                    <div class="pg-title">Baisic Settings</div>
+                    <div class="pg-title">Basic Settings</div>
                     <div class="pg-desc">
                         Manage notifications, security and account actions.
                     </div>

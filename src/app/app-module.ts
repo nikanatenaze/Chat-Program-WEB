@@ -23,6 +23,7 @@ import { AccountCenter } from './components/account-center/account-center';
 import { Messenger } from './components/messenger/messenger';
 import { TestComponent } from './components/test.component/test.component';
 import { AuthInterceptor } from './classes/auth-interceptor.class';
+import { ProjectInfoComponent } from './components/project-info.component/project-info.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +43,7 @@ import { AuthInterceptor } from './classes/auth-interceptor.class';
     AccountCenter,
     Messenger,
     TestComponent,
+    ProjectInfoComponent,
   ],
   imports: [
     BrowserModule,
