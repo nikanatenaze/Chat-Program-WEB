@@ -364,6 +364,170 @@ hr {
     color: var(--danger);
 }
 
+/* ── Quit confirm — panel-level overlay + centered card ── */
+
+/* Transparent click-outside trap that fills the panel */
+.quit-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    border-radius: var(--r-xl);
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    animation: quit-overlay-in 0.18s ease forwards;
+}
+
+@keyframes quit-overlay-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes quit-overlay-out {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+.quit-overlay.quit-confirm-closing {
+    animation: quit-overlay-out 0.18s ease forwards;
+}
+
+/* The card itself — centred in the panel */
+@keyframes quit-card-in {
+    0% {
+        opacity: 0;
+        transform: translateY(10px) scale(0.94);
+    }
+
+    70% {
+        opacity: 1;
+        transform: translateY(-2px) scale(1.01);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes quit-card-out {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(8px) scale(0.95);
+    }
+}
+
+.quit-confirm-card {
+    position: absolute;
+    bottom: 20px;
+    left: 14px;
+    right: 14px;
+    background: rgba(14, 16, 24, 0.99);
+    border: 1px solid rgba(239, 68, 68, 0.22);
+    border-radius: var(--r-xl);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 41;
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    box-shadow:
+        0 16px 48px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(239, 68, 68, 0.08);
+    animation: quit-card-in 0.24s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+}
+
+.quit-confirm-card.quit-confirm-closing {
+    animation: quit-card-out 0.18s ease forwards;
+    pointer-events: none;
+}
+
+.quit-confirm-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.1px;
+}
+
+.quit-confirm-header i {
+    color: var(--danger);
+    font-size: 12px;
+}
+
+.quit-confirm-body {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.quit-confirm-actions {
+    display: flex;
+    gap: 7px;
+}
+
+.quit-btn {
+    flex: 1;
+    height: 32px;
+    border-radius: var(--r-md);
+    border: none;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: background .15s, color .15s, border-color .15s, transform .1s;
+}
+
+.quit-btn:active {
+    transform: scale(0.96);
+}
+
+.quit-btn-cancel {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--sub);
+    border: 1px solid var(--border-mid);
+}
+
+.quit-btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.10);
+    color: var(--text);
+}
+
+.quit-btn-confirm {
+    background: rgba(239, 68, 68, 0.12);
+    color: var(--danger);
+    border: 1px solid rgba(239, 68, 68, 0.28);
+}
+
+.quit-btn-confirm:hover {
+    background: var(--danger);
+    color: #fff;
+    border-color: var(--danger);
+}
+
 /* ── RIGHT: chat area ── */
 
 .chat-ui {
@@ -567,6 +731,35 @@ hr {
     animation: msg-pop-sent 0.28s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
 }
 
+/* Message delete: shrink toward the right and fade out */
+@keyframes msg-delete-out {
+    0% {
+        opacity: 1;
+        transform: scaleY(1) translateX(0);
+        max-height: 200px;
+        margin-bottom: 1px;
+    }
+
+    40% {
+        opacity: 0;
+        transform: scaleY(0.7) translateX(12px);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scaleY(0) translateX(12px);
+        max-height: 0;
+        margin-bottom: 0;
+    }
+}
+
+.msg-deleting {
+    animation: msg-delete-out 0.28s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+    transform-origin: right center;
+    pointer-events: none;
+    overflow: hidden;
+}
+
 /* ── Message row ── */
 
 .msg {
@@ -768,27 +961,56 @@ hr {
     align-items: center;
     justify-content: center;
     gap: 5px;
-    transition: color .15s, background .15s, border-color .15s;
+    transition: color .15s, background .15s, border-color .15s, box-shadow .15s;
     z-index: 5;
-    animation: fab-pop-in 0.2s cubic-bezier(0.34, 1.5, 0.64, 1);
+    animation: fab-pop-in 0.25s cubic-bezier(0.34, 1.6, 0.64, 1) forwards;
 }
 
 .scroll-to-bottom-btn:hover {
     color: var(--accent);
-    background: rgba(22, 25, 37, 0.92);
-    border-color: rgba(99, 102, 241, 0.3);
+    background: rgba(22, 25, 37, 0.96);
+    border-color: rgba(99, 102, 241, 0.4);
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.18);
 }
 
+.scroll-to-bottom-btn:active {
+    transform: translateX(-50%) scale(0.93);
+}
+
+/* FAB entrance */
 @keyframes fab-pop-in {
-    from {
+    0% {
         opacity: 0;
-        transform: translateX(-50%) scale(0.7);
+        transform: translateX(-50%) scale(0.6) translateY(6px);
     }
 
-    to {
+    70% {
         opacity: 1;
-        transform: translateX(-50%) scale(1);
+        transform: translateX(-50%) scale(1.05) translateY(-2px);
     }
+
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1) translateY(0);
+    }
+}
+
+/* FAB exit */
+@keyframes fab-pop-out {
+    0% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1) translateY(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.7) translateY(5px);
+    }
+}
+
+.scroll-to-bottom-btn.fab-closing {
+    animation: fab-pop-out 0.18s ease forwards;
+    pointer-events: none;
 }
 
 /* ═══════════════════════════════════════════════
@@ -1032,6 +1254,31 @@ hr {
 
 /* ── Inline edit bubble ── */
 
+/* Edit bubble: slide in from below, slide out downward */
+@keyframes edit-bubble-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes edit-bubble-out {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(8px) scale(0.97);
+    }
+}
+
 .edit-bubble {
     display: flex;
     flex-direction: column;
@@ -1039,6 +1286,12 @@ hr {
     align-self: flex-end;
     min-width: 200px;
     max-width: 420px;
+    animation: edit-bubble-in 0.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.edit-bubble.edit-bubble-closing {
+    animation: edit-bubble-out 0.18s ease forwards;
+    pointer-events: none;
 }
 
 .edit-textarea {

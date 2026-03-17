@@ -51,10 +51,30 @@
                     </div>
                     <p>{{ i.name }}</p>
                 </div>
-                <div class="chat-hover-icon" (click)="quitFromChatSwal(i.id); $event.stopPropagation()"
+                <div class="chat-hover-icon" (click)="openQuitConfirm(i.id); $event.stopPropagation()"
                     title="Leave chat">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 </div>
+            </div>
+        </div>
+
+        <!-- ── Quit confirm overlay — single instance, sits over the panel ── -->
+        <div class="quit-overlay" *ngIf="quitConfirmChatId !== null || quitConfirmClosing"
+            [class.quit-confirm-closing]="quitConfirmClosing" (click)="closeQuitConfirm()"></div>
+        <div class="quit-confirm-card" *ngIf="quitConfirmChatId !== null || quitConfirmClosing"
+            [class.quit-confirm-closing]="quitConfirmClosing" (click)="$event.stopPropagation()">
+            <div class="quit-confirm-header">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Leave chat?</span>
+            </div>
+            <p class="quit-confirm-body">You won't be able to rejoin without being added back.</p>
+            <div class="quit-confirm-actions">
+                <button class="quit-btn quit-btn-cancel" (click)="closeQuitConfirm()">
+                    Cancel
+                </button>
+                <button class="quit-btn quit-btn-confirm" (click)="confirmQuit()">
+                    <i class="fa-solid fa-right-from-bracket"></i> Leave
+                </button>
             </div>
         </div>
 
@@ -231,7 +251,7 @@
                 <ng-container *ngIf="selectedChatMessages$ | async as messages">
                     <div class="msg" [class.msg-new-received]="i.id === latestMessageId && !i.isWriter"
                         [class.msg-new-sent]="i.id === latestMessageId && i.isWriter"
-                        *ngFor="let i of messages; let idx = index">
+                        [class.msg-deleting]="i.id === deletingMessageId" *ngFor="let i of messages; let idx = index">
 
                         <div class="sender" *ngIf="shouldShowSender(messages, idx)">
                             {{ getUserName(i) }}
@@ -253,7 +273,7 @@
                             </div>
 
                             <div class="message-wrapper">
-                                <ng-container *ngIf="editingMessageId !== i.id">
+                                <ng-container *ngIf="editingMessageId !== i.id && editClosingId !== i.id">
                                     <div class="bubble-group" [class.bubble-group-me]="i.isWriter">
                                         <div class="msg-actions" *ngIf="i.isWriter">
                                             <button class="msg-action-btn" (click)="startEdit(i)" title="Edit">
@@ -271,8 +291,8 @@
                                     </div>
                                 </ng-container>
 
-                                <ng-container *ngIf="editingMessageId === i.id">
-                                    <div class="edit-bubble">
+                                <ng-container *ngIf="editingMessageId === i.id || editClosingId === i.id">
+                                    <div class="edit-bubble" [class.edit-bubble-closing]="editClosingId === i.id">
                                         <textarea [id]="'edit-input-' + i.id" class="edit-textarea"
                                             [(ngModel)]="editContent"
                                             (keydown.enter)="$event.preventDefault(); saveEdit(i.id)"
@@ -296,8 +316,8 @@
         </div><!-- /chat-body-wrap -->
 
         <!-- Scroll-to-bottom FAB -->
-        <button class="scroll-to-bottom-btn" *ngIf="showScrollToBottom && !chatLoading" (click)="scrollToBottom()"
-            title="Jump to latest">
+        <button class="scroll-to-bottom-btn" *ngIf="(showScrollToBottom || fabClosing) && !chatLoading"
+            [class.fab-closing]="fabClosing" (click)="scrollToBottom()" title="Jump to latest">
             <i class="fa-solid fa-chevron-down"></i>
             <span>Latest</span>
         </button>

@@ -47,6 +47,13 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   // ─── Inline message editing ──────────────────────────────────────────────────
   public editingMessageId: number | null = null;
   public editContent = '';
+  public editClosingId: number | null = null;   // drives edit-bubble exit anim
+  public deletingMessageId: number | null = null; // drives delete shrink-out anim
+  public quitConfirmChatId: number | null = null; // custom quit confirm UI
+  public quitConfirmClosing = false;              // drives quit card exit anim
+  private editCloseTimer: any;
+  private deleteAnimTimer: any;
+  private quitCloseTimer: any;
 
   // ─── Add-people panel ────────────────────────────────────────────────────────
   public showAddUserPanel = false;
@@ -73,6 +80,8 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
 
   // ─── Scroll-to-bottom FAB ────────────────────────────────────────────────────
   public showScrollToBottom = false;
+  public fabClosing = false;
+  private fabCloseTimer: any;
   @ViewChild('messagesContainer') messagesContainerRef!: ElementRef<HTMLDivElement>;
 
   // ─── Stars canvas ────────────────────────────────────────────────────────────
@@ -137,6 +146,10 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy(): void {
     if (this.starsAnimFrame) cancelAnimationFrame(this.starsAnimFrame);
     clearTimeout(this.latestMsgTimer);
+    clearTimeout(this.fabCloseTimer);
+    clearTimeout(this.editCloseTimer);
+    clearTimeout(this.deleteAnimTimer);
+    clearTimeout(this.quitCloseTimer);
     this.hub.stopConnection()
       .then(() => console.log('SignalR disconnected'))
       .catch(err => console.error('SignalR disconnect error:', err));
@@ -271,7 +284,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
       }
       // Trigger the new-message pop-in animation
       this._flashLatestMessage(mapped.id);
-      this.scrollToBottom();
+      this.scrollToBottom(true);
     });
 
     this.hub.onDeleteMessage(data => {
@@ -337,7 +350,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
           this.selectedChatMessages$.next(messages.map(x => this.mapMessage(x)));
           this.chatLoading = false;
 
-          this.scrollToBottom();
+          this.scrollToBottom(true);
         });
       });
     });
@@ -445,8 +458,14 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public cancelEdit() {
-    this.editingMessageId = null;
-    this.editContent = '';
+    if (this.editingMessageId === null) return;
+    this.editClosingId = this.editingMessageId;
+    clearTimeout(this.editCloseTimer);
+    this.editCloseTimer = setTimeout(() => {
+      this.editingMessageId = null;
+      this.editClosingId = null;
+      this.editContent = '';
+    }, 200);
   }
 
   public saveEdit(messageId: number) {
@@ -454,33 +473,38 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     if (!content) return;
     this.messageService.EditMessage({ id: messageId, content, userId: this.tokenData.id }).subscribe({
       next: updated => {
-        const msgs = this.selectedChatMessages$.value.map(m =>
-          m.id === messageId ? { ...m, content: updated.content } : m
-        );
-        this.selectedChatMessages$.next(msgs);
-        this.cancelEdit();
+        // Play close animation first, then swap the content in
+        this.editClosingId = messageId;
+        clearTimeout(this.editCloseTimer);
+        this.editCloseTimer = setTimeout(() => {
+          const msgs = this.selectedChatMessages$.value.map(m =>
+            m.id === messageId ? { ...m, content: updated.content } : m
+          );
+          this.selectedChatMessages$.next(msgs);
+          this.editingMessageId = null;
+          this.editClosingId = null;
+          this.editContent = '';
+        }, 200);
       },
       error: () => this.notification.error('Failed to edit message.'),
     });
   }
 
   public deleteMessage(messageId: number) {
-    Swal.fire({
-      title: 'Delete message?',
-      text: 'This cannot be undone.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Delete',
-    }).then(result => {
-      if (result.isConfirmed) {
-        this.messageService.DeleteMessage(messageId).subscribe({
-          next: () => this.notification.success('Message deleted.'),
-          error: () => this.notification.error('Failed to delete message.'),
-        });
-      }
-    });
+    // Animate the bubble out, then fire the API
+    this.deletingMessageId = messageId;
+    clearTimeout(this.deleteAnimTimer);
+    this.deleteAnimTimer = setTimeout(() => {
+      this.messageService.DeleteMessage(messageId).subscribe({
+        next: () => {
+          this.deletingMessageId = null;
+        },
+        error: () => {
+          this.deletingMessageId = null;
+          this.notification.error('Failed to delete message.');
+        },
+      });
+    }, 280);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -759,17 +783,27 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   // Leave chat
   // ═══════════════════════════════════════════════════════════════════════════
 
-  quitFromChatSwal(id: number) {
-    Swal.fire({
-      title: 'Quit chat?',
-      text: "You won't be able to rejoin by yourself.",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, quit',
-    }).then(result => {
-      if (!result.isConfirmed) return;
+  openQuitConfirm(id: number) {
+    this.quitConfirmClosing = false;
+    this.quitConfirmChatId = id;
+  }
+
+  closeQuitConfirm() {
+    if (this.quitConfirmClosing) return;
+    this.quitConfirmClosing = true;
+    clearTimeout(this.quitCloseTimer);
+    this.quitCloseTimer = setTimeout(() => {
+      this.quitConfirmChatId = null;
+      this.quitConfirmClosing = false;
+    }, 200);
+  }
+
+  confirmQuit() {
+    const id = this.quitConfirmChatId;
+    if (id === null) return;
+    this.closeQuitConfirm();
+    // Small delay so the card animates out before action fires
+    setTimeout(() => {
       if (id === this.selectedChat?.id) {
         this.selectedChat = null;
         this.selectedChatMessages$.next([]);
@@ -778,7 +812,12 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
         next: () => this.notification.success('You left the chat.'),
         error: () => this.notification.error('Something went wrong.'),
       });
-    });
+    }, 220);
+  }
+
+  // Keep old name so HTML template still compiles — just delegates
+  quitFromChatSwal(id: number) {
+    this.openQuitConfirm(id);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -820,16 +859,45 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   onMessagesScroll(event: Event) {
     const el = event.target as HTMLDivElement;
     const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
-    this.showScrollToBottom = distanceFromBottom > 150;
+    const shouldShow = distanceFromBottom > 150;
+
+    if (!shouldShow && this.showScrollToBottom && !this.fabClosing) {
+      // User scrolled close to bottom — play exit animation before removing FAB
+      this.fabClosing = true;
+      clearTimeout(this.fabCloseTimer);
+      this.fabCloseTimer = setTimeout(() => {
+        this.showScrollToBottom = false;
+        this.fabClosing = false;
+      }, 190);
+    } else if (shouldShow && !this.showScrollToBottom) {
+      this.fabClosing = false;
+      clearTimeout(this.fabCloseTimer);
+      this.showScrollToBottom = true;
+    }
   }
 
-  public scrollToBottom() {
+  public scrollToBottom(instant = false) {
     setTimeout(() => {
       const container = this.messagesContainerRef?.nativeElement
-        ?? document.querySelector('.chat-messages');
-      if (container) {
+        ?? document.querySelector('.chat-messages') as HTMLElement;
+      if (!container) return;
+
+      if (instant) {
         container.scrollTop = container.scrollHeight;
         this.showScrollToBottom = false;
+        this.fabClosing = false;
+      } else {
+        // Smooth animated scroll
+        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+        // Trigger FAB exit animation then hide
+        if (this.showScrollToBottom && !this.fabClosing) {
+          this.fabClosing = true;
+          clearTimeout(this.fabCloseTimer);
+          this.fabCloseTimer = setTimeout(() => {
+            this.showScrollToBottom = false;
+            this.fabClosing = false;
+          }, 190);
+        }
       }
     }, 50);
   }
