@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { TokenModelInterface } from '../../interfaces/token-model.interface';
 import { UserInterface } from '../../interfaces/user.interface';
 import { ChatInterface } from '../../interfaces/chat.interface';
@@ -13,39 +13,44 @@ import { BehaviorSubject, forkJoin } from 'rxjs';
 import Swal from 'sweetalert2';
 import { GlobalMethods } from '../../classes/global-methods';
 
+// Animation duration constants (must match CSS)
+const CLOSE_ANIM_MS = 210;  // panel / modal exit animation
+const SWITCH_OUT_MS = 190;  // messages fade-out on chat switch
+
 @Component({
   selector: 'app-messenger',
   templateUrl: './messenger.html',
   standalone: false,
   styleUrls: ['./messenger.css'],
 })
-export class Messenger implements OnInit, OnDestroy {
+export class Messenger implements OnInit, OnDestroy, AfterViewInit {
 
-  // Auth / user basics
+  // ─── Auth / user basics ──────────────────────────────────────────────────────
   public token: string = sessionStorage.getItem('token') ?? '';
   public tokenData!: TokenModelInterface;
   public userData!: UserInterface;
 
-  // Chat list streams
+  // ─── Chat list streams ───────────────────────────────────────────────────────
   public userChats$ = new BehaviorSubject<ChatInterface[]>([]);
   public filteredChats$ = new BehaviorSubject<ChatInterface[]>([]);
   public selectedChatMessages$ = new BehaviorSubject<MessageInterface[]>([]);
 
-  // Search & compose state
+  // ─── Search & compose ────────────────────────────────────────────────────────
   public searchTerm = '';
   public newMessage = '';
 
-  // Loading / in-flight flags
+  // ─── Loading / in-flight flags ───────────────────────────────────────────────
   public chatLoading = false;
   public chatsLoading = true;
   public isSending = false;
 
-  // Inline message editing
+  // ─── Inline message editing ──────────────────────────────────────────────────
   public editingMessageId: number | null = null;
   public editContent = '';
 
-  // "Add people" slide-up panel (inside an open chat)
+  // ─── Add-people panel ────────────────────────────────────────────────────────
   public showAddUserPanel = false;
+  public addUserPanelClosing = false;       // drives exit animation
   public addUserSearch = '';
   public addUserResults: UserInterface[] = [];
   public addUserSelected = new Map<number, UserInterface>();
@@ -53,8 +58,9 @@ export class Messenger implements OnInit, OnDestroy {
   public addUserAdding = false;
   private addUserDebounce: any;
 
-  // "Create chat" modal state
+  // ─── Create chat modal ───────────────────────────────────────────────────────
   public showCreateChatModal = false;
+  public createChatModalClosing = false;    // drives exit animation
   public createChatName = '';
   public createChatHasPassword = false;
   public createChatPassword = '';
@@ -65,21 +71,43 @@ export class Messenger implements OnInit, OnDestroy {
   public createChatCreating = false;
   private createChatDebounce: any;
 
-  // Scroll-to-bottom FAB
+  // ─── Scroll-to-bottom FAB ────────────────────────────────────────────────────
   public showScrollToBottom = false;
   @ViewChild('messagesContainer') messagesContainerRef!: ElementRef<HTMLDivElement>;
 
-  // Mobile sidebar drawer state
-  public panelOpen = false;
+  // ─── Stars canvas ────────────────────────────────────────────────────────────
+  @ViewChild('starsCanvas') starsCanvasRef!: ElementRef<HTMLCanvasElement>;
+  private starsAnimFrame: number = 0;
 
-  // Currently open chat
+  // ─── Mobile sidebar ──────────────────────────────────────────────────────────
+  public panelOpen = false;
+  public panelClosing = false;              // drives exit animation
+
+  // ─── Active chat ─────────────────────────────────────────────────────────────
   public selectedChat: ChatInterface | null = null;
 
-  // Avatar / name lookup maps for people in the active chat
+  // ─── Chat-switch animation ───────────────────────────────────────────────────
+  // 'idle' = normal | 'out' = fading out before load
+  public chatTransition: 'idle' | 'out' = 'idle';
+  private switchPending = false;
+  // Getter so existing template binding still works
+  public get chatSwitchingOut(): boolean { return this.chatTransition === 'out'; }
+
+  // ─── New message animation ───────────────────────────────────────────────────
+  // ID of the most-recently-received/sent message — drives the pop-in CSS class.
+  // Cleared after the animation duration so the class doesn't stick.
+  public latestMessageId: number | null = null;
+  private latestMsgTimer: any;
+
+  // ─── Avatar / name caches ────────────────────────────────────────────────────
   private usersImageMap = new Map<number, string | null>();
   private usersNameMap = new Map<number, string>();
 
-  // Incoming-message sound
+  // ─── Chat list skeleton widths (randomised once) ─────────────────────────────
+  public chatSkelWidths = ['72%', '55%', '88%', '64%', '76%', '50%'];
+  public chatSkelSubWidths = ['48%', '60%', '38%', '52%', '44%', '58%'];
+
+  // ─── Receive sound ───────────────────────────────────────────────────────────
   private receiveAudio = new Audio('message-recive-sound.mp3');
 
   constructor(
@@ -91,24 +119,89 @@ export class Messenger implements OnInit, OnDestroy {
     public notification: NotificationService
   ) { }
 
-  // ─── Lifecycle ───────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Lifecycle
+  // ═══════════════════════════════════════════════════════════════════════════
 
   ngOnInit(): void {
-    // Grab our own user info from the JWT, then kick off the rest of startup
     this.userService.getDataFromToken().subscribe(x => {
       this.tokenData = x;
       this.build();
     });
   }
 
+  ngAfterViewInit(): void {
+    this.initStars();
+  }
+
   ngOnDestroy(): void {
-    // Always clean up the SignalR connection when we leave
+    if (this.starsAnimFrame) cancelAnimationFrame(this.starsAnimFrame);
+    clearTimeout(this.latestMsgTimer);
     this.hub.stopConnection()
       .then(() => console.log('SignalR disconnected'))
       .catch(err => console.error('SignalR disconnect error:', err));
   }
 
-  // ─── Startup ─────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Stars background
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  private initStars(): void {
+    const canvas = this.starsCanvasRef?.nativeElement;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    interface Star {
+      x: number; y: number;
+      r: number; opacity: number;
+      speed: number; twinkleSpeed: number; twinkleOffset: number;
+    }
+
+    const STAR_COUNT = 160;
+    let stars: Star[] = [];
+    let W = 0, H = 0;
+
+    const resize = () => {
+      W = canvas.width = canvas.offsetWidth;
+      H = canvas.height = canvas.offsetHeight;
+    };
+
+    const seed = () => {
+      stars = Array.from({ length: STAR_COUNT }, () => ({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 1.2 + 0.2,
+        opacity: Math.random() * 0.5 + 0.15,
+        speed: Math.random() * 0.012 + 0.003,
+        twinkleSpeed: Math.random() * 0.02 + 0.005,
+        twinkleOffset: Math.random() * Math.PI * 2,
+      }));
+    };
+
+    const draw = (t: number) => {
+      ctx.clearRect(0, 0, W, H);
+      for (const s of stars) {
+        const twinkle = Math.sin(t * s.twinkleSpeed + s.twinkleOffset) * 0.25;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${Math.max(0, s.opacity + twinkle)})`;
+        ctx.fill();
+        s.y -= s.speed;
+        if (s.y + s.r < 0) { s.y = H + s.r; s.x = Math.random() * W; }
+      }
+      this.starsAnimFrame = requestAnimationFrame(draw);
+    };
+
+    resize();
+    seed();
+    new ResizeObserver(() => { resize(); seed(); }).observe(canvas);
+    this.starsAnimFrame = requestAnimationFrame(draw);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Startup
+  // ═══════════════════════════════════════════════════════════════════════════
 
   private async build() {
     await this.fetchData();
@@ -148,14 +241,14 @@ export class Messenger implements OnInit, OnDestroy {
     });
   }
 
-  // ─── SignalR ─────────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SignalR
+  // ═══════════════════════════════════════════════════════════════════════════
 
   private async connectSignalR() {
     await this.hub.startConnection(this.token);
-    // Join the personal "chat-user" channel so we hear add/remove events
     await this.hub.joinChatUsers(this.userData.id);
 
-    // Someone added us to a chat — update the sidebar list
     this.hub.onAddUser(data => {
       const updated = [...this.userChats$.value, data].sort((a, b) => a.id - b.id);
       this.userChats$.next(updated);
@@ -163,34 +256,30 @@ export class Messenger implements OnInit, OnDestroy {
       this.notification.success(`You were added to "${data.name}"!`);
     });
 
-    // We were removed from a chat — drop it from the sidebar
     this.hub.onRemoveUser(data => {
       this.userChats$.next(this.userChats$.value.filter(x => x.id !== data.id));
       this.applyFilter();
     });
 
-    // A new message arrived in the active chat
     this.hub.onCreateMessage(data => {
       const mapped = this.mapMessage(data);
       this.selectedChatMessages$.next([...this.selectedChatMessages$.value, mapped]);
-
-      // Play a subtle receive sound for messages from other people
       if (!mapped.isWriter) {
         this.receiveAudio.currentTime = 0;
         this.receiveAudio.volume = 0.4;
         this.receiveAudio.play().catch(() => { });
       }
+      // Trigger the new-message pop-in animation
+      this._flashLatestMessage(mapped.id);
       this.scrollToBottom();
     });
 
-    // A message was deleted — remove it from the local list
     this.hub.onDeleteMessage(data => {
       this.selectedChatMessages$.next(
         this.selectedChatMessages$.value.filter(m => m.id !== data.id)
       );
     });
 
-    // A message was edited — swap in the updated content
     this.hub.onEditMessage(data => {
       const updated = this.selectedChatMessages$.value.map(m =>
         m.id === data.id ? { ...m, content: data.content } : m
@@ -199,13 +288,34 @@ export class Messenger implements OnInit, OnDestroy {
     });
   }
 
-  // ─── Chat selection ───────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Chat selection — with switch animation
+  // ═══════════════════════════════════════════════════════════════════════════
 
   public selectChat(id: number) {
-    this.closeAddUserPanel();
-    this.closePanelMobile(); // close the sidebar drawer on mobile after picking a chat
+    if (this.switchPending) return;
 
-    // Reset everything so the skeleton shows while the new chat loads
+    this.closeAddUserPanel();
+    this.closePanelMobile();
+
+    // If content is visible, play out-animation first, then load
+    const hasContent = (this.selectedChatMessages$.value.length > 0 || this.selectedChat) && !this.chatLoading;
+
+    if (hasContent) {
+      this.switchPending = true;
+      this.chatTransition = 'out';
+      setTimeout(() => {
+        this.switchPending = false;
+        this._loadChat(id);
+      }, SWITCH_OUT_MS);
+    } else {
+      this._loadChat(id);
+    }
+  }
+
+  private _loadChat(id: number) {
+    // Reset to idle so the wrapper isn't animated while the skeleton shows
+    this.chatTransition = 'idle';
     this.chatLoading = true;
     this.selectedChat = null;
     this.selectedChatMessages$.next([]);
@@ -214,30 +324,25 @@ export class Messenger implements OnInit, OnDestroy {
 
     this.chatService.GetChatById(id).subscribe(chat => {
       this.selectedChat = chat;
-      // Leave the previous SignalR chat group and join the new one
       this.hub.leaveChat(chat.id);
       this.hub.joinChat(chat.id);
 
-      // Preload avatars & names for everyone in this chat
       this.chatUserService.GetUsersInChat(chat.id).subscribe(users => {
         users.forEach(u => {
           this.usersImageMap.set(u.id, u.profileImageUrl ?? null);
           this.usersNameMap.set(u.id, u.name);
         });
 
-        // Fetch the message history
         this.chatService.GetChatMessages(chat.id).subscribe(messages => {
-          this.selectedChatMessages$.next(
-            messages.map(x => this.mapMessage(x))
-          );
+          this.selectedChatMessages$.next(messages.map(x => this.mapMessage(x)));
           this.chatLoading = false;
+
           this.scrollToBottom();
         });
       });
     });
   }
 
-  // Normalise a raw message from the server into our local shape
   private mapMessage(data: MessageInterface): MessageInterface {
     return {
       ...data,
@@ -246,9 +351,10 @@ export class Messenger implements OnInit, OnDestroy {
     };
   }
 
-  // ─── Message display helpers ─────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Message display helpers
+  // ═══════════════════════════════════════════════════════════════════════════
 
-  /** Show the sender's name above the first bubble in a consecutive group */
   shouldShowSender(messages: MessageInterface[], index: number): boolean {
     const current = messages[index];
     if (current.isWriter) return false;
@@ -256,7 +362,6 @@ export class Messenger implements OnInit, OnDestroy {
     return messages[index - 1].userId !== current.userId;
   }
 
-  /** Show the avatar only on the last bubble of a consecutive group */
   shouldShowAvatar(messages: MessageInterface[], index: number): boolean {
     const current = messages[index];
     if (current.isWriter) return false;
@@ -271,17 +376,12 @@ export class Messenger implements OnInit, OnDestroy {
   getUserName(message: MessageInterface): string {
     const fromMap = this.usersNameMap.get(message.userId);
     if (fromMap) return fromMap;
-
     if (message.userName) return message.userName;
-
-    // Lazily fetch the user if we somehow don't have them cached yet
     this.userService.getUserById(message.userId).subscribe(u => {
       this.usersNameMap.set(u.id, u.name);
       this.usersImageMap.set(u.id, u.profileImageUrl ?? null);
-      // Nudge the stream to trigger a re-render with the now-resolved name
       this.selectedChatMessages$.next([...this.selectedChatMessages$.value]);
     });
-
     return '…';
   }
 
@@ -289,7 +389,9 @@ export class Messenger implements OnInit, OnDestroy {
     return this.getUserName(message).charAt(0).toUpperCase();
   }
 
-  // ─── Chat list search ─────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Chat list search
+  // ═══════════════════════════════════════════════════════════════════════════
 
   onSearch(event: Event) {
     this.searchTerm = (event.target as HTMLInputElement).value;
@@ -303,11 +405,12 @@ export class Messenger implements OnInit, OnDestroy {
     );
   }
 
-  // ─── Sending messages ─────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Sending messages
+  // ═══════════════════════════════════════════════════════════════════════════
 
   public sendMessage() {
     if (!this.selectedChat || !this.newMessage.trim()) return;
-
     if (this.isSending) {
       this.notification.error('Slow down — wait for the previous message to send.');
       return;
@@ -321,25 +424,20 @@ export class Messenger implements OnInit, OnDestroy {
     };
 
     this.messageService.CreateMessage(payload).subscribe({
-      next: () => {
-        this.newMessage = '';
-        this.isSending = false;
-      },
-      error: err => {
-        console.error(err);
-        this.isSending = false;
-      },
+      next: () => { this.newMessage = ''; this.isSending = false; },
+      error: err => { console.error(err); this.isSending = false; },
     });
 
     this.scrollToBottom();
   }
 
-  // ─── Inline editing ───────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Inline editing
+  // ═══════════════════════════════════════════════════════════════════════════
 
   public startEdit(message: MessageInterface) {
     this.editingMessageId = message.id;
     this.editContent = message.content;
-    // Focus the textarea and move the cursor to the end
     setTimeout(() => {
       const el = document.getElementById(`edit-input-${message.id}`) as HTMLTextAreaElement;
       if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
@@ -354,7 +452,6 @@ export class Messenger implements OnInit, OnDestroy {
   public saveEdit(messageId: number) {
     const content = this.editContent.trim();
     if (!content) return;
-
     this.messageService.EditMessage({ id: messageId, content, userId: this.tokenData.id }).subscribe({
       next: updated => {
         const msgs = this.selectedChatMessages$.value.map(m =>
@@ -386,11 +483,13 @@ export class Messenger implements OnInit, OnDestroy {
     });
   }
 
-  // ─── Create chat modal ────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Create chat modal — with close animation
+  // ═══════════════════════════════════════════════════════════════════════════
 
   openCreateChatModal() {
+    this.createChatModalClosing = false;
     this.showCreateChatModal = true;
-    // Reset every field so the modal feels fresh each time
     this.createChatName = '';
     this.createChatHasPassword = false;
     this.createChatPassword = '';
@@ -400,11 +499,15 @@ export class Messenger implements OnInit, OnDestroy {
   }
 
   closeCreateChatModal() {
-    this.showCreateChatModal = false;
+    if (this.createChatModalClosing) return;
+    this.createChatModalClosing = true;
     clearTimeout(this.createChatDebounce);
+    setTimeout(() => {
+      this.showCreateChatModal = false;
+      this.createChatModalClosing = false;
+    }, CLOSE_ANIM_MS);
   }
 
-  /** Debounced user search inside the "create chat" modal */
   onCreateChatUserSearch(event: Event) {
     this.createChatUserSearch = (event.target as HTMLInputElement).value;
     clearTimeout(this.createChatDebounce);
@@ -422,7 +525,6 @@ export class Messenger implements OnInit, OnDestroy {
           }
           forkJoin(tokens.map(t => this.userService.getUserById(t.id))).subscribe({
             next: users => {
-              // Exclude ourselves from the list — no point adding the creator twice
               this.createChatUserResults = users.filter(u => u.id !== this.userData.id);
               this.createChatUserSearching = false;
             },
@@ -440,7 +542,6 @@ export class Messenger implements OnInit, OnDestroy {
     } else {
       this.createChatSelected.set(user.id, user);
     }
-    // Replace the map reference so Angular change detection picks it up
     this.createChatSelected = new Map(this.createChatSelected);
   }
 
@@ -472,55 +573,45 @@ export class Messenger implements OnInit, OnDestroy {
     this.chatService.CreateChat(payload as any).subscribe({
       next: newChat => {
         this.notification.success('Chat created!');
+        const updated = [...this.userChats$.value, newChat].sort((a, b) => a.id - b.id);
+        this.userChats$.next(updated);
+        this.applyFilter();
 
-        // Add the creator as the first member
-        this.chatUserService.AddChatUser({ userId: newChat.createdByUserId, chatId: newChat.id }).subscribe({
-          next: () => {
-            const updated = [...this.userChats$.value, newChat].sort((a, b) => a.id - b.id);
-            this.userChats$.next(updated);
-            this.applyFilter();
+        const invitees = Array.from(this.createChatSelected.values());
+        if (!invitees.length) {
+          this.createChatCreating = false;
+          this.closeCreateChatModal();
+          return;
+        }
 
-            // Now add everyone the user selected during creation
-            const invitees = Array.from(this.createChatSelected.values());
-            if (!invitees.length) {
-              this.createChatCreating = false;
-              this.closeCreateChatModal();
-              return;
+        let done = 0, failed = 0;
+        invitees.forEach(user => {
+          this.chatUserService.AddChatUser({ userId: user.id, chatId: newChat.id }).subscribe({
+            next: () => {
+              done++;
+              if (done + failed === invitees.length) {
+                this.createChatCreating = false;
+                if (failed) this.notification.error(`${failed} invite${failed > 1 ? 's' : ''} failed.`);
+                this.closeCreateChatModal();
+              }
+            },
+            error: () => {
+              failed++;
+              if (done + failed === invitees.length) {
+                this.createChatCreating = false;
+                if (failed) this.notification.error(`${failed} invite${failed > 1 ? 's' : ''} failed.`);
+                this.closeCreateChatModal();
+              }
             }
-
-            let done = 0;
-            let failed = 0;
-            invitees.forEach(user => {
-              this.chatUserService.AddChatUser({ userId: user.id, chatId: newChat.id }).subscribe({
-                next: () => {
-                  done++;
-                  if (done + failed === invitees.length) {
-                    this.createChatCreating = false;
-                    if (failed) this.notification.error(`${failed} invite${failed > 1 ? 's' : ''} failed.`);
-                    this.closeCreateChatModal();
-                  }
-                },
-                error: () => {
-                  failed++;
-                  if (done + failed === invitees.length) {
-                    this.createChatCreating = false;
-                    if (failed) this.notification.error(`${failed} invite${failed > 1 ? 's' : ''} failed.`);
-                    this.closeCreateChatModal();
-                  }
-                }
-              });
-            });
-          }
+          });
         });
-      },
-      error: () => {
-        this.notification.error('Failed to create chat.');
-        this.createChatCreating = false;
-      },
+      }
     });
   }
 
-  // ─── Chat settings ────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Chat settings
+  // ═══════════════════════════════════════════════════════════════════════════
 
   chatSettingsSwal() {
     if (!this.selectedChat) return;
@@ -565,10 +656,13 @@ export class Messenger implements OnInit, OnDestroy {
     });
   }
 
-  // ─── Add-people panel (inside open chat) ─────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Add-people panel — with close animation
+  // ═══════════════════════════════════════════════════════════════════════════
 
   openAddUserPanel() {
     if (!this.selectedChat) return;
+    this.addUserPanelClosing = false;
     this.showAddUserPanel = true;
     this.addUserSearch = '';
     this.addUserResults = [];
@@ -576,11 +670,16 @@ export class Messenger implements OnInit, OnDestroy {
   }
 
   closeAddUserPanel() {
-    this.showAddUserPanel = false;
-    this.addUserSearch = '';
-    this.addUserResults = [];
-    this.addUserSelected.clear();
+    if (!this.showAddUserPanel || this.addUserPanelClosing) return;
+    this.addUserPanelClosing = true;
     clearTimeout(this.addUserDebounce);
+    setTimeout(() => {
+      this.showAddUserPanel = false;
+      this.addUserPanelClosing = false;
+      this.addUserSearch = '';
+      this.addUserResults = [];
+      this.addUserSelected.clear();
+    }, CLOSE_ANIM_MS);
   }
 
   onAddUserSearch(event: Event) {
@@ -599,10 +698,7 @@ export class Messenger implements OnInit, OnDestroy {
             return;
           }
           forkJoin(tokens.map(t => this.userService.getUserById(t.id))).subscribe({
-            next: users => {
-              this.addUserResults = users;
-              this.addUserSearching = false;
-            },
+            next: users => { this.addUserResults = users; this.addUserSearching = false; },
             error: () => { this.addUserSearching = false; }
           });
         },
@@ -634,13 +730,11 @@ export class Messenger implements OnInit, OnDestroy {
     this.addUserAdding = true;
     const chatId = this.selectedChat.id;
     const users = Array.from(this.addUserSelected.values());
-    let done = 0;
-    let failed = 0;
+    let done = 0, failed = 0;
 
     users.forEach(user => {
       this.chatUserService.AddChatUser({ userId: user.id, chatId }).subscribe({
         next: () => {
-          // Cache the new member locally so their name/avatar shows right away
           this.usersNameMap.set(user.id, user.name);
           this.usersImageMap.set(user.id, user.profileImageUrl ?? null);
           done++;
@@ -661,7 +755,9 @@ export class Messenger implements OnInit, OnDestroy {
     this.closeAddUserPanel();
   }
 
-  // ─── Leave chat ───────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Leave chat
+  // ═══════════════════════════════════════════════════════════════════════════
 
   quitFromChatSwal(id: number) {
     Swal.fire({
@@ -674,13 +770,10 @@ export class Messenger implements OnInit, OnDestroy {
       confirmButtonText: 'Yes, quit',
     }).then(result => {
       if (!result.isConfirmed) return;
-
-      // If we're leaving the currently open chat, clear it immediately
       if (id === this.selectedChat?.id) {
         this.selectedChat = null;
         this.selectedChatMessages$.next([]);
       }
-
       this.chatUserService.RemoveChatUser({ userId: this.tokenData.id, chatId: id }).subscribe({
         next: () => this.notification.success('You left the chat.'),
         error: () => this.notification.error('Something went wrong.'),
@@ -688,27 +781,48 @@ export class Messenger implements OnInit, OnDestroy {
     });
   }
 
-  // ─── Mobile sidebar drawer ────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Mobile sidebar — with close animation
+  // ═══════════════════════════════════════════════════════════════════════════
 
   openPanelMobile() {
+    this.panelClosing = false;
     this.panelOpen = true;
   }
 
   closePanelMobile() {
-    this.panelOpen = false;
+    if (!this.panelOpen || this.panelClosing) return;
+    this.panelClosing = true;
+    setTimeout(() => {
+      this.panelOpen = false;
+      this.panelClosing = false;
+    }, CLOSE_ANIM_MS);
   }
 
-  // ─── Scroll helpers ───────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════════════
+  // New-message animation helper
+  // ═══════════════════════════════════════════════════════════════════════════
 
-  /** Listen to the messages container's scroll position and toggle the FAB */
+  private _flashLatestMessage(id: number) {
+    clearTimeout(this.latestMsgTimer);
+    this.latestMessageId = id;
+    // CSS animation is 320ms max — clear after to avoid the class persisting
+    // if the user scrolls back up and the element re-enters the DOM
+    this.latestMsgTimer = setTimeout(() => {
+      this.latestMessageId = null;
+    }, 400);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Scroll helpers
+  // ═══════════════════════════════════════════════════════════════════════════
+
   onMessagesScroll(event: Event) {
     const el = event.target as HTMLDivElement;
-    // Show the button when the user has scrolled more than 150px from the bottom
     const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
     this.showScrollToBottom = distanceFromBottom > 150;
   }
 
-  /** Programmatically jump to the latest messages */
   public scrollToBottom() {
     setTimeout(() => {
       const container = this.messagesContainerRef?.nativeElement
