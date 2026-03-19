@@ -3,7 +3,7 @@
 
     <!-- ─── CANVAS GLOBE ────────────────────────────────────── -->
     <div class="globe-scene" aria-hidden="true">
-        <canvas #globeCanvas class="globe-canvas"></canvas>
+        <canvas #globeCanvas class="globe-canvas" [class.globe-exit]="isLeaving"></canvas>
         <div class="hero-fade"></div>
     </div>
 

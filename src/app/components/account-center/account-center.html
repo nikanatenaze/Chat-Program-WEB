@@ -3,7 +3,7 @@
     <canvas #starsCanvas class="stars-canvas"></canvas>
     <div class="glow-blob"></div>
 
-    <div class="ac-shell">
+    <div class="ac-shell shell-ready">
         <aside class="sidebar">
             <div class="sidebar-top">
                 <div class="av-ring">
@@ -48,25 +48,20 @@
 
         <main class="content-area">
 
+            <!-- PROFILE PAGE -->
             <ng-container *ngIf="activePage === 'profile'">
                 <ng-container *ngIf="!loading; else loader">
                     <div class="page">
-
                         <div class="pg-badge">
                             <i class="fa-solid fa-circle-user"></i> Profile
                         </div>
                         <div class="pg-title">Profile Details</div>
-                        <div class="pg-desc">
-                            Update your name, email and profile photo.
-                        </div>
+                        <div class="pg-desc">Update your name, email and profile photo.</div>
 
-                        <!-- Avatar upload card -->
                         <div class="avatar-section">
                             <div class="av-big">
                                 <img *ngIf="avatarPreview" [src]="avatarPreview" class="av-img-big" alt="Profile" />
-                                <div *ngIf="!avatarPreview" class="av-big-initials">
-                                    {{ nameInitial }}
-                                </div>
+                                <div *ngIf="!avatarPreview" class="av-big-initials">{{ nameInitial }}</div>
                                 <label for="av-input" class="av-upload-overlay">
                                     <i class="fa-solid fa-camera"></i>
                                 </label>
@@ -93,7 +88,6 @@
 
                         <form [formGroup]="updateForm" (ngSubmit)="saveChanges()">
                             <div class="fields">
-
                                 <div class="field">
                                     <label>Username</label>
                                     <input formControlName="name" type="text" placeholder="Your username" />
@@ -103,7 +97,6 @@
                                         Username must be 3–20 characters.
                                     </span>
                                 </div>
-
                                 <div class="field">
                                     <label>Email Address</label>
                                     <input formControlName="email" type="email" placeholder="your@email.com" />
@@ -113,7 +106,6 @@
                                         Please enter a valid email address.
                                     </span>
                                 </div>
-
                             </div>
 
                             <div class="form-footer">
@@ -125,7 +117,6 @@
                                 </button>
                             </div>
                         </form>
-
                     </div>
                 </ng-container>
             </ng-container>
@@ -133,14 +124,9 @@
             <!-- APPEARANCE PAGE -->
             <ng-container *ngIf="activePage === 'appearance'">
                 <div class="page">
-                    <div class="pg-badge">
-                        <i class="fa-solid fa-palette"></i> Appearance
-                    </div>
+                    <div class="pg-badge"><i class="fa-solid fa-palette"></i> Appearance</div>
                     <div class="pg-title">Client Appearance</div>
-                    <div class="pg-desc">
-                        Personalise your language and theme preferences.
-                    </div>
-
+                    <div class="pg-desc">Personalise your language and theme preferences.</div>
                     <div class="fields">
                         <div class="field">
                             <label>Language</label>
@@ -159,11 +145,8 @@
                             </select>
                         </div>
                     </div>
-
                     <div class="form-footer">
-                        <button class="btn btn-primary">
-                            <i class="fa-solid fa-check"></i> Apply
-                        </button>
+                        <button class="btn btn-primary"><i class="fa-solid fa-check"></i> Apply</button>
                     </div>
                 </div>
             </ng-container>
@@ -171,13 +154,9 @@
             <!-- SETTINGS PAGE -->
             <ng-container *ngIf="activePage === 'settings'">
                 <div class="page">
-                    <div class="pg-badge">
-                        <i class="fa-solid fa-gears"></i> Settings
-                    </div>
+                    <div class="pg-badge"><i class="fa-solid fa-gears"></i> Settings</div>
                     <div class="pg-title">Basic Settings</div>
-                    <div class="pg-desc">
-                        Manage notifications, security and account actions.
-                    </div>
+                    <div class="pg-desc">Manage notifications, security and account actions.</div>
 
                     <div class="settings-card">
                         <div class="s-row">
@@ -212,16 +191,13 @@
                         </div>
                     </div>
 
-                    <!-- Danger Zone -->
                     <div class="danger-zone">
                         <div class="dz-header">
                             <i class="fa-solid fa-triangle-exclamation" style="color:#f87171;font-size:13px;"></i>
                             <span class="dz-title">Danger Zone</span>
                         </div>
-                        <div class="dz-desc">
-                            These actions are permanent and cannot be reversed.
-                            Please proceed with caution.
-                        </div>
+                        <div class="dz-desc">These actions are permanent and cannot be reversed. Please proceed with
+                            caution.</div>
                         <div class="dz-btns">
                             <button class="btn btn-ghost" (click)="logout()">
                                 <i class="fa-solid fa-right-from-bracket"></i> Logout
@@ -231,13 +207,140 @@
                             </button>
                         </div>
                     </div>
-
                 </div>
             </ng-container>
 
         </main>
     </div>
 </section>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--  CUSTOM MODALS                                          -->
+<!-- ═══════════════════════════════════════════════════════ -->
+
+<!-- SAVE CHANGES CONFIRM MODAL -->
+<div class="modal-backdrop" [class.modal-open]="modalSaveOpen" (click)="closeSaveModal()">
+    <div class="modal-box modal-confirm" (click)="$event.stopPropagation()" [class.modal-box-in]="modalSaveOpen">
+        <div class="modal-icon modal-icon-indigo">
+            <i class="fa-solid fa-floppy-disk"></i>
+        </div>
+        <div class="modal-title">Save Profile?</div>
+        <div class="modal-desc">Your profile details will be updated immediately.</div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" (click)="closeSaveModal()">Cancel</button>
+            <button class="btn btn-primary" (click)="confirmSave()">
+                <i class="fa-solid fa-check"></i> Save it
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- CHANGE PASSWORD MODAL -->
+<div class="modal-backdrop" [class.modal-open]="modalPassOpen" (click)="closePassModal()">
+    <div class="modal-box modal-form" (click)="$event.stopPropagation()" [class.modal-box-in]="modalPassOpen">
+        <div class="modal-header-row">
+            <div class="modal-icon modal-icon-indigo modal-icon-sm">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <div>
+                <div class="modal-title modal-title-sm">Change Password</div>
+                <div class="modal-desc modal-desc-sm">Choose a strong, unique password.</div>
+            </div>
+        </div>
+
+        <div class="modal-fields">
+            <div class="mfield">
+                <label>Current Password</label>
+                <div class="pw-wrap">
+                    <input [type]="showCur ? 'text' : 'password'" [(ngModel)]="passForm.current"
+                        placeholder="Enter current password" class="mfield-input" />
+                    <button type="button" class="pw-eye" (click)="showCur = !showCur">
+                        <i [class]="showCur ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="mfield">
+                <label>New Password</label>
+                <div class="pw-wrap">
+                    <input [type]="showNew ? 'text' : 'password'" [(ngModel)]="passForm.newPass"
+                        placeholder="Min {{ minPasLen }} characters" class="mfield-input" />
+                    <button type="button" class="pw-eye" (click)="showNew = !showNew">
+                        <i [class]="showNew ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"></i>
+                    </button>
+                </div>
+                <!-- strength bar -->
+                <div class="strength-bar" *ngIf="passForm.newPass">
+                    <div class="strength-track">
+                        <div class="strength-fill" [style.width.%]="passStrengthPct"
+                            [class]="'strength-' + passStrengthLabel"></div>
+                    </div>
+                    <span class="strength-label" [class]="'strength-' + passStrengthLabel">{{ passStrengthLabel
+                        }}</span>
+                </div>
+            </div>
+            <div class="mfield">
+                <label>Confirm New Password</label>
+                <div class="pw-wrap">
+                    <input [type]="showConf ? 'text' : 'password'" [(ngModel)]="passForm.confirm"
+                        placeholder="Repeat new password" class="mfield-input"
+                        [class.mfield-mismatch]="passForm.confirm && passForm.newPass !== passForm.confirm" />
+                    <button type="button" class="pw-eye" (click)="showConf = !showConf">
+                        <i [class]="showConf ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"></i>
+                    </button>
+                </div>
+                <span class="field-err" *ngIf="passForm.confirm && passForm.newPass !== passForm.confirm">
+                    <i class="fa-solid fa-circle-exclamation"></i> Passwords do not match.
+                </span>
+            </div>
+            <span class="field-err" *ngIf="passModalError">
+                <i class="fa-solid fa-circle-exclamation"></i> {{ passModalError }}
+            </span>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn btn-ghost" (click)="closePassModal()">Cancel</button>
+            <button class="btn btn-primary" (click)="confirmChangePassword()">
+                <i class="fa-solid fa-key"></i> Update Password
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- DELETE ACCOUNT MODAL -->
+<div class="modal-backdrop modal-backdrop-danger" [class.modal-open]="modalDeleteOpen" (click)="closeDeleteModal()">
+    <div class="modal-box modal-form" (click)="$event.stopPropagation()" [class.modal-box-in]="modalDeleteOpen">
+        <div class="modal-icon modal-icon-danger">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div class="modal-title">Delete Account?</div>
+        <div class="modal-desc" style="color:#f87171;">
+            This action is <strong>permanent</strong> and cannot be undone. All your data will be erased.
+        </div>
+
+        <div class="modal-fields">
+            <div class="mfield">
+                <label>Confirm with your password</label>
+                <div class="pw-wrap">
+                    <input [type]="showDelPass ? 'text' : 'password'" [(ngModel)]="deletePassword"
+                        placeholder="Enter your password" class="mfield-input mfield-danger" />
+                    <button type="button" class="pw-eye" (click)="showDelPass = !showDelPass">
+                        <i [class]="showDelPass ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"></i>
+                    </button>
+                </div>
+            </div>
+            <span class="field-err" *ngIf="deleteModalError">
+                <i class="fa-solid fa-circle-exclamation"></i> {{ deleteModalError }}
+            </span>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn btn-ghost" (click)="closeDeleteModal()">Cancel</button>
+            <button class="btn btn-soft-danger" (click)="confirmDeleteUser()">
+                <i class="fa-solid fa-trash"></i> Delete my account
+            </button>
+        </div>
+    </div>
+</div>
 
 <!-- Loader template -->
 <ng-template #loader>

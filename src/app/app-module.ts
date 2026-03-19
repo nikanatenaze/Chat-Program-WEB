@@ -24,6 +24,7 @@ import { Messenger } from './components/messenger/messenger';
 import { TestComponent } from './components/test.component/test.component';
 import { AuthInterceptor } from './classes/auth-interceptor.class';
 import { ProjectInfoComponent } from './components/project-info.component/project-info.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -52,6 +53,7 @@ import { ProjectInfoComponent } from './components/project-info.component/projec
     ReactiveFormsModule,
     FormsModule,
     CommonModule,
+    BrowserAnimationsModule,
     SweetAlert2Module.forRoot(),
   ],
   providers: [

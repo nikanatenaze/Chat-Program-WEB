@@ -3,13 +3,11 @@ import { UserInterface } from '../../interfaces/user.interface';
 import { User } from '../../services/user';
 import { TokenModelInterface } from '../../interfaces/token-model.interface';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import Swal from 'sweetalert2';
 import { Auth } from '../../services/auth';
 import { Router } from '@angular/router';
 import { GlobalData } from '../../classes/global-data';
 import { finalize } from 'rxjs';
 import { NotificationService } from '../../services/notification.service';
-import { GlobalMethods } from '../../classes/global-methods';
 
 @Component({
   selector: 'app-account-center',
@@ -29,7 +27,24 @@ export class AccountCenter implements OnInit, AfterViewInit {
   activePage = 'profile';
   minPasLen = GlobalData.PASSWORD_MIN_LENGTH;
 
-  // bg props
+  // ── Modal state ────────────────────────────────────────────────
+  modalSaveOpen = false;
+  modalPassOpen = false;
+  modalDeleteOpen = false;
+
+  // Password modal fields
+  passForm = { current: '', newPass: '', confirm: '' };
+  showCur = false;
+  showNew = false;
+  showConf = false;
+  passModalError = '';
+
+  // Delete modal fields
+  deletePassword = '';
+  showDelPass = false;
+  deleteModalError = '';
+
+  // ── bg props ───────────────────────────────────────────────────
   private ctx!: CanvasRenderingContext2D;
   private raf = 0;
 
@@ -62,8 +77,25 @@ export class AccountCenter implements OnInit, AfterViewInit {
     return this.displayName ? this.displayName.charAt(0).toUpperCase() : '?';
   }
 
-  get displayAvatarSrc(): string {
-    return this.avatarPreview ?? this.DEFAULT_AVATAR;
+  // ── Password strength ──────────────────────────────────────────
+  get passStrengthPct(): number {
+    const p = this.passForm.newPass;
+    if (!p) return 0;
+    let score = 0;
+    if (p.length >= 8) score += 25;
+    if (p.length >= 12) score += 15;
+    if (/[A-Z]/.test(p)) score += 20;
+    if (/[0-9]/.test(p)) score += 20;
+    if (/[^A-Za-z0-9]/.test(p)) score += 20;
+    return Math.min(score, 100);
+  }
+
+  get passStrengthLabel(): string {
+    const pct = this.passStrengthPct;
+    if (pct <= 25) return 'weak';
+    if (pct <= 50) return 'fair';
+    if (pct <= 75) return 'good';
+    return 'strong';
   }
 
   constructor(
@@ -72,7 +104,7 @@ export class AccountCenter implements OnInit, AfterViewInit {
     public router: Router,
     public notifi: NotificationService,
   ) { }
-  
+
   ngAfterViewInit(): void {
     this.setupCanvas();
     this.loop();
@@ -90,14 +122,9 @@ export class AccountCenter implements OnInit, AfterViewInit {
             next: (user: UserInterface) => {
               this.updateForm.patchValue({ name: user.name, email: user.email });
               this.userData = user;
-
-              // Set sidebar display values from server data
               this.displayName = user.name;
               this.displayEmail = user.email;
-
-              if (user.profileImageUrl) {
-                this.avatarPreview = user.profileImageUrl;
-              }
+              if (user.profileImageUrl) this.avatarPreview = user.profileImageUrl;
             },
           });
       },
@@ -108,7 +135,7 @@ export class AccountCenter implements OnInit, AfterViewInit {
     this.activePage = page;
   }
 
-  // Form
+  // ── Form ───────────────────────────────────────────────────────
 
   buildForm(): void {
     this.updateForm = new FormGroup({
@@ -124,83 +151,84 @@ export class AccountCenter implements OnInit, AfterViewInit {
     });
   }
 
+  // ── Save Changes ───────────────────────────────────────────────
+
   saveChanges(): void {
     if (this.updateForm.invalid) {
       this.updateForm.markAllAsTouched();
       this.notifi.error('Please fix the errors before saving.');
       return;
     }
+    this.modalSaveOpen = true;
+  }
 
-    Swal.fire({
-      text: 'Your profile details will be updated.',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#6366f1',
-      cancelButtonColor: '#374151',
-      confirmButtonText: 'Save it',
-    }).then(result => {
-      if (!result.isConfirmed) return;
+  closeSaveModal(): void {
+    this.modalSaveOpen = false;
+  }
 
-      const form = this.updateForm.getRawValue();
-      this.userService.updateUser(form).subscribe({
-        next: () => {
-          // Only update sidebar after server confirms success
-          this.displayName = this.updateForm.get('name')?.value;
-          this.displayEmail = this.updateForm.get('email')?.value;
-          this.notifi.success('Profile updated successfully!');
-        },
-        error: err => {
-          this.notifi.error(`Update failed: ${err?.error?.message ?? err.error}`);
-        },
-      });
+  confirmSave(): void {
+    this.modalSaveOpen = false;
+    const form = this.updateForm.getRawValue();
+    this.userService.updateUser(form).subscribe({
+      next: () => {
+        this.displayName = this.updateForm.get('name')?.value;
+        this.displayEmail = this.updateForm.get('email')?.value;
+        this.notifi.success('Profile updated successfully!');
+      },
+      error: err => {
+        this.notifi.error(`Update failed: ${err?.error?.message ?? err.error}`);
+      },
     });
   }
+
+  // ── Change Password ────────────────────────────────────────────
 
   changePassword(): void {
-    Swal.fire({
-      title: 'Change Password',
-      html: `
-      <input id="swal-cur"  type="password" class="swal2-input" placeholder="Current password">
-      <input id="swal-new"  type="password" class="swal2-input" placeholder="New password (min ${this.minPasLen} chars)">
-      <input id="swal-conf" type="password" class="swal2-input" placeholder="Confirm new password">
-    `,
-      icon: 'info',
-      showCancelButton: true,
-      confirmButtonColor: '#6366f1',
-      cancelButtonColor: '#374151',
-      confirmButtonText: 'Update Password',
-      focusConfirm: false,
-      preConfirm: () => {
-        const cur = (document.getElementById('swal-cur') as HTMLInputElement).value;
-        const nw = (document.getElementById('swal-new') as HTMLInputElement).value;
-        const conf = (document.getElementById('swal-conf') as HTMLInputElement).value;
+    this.passForm = { current: '', newPass: '', confirm: '' };
+    this.showCur = false;
+    this.showNew = false;
+    this.showConf = false;
+    this.passModalError = '';
+    this.modalPassOpen = true;
+  }
 
-        if (!cur) { Swal.showValidationMessage('Current password is required.'); return false; }
-        if (nw.length < this.minPasLen) { Swal.showValidationMessage(`New password must be at least ${this.minPasLen} characters.`); return false; }
-        if (nw !== conf) { Swal.showValidationMessage('Passwords do not match.'); return false; }
+  closePassModal(): void {
+    this.modalPassOpen = false;
+  }
 
-        return { currentPassword: cur, newPassword: nw };
+  confirmChangePassword(): void {
+    this.passModalError = '';
+    const { current, newPass, confirm } = this.passForm;
+
+    if (!current) {
+      this.passModalError = 'Current password is required.';
+      return;
+    }
+    if (newPass.length < this.minPasLen) {
+      this.passModalError = `New password must be at least ${this.minPasLen} characters.`;
+      return;
+    }
+    if (newPass !== confirm) {
+      this.passModalError = 'Passwords do not match.';
+      return;
+    }
+
+    this.modalPassOpen = false;
+    this.userService.changePassword({ currentPassword: current, newPassword: newPass }).subscribe({
+      next: () => {
+        this.notifi.success('Password changed successfully!');
       },
-    }).then(result => {
-      if (!result.isConfirmed) return;
-
-      this.userService.changePassword(result.value).subscribe({
-        next: () => {
+      error: (err) => {
+        if (err.status === 200) {
           this.notifi.success('Password changed successfully!');
-        },
-        error: (err) => {
-          if (err.status === 200) {
-            this.notifi.success('Password changed successfully!');
-          } else {
-            const message = err?.error?.message || 'Failed to change password. Please try again.';
-            this.notifi.error(message);
-          }
+        } else {
+          this.notifi.error(err?.error?.message ?? 'Failed to change password. Please try again.');
         }
-      });
+      },
     });
   }
 
-  // Avatar
+  // ── Avatar ─────────────────────────────────────────────────────
 
   onAvatarSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -212,7 +240,6 @@ export class AccountCenter implements OnInit, AfterViewInit {
       input.value = '';
       return;
     }
-
     if (!file.type.startsWith('image/')) {
       this.notifi.error('Only image files are allowed.');
       input.value = '';
@@ -239,19 +266,18 @@ export class AccountCenter implements OnInit, AfterViewInit {
 
   removeAvatar(): void {
     this.userService.removeProfileImage().subscribe({
-      next: (res: any) => {
-        this.notifi.success("Successfuly removed profile picture!")
-        this.avatarPreview = this.userData?.profileImageUrl ?? null;
+      next: () => {
+        this.notifi.success('Profile picture removed!');
+        this.avatarPreview = null;
         this.avatarFile = null;
       },
       error: err => {
-
         this.notifi.error(`Remove failed: ${err?.error?.message ?? 'Unknown error'}`);
-      }
-    })
+      },
+    });
   }
 
-  // Settings
+  // ── Logout ─────────────────────────────────────────────────────
 
   logout(): void {
     this.auth.logout();
@@ -259,41 +285,40 @@ export class AccountCenter implements OnInit, AfterViewInit {
     this.router.navigate(['/']);
   }
 
-  deleteUser(): void {
-    Swal.fire({
-      title: 'Delete Account',
-      html: `
-      <p style="color:#ef4444; margin-bottom:12px;">This action is permanent and cannot be undone.</p>
-      <input id="swal-del-pass" type="password" class="swal2-input" placeholder="Enter your password to confirm">
-    `,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Delete my account',
-      confirmButtonColor: '#ef4444',
-      cancelButtonColor: '#374151',
-      focusConfirm: false,
-      preConfirm: () => {
-        const pass = (document.getElementById('swal-del-pass') as HTMLInputElement).value;
-        if (!pass) { Swal.showValidationMessage('Password is required to delete your account.'); return false; }
-        return { password: pass };
-      },
-    }).then(result => {
-      if (!result.isConfirmed || !result.value) return;
+  // ── Delete Account ─────────────────────────────────────────────
 
-      this.userService.deleteUser(result.value.password).subscribe({
-        next: () => {
-          this.notifi.success('Account deleted.');
-          this.auth.logout();
-          this.router.navigate(['/']);
-        },
-        error: err => {
-          this.notifi.error('Something went wrong.');
-        },
-      });
+  deleteUser(): void {
+    this.deletePassword = '';
+    this.showDelPass = false;
+    this.deleteModalError = '';
+    this.modalDeleteOpen = true;
+  }
+
+  closeDeleteModal(): void {
+    this.modalDeleteOpen = false;
+  }
+
+  confirmDeleteUser(): void {
+    this.deleteModalError = '';
+    if (!this.deletePassword) {
+      this.deleteModalError = 'Password is required to delete your account.';
+      return;
+    }
+
+    this.modalDeleteOpen = false;
+    this.userService.deleteUser(this.deletePassword).subscribe({
+      next: () => {
+        this.notifi.success('Account deleted.');
+        this.auth.logout();
+        this.router.navigate(['/']);
+      },
+      error: () => {
+        this.notifi.error('Something went wrong. Please try again.');
+      },
     });
   }
 
-  // bg methods
+  // ── Canvas / bg ────────────────────────────────────────────────
 
   private setupCanvas(): void {
     const canvas = this.canvasRef.nativeElement;
