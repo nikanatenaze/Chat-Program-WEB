@@ -25,6 +25,7 @@ import { TestComponent } from './components/test.component/test.component';
 import { AuthInterceptor } from './classes/auth-interceptor.class';
 import { ProjectInfoComponent } from './components/project-info.component/project-info.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ChatSettings } from './components/chat-settings/chat-settings';
 
 @NgModule({
   declarations: [
@@ -45,6 +46,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     Messenger,
     TestComponent,
     ProjectInfoComponent,
+    ChatSettings,
   ],
   imports: [
     BrowserModule,

@@ -106,7 +106,7 @@
                 <button class="header-btn" (click)="openAddUserPanel()" title="Add user">
                     <i class="fa-solid fa-user-plus"></i>
                 </button>
-                <button class="header-btn" (click)="chatSettingsSwal()" title="Chat settings">
+                <button class="header-btn" [routerLink]="['/chat-settings', selectedChat.id]" title="Chat settings">
                     <i class="fa-solid fa-gear"></i>
                 </button>
             </div>

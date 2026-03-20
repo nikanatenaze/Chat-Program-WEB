@@ -1,0 +1,1131 @@
+/* ═══════════════════════════════════════════════
+   CSS VARIABLES — mirrors messenger globals
+   ═══════════════════════════════════════════════ */
+:host {
+    --accent: #6366f1;
+    --accent-soft: rgba(99, 102, 241, 0.12);
+    --border: rgba(255, 255, 255, 0.07);
+    --border-mid: rgba(255, 255, 255, 0.11);
+    --text: #e8eaf2;
+    --sub: #9ca3bf;
+    --muted: #555e7a;
+    --danger: #ef4444;
+    --danger-soft: rgba(239, 68, 68, 0.1);
+    --green: #34d399;
+    --r-sm: 6px;
+    --r-md: 10px;
+    --r-lg: 12px;
+    --r-xl: 18px;
+}
+
+/* ═══════════════════════════════════════════════
+   BACKGROUND — same as messenger
+   ═══════════════════════════════════════════════ */
+.app-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: #02020a;
+    overflow: hidden;
+}
+
+.glow-blob {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 700px;
+    height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at center,
+            rgba(99, 102, 241, 0.09) 0%,
+            transparent 70%);
+    pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════
+   PAGE LAYOUT
+   ═══════════════════════════════════════════════ */
+.cs-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px 16px 60px;
+    font-family: "Oxygen", sans-serif;
+}
+
+/* ═══════════════════════════════════════════════
+   LOADER
+   ═══════════════════════════════════════════════ */
+.cs-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: 16px;
+    color: var(--sub);
+    font-size: 14px;
+}
+
+.cs-spinner {
+    width: 34px;
+    height: 34px;
+    border: 3px solid var(--border-mid);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: cs-spin 0.7s linear infinite;
+}
+
+.cs-spinner-sm {
+    width: 20px;
+    height: 20px;
+    border-width: 2px;
+}
+
+@keyframes cs-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ═══════════════════════════════════════════════
+   MAIN PANEL — glassmorphism card like messenger
+   ═══════════════════════════════════════════════ */
+.cs-panel {
+    width: 100%;
+    max-width: 580px;
+    background: rgba(22, 25, 37, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(28px);
+    border: 1px solid var(--border-mid);
+    border-radius: var(--r-xl);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(99, 102, 241, 0.06);
+    overflow: hidden;
+    animation: cs-panel-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes cs-panel-in {
+    from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ── Header ── */
+.cs-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid var(--border);
+}
+
+.cs-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cs-back-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--border-mid);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--sub);
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s, color .2s, transform .15s, border-color .2s;
+    flex-shrink: 0;
+}
+
+.cs-back-btn:hover {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-color: rgba(99, 102, 241, 0.3);
+    transform: scale(1.08);
+}
+
+.cs-back-btn:active {
+    transform: scale(0.94);
+}
+
+.cs-chat-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.cs-chat-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cs-chat-initials {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    border: 1.5px solid rgba(99, 102, 241, 0.35);
+    color: var(--accent);
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cs-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cs-chat-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+    letter-spacing: -0.2px;
+}
+
+.cs-member-count {
+    font-size: 12px;
+    color: var(--green);
+}
+
+/* ── Tabs ── */
+.cs-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 12px 14px 0;
+}
+
+.cs-tab {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 16px;
+    border-radius: var(--r-md) var(--r-md) 0 0;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: color .15s, background .15s;
+    position: relative;
+}
+
+.cs-tab:hover {
+    color: var(--sub);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.cs-tab-active {
+    color: var(--accent) !important;
+    background: var(--accent-soft) !important;
+    border: 1px solid rgba(99, 102, 241, 0.18);
+    border-bottom: none;
+}
+
+.cs-tab-badge {
+    background: rgba(99, 102, 241, 0.2);
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 10px;
+    line-height: 16px;
+}
+
+.cs-hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0;
+}
+
+/* ── Alerts ── */
+.cs-alert {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 14px 16px 0;
+    padding: 10px 13px;
+    border-radius: var(--r-md);
+    font-size: 13px;
+    font-weight: 500;
+    animation: cs-alert-in 0.22s ease;
+}
+
+@keyframes cs-alert-in {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.cs-alert-success {
+    background: rgba(52, 211, 153, 0.1);
+    border: 1px solid rgba(52, 211, 153, 0.22);
+    color: var(--green);
+}
+
+.cs-alert-error {
+    background: var(--danger-soft);
+    border: 1px solid rgba(239, 68, 68, 0.22);
+    color: var(--danger);
+}
+
+.cs-alert-close {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    opacity: 0.6;
+    font-size: 12px;
+    padding: 2px 4px;
+    transition: opacity .15s;
+}
+
+.cs-alert-close:hover {
+    opacity: 1;
+}
+
+/* ═══════════════════════════════════════════════
+   TAB CONTENT
+   ═══════════════════════════════════════════════ */
+.cs-tab-content {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    animation: cs-tab-in 0.2s ease;
+}
+
+@keyframes cs-tab-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── Sections ── */
+.cs-section {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cs-section:last-of-type {
+    border-bottom: none;
+}
+
+.cs-section-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--muted);
+    margin: 0;
+}
+
+.cs-section-label i {
+    font-size: 11px;
+    color: var(--accent);
+    opacity: 0.8;
+}
+
+/* ── Image upload ── */
+.cs-image-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.cs-avatar-wrap {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+}
+
+.cs-avatar-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border-mid);
+}
+
+.cs-avatar-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px dashed var(--border-mid);
+    color: var(--muted);
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cs-avatar-uploading {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(2, 2, 10, 0.65);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cs-image-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cs-image-hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0;
+}
+
+.cs-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    padding: 7px 14px;
+    border-radius: var(--r-md);
+    font-size: 12px;
+    font-weight: 700;
+    font-family: inherit;
+    transition: all .2s;
+    width: fit-content;
+}
+
+.cs-upload-btn:hover:not(.cs-btn-disabled) {
+    background: rgba(99, 102, 241, 0.22);
+    border-color: var(--accent);
+}
+
+.cs-btn-disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* ── Fields ── */
+.cs-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+}
+
+.cs-field-mt {
+    margin-top: 4px;
+}
+
+.cs-field-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--sub);
+}
+
+.cs-input {
+    height: 40px;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: var(--r-lg);
+    border: 1px solid var(--border-mid);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+    font-size: 13px;
+    font-family: inherit;
+    padding: 0 14px;
+    transition: border-color .2s, background .2s, box-shadow .2s;
+}
+
+.cs-input:focus {
+    outline: none;
+    border-color: rgba(99, 102, 241, 0.5);
+    background: rgba(99, 102, 241, 0.06);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.cs-input::placeholder {
+    color: var(--muted);
+}
+
+.cs-input-error {
+    border-color: rgba(239, 68, 68, 0.5) !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.cs-char-count {
+    align-self: flex-end;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: -2px;
+}
+
+.cs-field-err {
+    font-size: 11px;
+    color: var(--danger);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* ── Password toggle ── */
+.cs-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    cursor: pointer;
+    padding: 4px 0;
+    user-select: none;
+}
+
+.cs-toggle-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cs-toggle-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.cs-toggle-desc {
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.cs-toggle-track {
+    width: 36px;
+    height: 20px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-mid);
+    display: flex;
+    align-items: center;
+    padding: 0 3px;
+    flex-shrink: 0;
+    transition: background .2s, border-color .2s;
+}
+
+.cs-toggle-on {
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+}
+
+.cs-toggle-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    transition: transform .22s cubic-bezier(0.34, 1.5, 0.64, 1);
+}
+
+.cs-toggle-on .cs-toggle-thumb {
+    transform: translateX(16px);
+}
+
+/* Password fields reveal */
+.cs-pw-fields {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.35s ease, opacity 0.28s ease;
+}
+
+.cs-pw-visible {
+    max-height: 220px;
+    opacity: 1;
+}
+
+/* ── Save button ── */
+.cs-save-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 40px;
+    border-radius: var(--r-lg);
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: filter .2s, transform .1s, box-shadow .2s;
+}
+
+.cs-save-btn:hover:not(:disabled) {
+    filter: brightness(1.12);
+    transform: scale(1.01);
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
+}
+
+.cs-save-btn:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.cs-save-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ── Danger zone ── */
+.cs-danger-zone {
+    margin-top: 20px;
+    padding: 14px;
+    border-radius: var(--r-lg);
+    background: rgba(239, 68, 68, 0.06);
+    border: 1px solid rgba(239, 68, 68, 0.18);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cs-danger-label {
+    color: var(--danger) !important;
+}
+
+.cs-danger-label i {
+    color: var(--danger) !important;
+}
+
+.cs-danger-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.cs-danger-info {
+    flex: 1;
+}
+
+.cs-danger-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 3px;
+}
+
+.cs-danger-desc {
+    font-size: 11px;
+    color: var(--sub);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.cs-delete-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: var(--r-md);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: var(--danger-soft);
+    color: var(--danger);
+    font-size: 12px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background .15s, color .15s, border-color .15s, transform .1s;
+}
+
+.cs-delete-btn:hover:not(:disabled) {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+}
+
+.cs-delete-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.cs-delete-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ═══════════════════════════════════════════════
+   MEMBERS TAB
+   ═══════════════════════════════════════════════ */
+.cs-members-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+@keyframes cs-member-in {
+    from {
+        opacity: 0;
+        transform: translateX(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.cs-member-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 10px;
+    border-radius: var(--r-lg);
+    transition: background .15s, opacity .25s;
+    animation: cs-member-in 0.25s ease both;
+}
+
+.cs-member-row:nth-child(1) {
+    animation-delay: 0.00s;
+}
+
+.cs-member-row:nth-child(2) {
+    animation-delay: 0.04s;
+}
+
+.cs-member-row:nth-child(3) {
+    animation-delay: 0.08s;
+}
+
+.cs-member-row:nth-child(4) {
+    animation-delay: 0.12s;
+}
+
+.cs-member-row:nth-child(5) {
+    animation-delay: 0.16s;
+}
+
+.cs-member-row:nth-child(n+6) {
+    animation-delay: 0.18s;
+}
+
+.cs-member-row:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.cs-member-kicking {
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+.cs-member-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.cs-member-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.cs-member-initials {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    border: 1.5px solid rgba(99, 102, 241, 0.3);
+    color: var(--accent);
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cs-member-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cs-member-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cs-owner-badge {
+    font-size: 10px;
+    font-weight: 700;
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    padding: 1px 6px;
+    border-radius: 10px;
+    white-space: nowrap;
+}
+
+.cs-owner-badge i {
+    font-size: 9px;
+}
+
+.cs-you-badge {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    padding: 1px 6px;
+    border-radius: 10px;
+    white-space: nowrap;
+}
+
+.cs-member-email {
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cs-kick-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--border-mid);
+    background: transparent;
+    color: var(--muted);
+    font-size: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    opacity: 0;
+    transform: translateX(4px);
+    transition: background .15s, color .15s, border-color .15s,
+        opacity .15s, transform .15s;
+}
+
+.cs-member-row:hover .cs-kick-btn {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.cs-kick-btn:hover:not(:disabled) {
+    background: var(--danger-soft);
+    color: var(--danger);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.cs-kick-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.cs-members-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 40px 0;
+    color: var(--muted);
+}
+
+.cs-members-empty i {
+    font-size: 28px;
+    opacity: 0.5;
+}
+
+.cs-members-empty p {
+    margin: 0;
+    font-size: 13px;
+}
+
+/* ═══════════════════════════════════════════════
+   CONFIRM OVERLAYS (delete / kick) — same style
+   as messenger quit-confirm
+   ═══════════════════════════════════════════════ */
+@keyframes cs-overlay-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes cs-overlay-out {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+.cs-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 50;
+    animation: cs-overlay-in 0.18s ease forwards;
+}
+
+.cs-overlay-closing {
+    animation: cs-overlay-out 0.2s ease forwards !important;
+    pointer-events: none;
+}
+
+@keyframes cs-card-in {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, calc(-50% + 12px)) scale(0.94);
+    }
+
+    70% {
+        opacity: 1;
+        transform: translate(-50%, calc(-50% - 2px)) scale(1.01);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes cs-card-out {
+    from {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translate(-50%, calc(-50% + 10px)) scale(0.95);
+    }
+}
+
+.cs-confirm-card {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 340px;
+    background: rgba(14, 16, 24, 0.98);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    border: 1px solid var(--border-mid);
+    border-radius: var(--r-xl);
+    padding: 28px 24px;
+    z-index: 51;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(99, 102, 241, 0.08);
+    animation: cs-card-in 0.26s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+}
+
+.cs-confirm-closing {
+    animation: cs-card-out 0.2s ease forwards !important;
+    pointer-events: none;
+}
+
+.cs-confirm-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.cs-confirm-icon-danger {
+    background: var(--danger-soft);
+    border: 1px solid rgba(239, 68, 68, 0.22);
+    color: var(--danger);
+}
+
+.cs-confirm-icon-kick {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.22);
+    color: #f59e0b;
+}
+
+.cs-confirm-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text);
+    margin: 0;
+}
+
+.cs-confirm-body {
+    font-size: 13px;
+    color: var(--sub);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.cs-confirm-body strong {
+    color: var(--text);
+    font-weight: 700;
+}
+
+.cs-confirm-actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-top: 4px;
+}
+
+.cs-confirm-cancel {
+    flex: 1;
+    height: 36px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--border-mid);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--sub);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+}
+
+.cs-confirm-cancel:hover {
+    background: rgba(255, 255, 255, 0.09);
+    color: var(--text);
+}
+
+.cs-confirm-danger {
+    flex: 1;
+    height: 36px;
+    border-radius: var(--r-md);
+    border: none;
+    background: var(--danger);
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: filter .15s, transform .1s;
+}
+
+.cs-confirm-danger:hover:not(:disabled) {
+    filter: brightness(1.1);
+}
+
+.cs-confirm-danger:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+.cs-confirm-danger:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════ */
+@media (max-width: 640px) {
+    .cs-page {
+        padding: 0;
+    }
+
+    .cs-panel {
+        border-radius: 0;
+        min-height: 100vh;
+        border-left: none;
+        border-right: none;
+        border-top: none;
+    }
+
+    .cs-danger-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cs-delete-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .cs-image-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cs-confirm-card {
+        width: 90%;
+    }
+}
