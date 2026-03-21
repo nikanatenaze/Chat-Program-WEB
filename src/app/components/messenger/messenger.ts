@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { TokenModelInterface } from '../../interfaces/token-model.interface';
 import { UserInterface } from '../../interfaces/user.interface';
 import { ChatInterface } from '../../interfaces/chat.interface';
@@ -10,12 +11,12 @@ import { ChatService } from '../../services/chat.service';
 import { MessageService } from '../../services/message.service';
 import { NotificationService } from '../../services/notification.service';
 import { BehaviorSubject, forkJoin } from 'rxjs';
-import Swal from 'sweetalert2';
 import { GlobalMethods } from '../../classes/global-methods';
 
 // Animation duration constants (must match CSS)
 const CLOSE_ANIM_MS = 210;  // panel / modal exit animation
 const SWITCH_OUT_MS = 190;  // messages fade-out on chat switch
+const CS_CLOSE_MS = 240;  // chat-settings panel slide-out
 
 @Component({
   selector: 'app-messenger',
@@ -47,17 +48,17 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   // ─── Inline message editing ──────────────────────────────────────────────────
   public editingMessageId: number | null = null;
   public editContent = '';
-  public editClosingId: number | null = null;   // drives edit-bubble exit anim
-  public deletingMessageId: number | null = null; // drives delete shrink-out anim
-  public quitConfirmChatId: number | null = null; // custom quit confirm UI
-  public quitConfirmClosing = false;              // drives quit card exit anim
+  public editClosingId: number | null = null;
+  public deletingMessageId: number | null = null;
+  public quitConfirmChatId: number | null = null;
+  public quitConfirmClosing = false;
   private editCloseTimer: any;
   private deleteAnimTimer: any;
   private quitCloseTimer: any;
 
   // ─── Add-people panel ────────────────────────────────────────────────────────
   public showAddUserPanel = false;
-  public addUserPanelClosing = false;       // drives exit animation
+  public addUserPanelClosing = false;
   public addUserSearch = '';
   public addUserResults: UserInterface[] = [];
   public addUserSelected = new Map<number, UserInterface>();
@@ -67,7 +68,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
 
   // ─── Create chat modal ───────────────────────────────────────────────────────
   public showCreateChatModal = false;
-  public createChatModalClosing = false;    // drives exit animation
+  public createChatModalClosing = false;
   public createChatName = '';
   public createChatHasPassword = false;
   public createChatPassword = '';
@@ -90,21 +91,17 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
 
   // ─── Mobile sidebar ──────────────────────────────────────────────────────────
   public panelOpen = false;
-  public panelClosing = false;              // drives exit animation
+  public panelClosing = false;
 
   // ─── Active chat ─────────────────────────────────────────────────────────────
   public selectedChat: ChatInterface | null = null;
 
   // ─── Chat-switch animation ───────────────────────────────────────────────────
-  // 'idle' = normal | 'out' = fading out before load
   public chatTransition: 'idle' | 'out' = 'idle';
   private switchPending = false;
-  // Getter so existing template binding still works
   public get chatSwitchingOut(): boolean { return this.chatTransition === 'out'; }
 
   // ─── New message animation ───────────────────────────────────────────────────
-  // ID of the most-recently-received/sent message — drives the pop-in CSS class.
-  // Cleared after the animation duration so the class doesn't stick.
   public latestMessageId: number | null = null;
   private latestMsgTimer: any;
 
@@ -112,12 +109,69 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   private usersImageMap = new Map<number, string | null>();
   private usersNameMap = new Map<number, string>();
 
-  // ─── Chat list skeleton widths (randomised once) ─────────────────────────────
+  // ─── Chat list skeleton widths ───────────────────────────────────────────────
   public chatSkelWidths = ['72%', '55%', '88%', '64%', '76%', '50%'];
   public chatSkelSubWidths = ['48%', '60%', '38%', '52%', '44%', '58%'];
 
   // ─── Receive sound ───────────────────────────────────────────────────────────
   private receiveAudio = new Audio('message-recive-sound.mp3');
+
+  // ══════════════════════════════════════════════════════════════════════════════
+  // CHAT SETTINGS — state
+  // ══════════════════════════════════════════════════════════════════════════════
+
+  // Panel open/close
+  public showChatSettings = false;
+  public chatSettingsClosing = false;
+  private csCloseTimer: any;
+
+  // Data
+  public csMembers: UserInterface[] = [];
+  public csLoading = false;
+
+  // Form state
+  public csChatName = '';
+  public csHasPassword = false;
+  public csPassword = '';
+  public csConfirmPassword = '';
+  public csActiveTab: 'general' | 'members' = 'general';
+
+  // Image
+  public csImagePreview: string | null = null;
+  public csImageLoading = false;          // header avatar skeleton
+  public csUploadImageLoading = false;    // section avatar uploading
+  public csUploadPreviewLoading = false;  // section avatar img onload skeleton
+
+  // Saving / deleting
+  public csSaving = false;
+  public csDeleting = false;
+  public csSuccessMessage = '';
+  public csErrorMessage = '';
+  private csSuccessTimer: any;
+
+  // Delete confirm
+  public csShowDeleteConfirm = false;
+  public csDeleteConfirmClosing = false;
+  private csDeleteCloseTimer: any;
+
+  // Kick confirm
+  public csKickTargetUser: UserInterface | null = null;
+  public csKickConfirmClosing = false;
+  public csKickingUserId: number | null = null;
+  private csKickCloseTimer: any;
+
+  // Member image loaded tracking (Set of loaded member IDs)
+  public csMemberImagesLoaded = new Set<number>();
+
+  // Owner check
+  public get csIsOwner(): boolean {
+    return this.tokenData?.id === this.selectedChat?.createdByUserId;
+  }
+
+  // Passwords match check
+  public get csPasswordsMatch(): boolean {
+    return !this.csConfirmPassword || this.csPassword === this.csConfirmPassword;
+  }
 
   constructor(
     public hub: MainHubService,
@@ -125,7 +179,8 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     public chatUserService: ChatUserService,
     public chatService: ChatService,
     public messageService: MessageService,
-    public notification: NotificationService
+    public notification: NotificationService,
+    private router: Router
   ) { }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -150,6 +205,10 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     clearTimeout(this.editCloseTimer);
     clearTimeout(this.deleteAnimTimer);
     clearTimeout(this.quitCloseTimer);
+    clearTimeout(this.csCloseTimer);
+    clearTimeout(this.csSuccessTimer);
+    clearTimeout(this.csDeleteCloseTimer);
+    clearTimeout(this.csKickCloseTimer);
     this.hub.stopConnection()
       .then(() => console.log('SignalR disconnected'))
       .catch(err => console.error('SignalR disconnect error:', err));
@@ -272,6 +331,10 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     this.hub.onRemoveUser(data => {
       this.userChats$.next(this.userChats$.value.filter(x => x.id !== data.id));
       this.applyFilter();
+      // If removed from currently open chat, close settings panel
+      if (this.selectedChat?.id === data.id) {
+        this.closeChatSettings();
+      }
     });
 
     this.hub.onCreateMessage(data => {
@@ -282,7 +345,6 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
         this.receiveAudio.volume = 0.4;
         this.receiveAudio.play().catch(() => { });
       }
-      // Trigger the new-message pop-in animation
       this._flashLatestMessage(mapped.id);
       this.scrollToBottom(true);
     });
@@ -311,7 +373,11 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     this.closeAddUserPanel();
     this.closePanelMobile();
 
-    // If content is visible, play out-animation first, then load
+    // Close settings if open when switching chats
+    if (this.showChatSettings) {
+      this.closeChatSettings();
+    }
+
     const hasContent = (this.selectedChatMessages$.value.length > 0 || this.selectedChat) && !this.chatLoading;
 
     if (hasContent) {
@@ -327,7 +393,6 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private _loadChat(id: number) {
-    // Reset to idle so the wrapper isn't animated while the skeleton shows
     this.chatTransition = 'idle';
     this.chatLoading = true;
     this.selectedChat = null;
@@ -349,7 +414,6 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
         this.chatService.GetChatMessages(chat.id).subscribe(messages => {
           this.selectedChatMessages$.next(messages.map(x => this.mapMessage(x)));
           this.chatLoading = false;
-
           this.scrollToBottom(true);
         });
       });
@@ -400,6 +464,11 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
 
   getInitial(message: MessageInterface): string {
     return this.getUserName(message).charAt(0).toUpperCase();
+  }
+
+  // ─── Settings-specific initial helper ────────────────────────────────────
+  getSettingsInitial(name: string): string {
+    return (name || '?').charAt(0).toUpperCase();
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -473,7 +542,6 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     if (!content) return;
     this.messageService.EditMessage({ id: messageId, content, userId: this.tokenData.id }).subscribe({
       next: updated => {
-        // Play close animation first, then swap the content in
         this.editClosingId = messageId;
         clearTimeout(this.editCloseTimer);
         this.editCloseTimer = setTimeout(() => {
@@ -491,14 +559,11 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   }
 
   public deleteMessage(messageId: number) {
-    // Animate the bubble out, then fire the API
     this.deletingMessageId = messageId;
     clearTimeout(this.deleteAnimTimer);
     this.deleteAnimTimer = setTimeout(() => {
       this.messageService.DeleteMessage(messageId).subscribe({
-        next: () => {
-          this.deletingMessageId = null;
-        },
+        next: () => { this.deletingMessageId = null; },
         error: () => {
           this.deletingMessageId = null;
           this.notification.error('Failed to delete message.');
@@ -508,7 +573,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // Create chat modal — with close animation
+  // Create chat modal
   // ═══════════════════════════════════════════════════════════════════════════
 
   openCreateChatModal() {
@@ -547,9 +612,9 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
             this.createChatUserSearching = false;
             return;
           }
-          forkJoin(tokens.map(t => this.userService.getUserById(t.id))).subscribe({
-            next: users => {
-              this.createChatUserResults = users.filter(u => u.id !== this.userData.id);
+          forkJoin(tokens.map((t: any) => this.userService.getUserById(t.id))).subscribe({
+            next: (users: any) => {
+              this.createChatUserResults = users.filter((u: any) => u.id !== this.userData.id);
               this.createChatUserSearching = false;
             },
             error: () => { this.createChatUserSearching = false; }
@@ -634,54 +699,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // Chat settings
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  chatSettingsSwal() {
-    if (!this.selectedChat) return;
-    const chat = this.selectedChat;
-
-    Swal.fire({
-      title: 'Chat Settings',
-      html: `
-        <input type="text" id="editName" class="swal2-input" placeholder="Chat Name" value="${chat.name}">
-        <div style="text-align:left;margin:10px 16px;">
-          <label><input type="checkbox" id="editHasPw" style="margin-right:6px;" ${chat.hasPassword ? 'checked' : ''}>Chat has password</label>
-        </div>
-        <input type="password" id="editPw" class="swal2-input" placeholder="New password" style="display:${chat.hasPassword ? 'block' : 'none'};">
-      `,
-      showCancelButton: true,
-      confirmButtonText: 'Save',
-      focusConfirm: false,
-      didOpen: () => {
-        const cb = document.getElementById('editHasPw') as HTMLInputElement;
-        const pw = document.getElementById('editPw') as HTMLInputElement;
-        cb.addEventListener('change', () => { pw.style.display = cb.checked ? 'block' : 'none'; });
-      },
-      preConfirm: () => {
-        const name = (document.getElementById('editName') as HTMLInputElement).value.trim();
-        const hasPassword = (document.getElementById('editHasPw') as HTMLInputElement).checked;
-        const password = (document.getElementById('editPw') as HTMLInputElement).value;
-        if (!name) { Swal.showValidationMessage('Chat name is required'); return false; }
-        return { id: chat.id, name, hasPassword, password: hasPassword ? password : '' };
-      },
-    }).then(result => {
-      if (!result.isConfirmed) return;
-      this.chatService.UpdateChat(result.value).subscribe({
-        next: updated => {
-          this.selectedChat = updated;
-          const chats = this.userChats$.value.map(c => c.id === updated.id ? updated : c);
-          this.userChats$.next(chats);
-          this.applyFilter();
-          this.notification.success('Chat updated!');
-        },
-        error: () => this.notification.error('Failed to update chat.'),
-      });
-    });
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // Add-people panel — with close animation
+  // Add-people panel
   // ═══════════════════════════════════════════════════════════════════════════
 
   openAddUserPanel() {
@@ -715,14 +733,14 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     this.addUserSearching = true;
     this.addUserDebounce = setTimeout(() => {
       this.userService.searchUserByName(term).subscribe({
-        next: tokens => {
+        next: (tokens: any) => {
           if (!tokens.length) {
             this.addUserResults = [];
             this.addUserSearching = false;
             return;
           }
-          forkJoin(tokens.map(t => this.userService.getUserById(t.id))).subscribe({
-            next: users => { this.addUserResults = users; this.addUserSearching = false; },
+          forkJoin(tokens.map((t: any) => this.userService.getUserById(t.id))).subscribe({
+            next: (users: any) => { this.addUserResults = users; this.addUserSearching = false; },
             error: () => { this.addUserSearching = false; }
           });
         },
@@ -761,6 +779,10 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
         next: () => {
           this.usersNameMap.set(user.id, user.name);
           this.usersImageMap.set(user.id, user.profileImageUrl ?? null);
+          // Also refresh settings member list if settings panel is open
+          if (this.showChatSettings) {
+            this.csMembers = [...this.csMembers, user];
+          }
           done++;
           if (done + failed === users.length) this.finishAddUsers(done, failed);
         },
@@ -802,11 +824,11 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     const id = this.quitConfirmChatId;
     if (id === null) return;
     this.closeQuitConfirm();
-    // Small delay so the card animates out before action fires
     setTimeout(() => {
       if (id === this.selectedChat?.id) {
         this.selectedChat = null;
         this.selectedChatMessages$.next([]);
+        this.closeChatSettings();
       }
       this.chatUserService.RemoveChatUser({ userId: this.tokenData.id, chatId: id }).subscribe({
         next: () => this.notification.success('You left the chat.'),
@@ -815,13 +837,11 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     }, 220);
   }
 
-  // Keep old name so HTML template still compiles — just delegates
-  quitFromChatSwal(id: number) {
-    this.openQuitConfirm(id);
-  }
+  // Keep old name so HTML template still compiles
+  quitFromChatSwal(id: number) { this.openQuitConfirm(id); }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // Mobile sidebar — with close animation
+  // Mobile sidebar
   // ═══════════════════════════════════════════════════════════════════════════
 
   openPanelMobile() {
@@ -845,11 +865,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   private _flashLatestMessage(id: number) {
     clearTimeout(this.latestMsgTimer);
     this.latestMessageId = id;
-    // CSS animation is 320ms max — clear after to avoid the class persisting
-    // if the user scrolls back up and the element re-enters the DOM
-    this.latestMsgTimer = setTimeout(() => {
-      this.latestMessageId = null;
-    }, 400);
+    this.latestMsgTimer = setTimeout(() => { this.latestMessageId = null; }, 400);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -862,7 +878,6 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     const shouldShow = distanceFromBottom > 150;
 
     if (!shouldShow && this.showScrollToBottom && !this.fabClosing) {
-      // User scrolled close to bottom — play exit animation before removing FAB
       this.fabClosing = true;
       clearTimeout(this.fabCloseTimer);
       this.fabCloseTimer = setTimeout(() => {
@@ -887,9 +902,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
         this.showScrollToBottom = false;
         this.fabClosing = false;
       } else {
-        // Smooth animated scroll
         container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
-        // Trigger FAB exit animation then hide
         if (this.showScrollToBottom && !this.fabClosing) {
           this.fabClosing = true;
           clearTimeout(this.fabCloseTimer);
@@ -900,5 +913,264 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
         }
       }
     }, 50);
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════════
+  // CHAT SETTINGS — panel open / close
+  // ══════════════════════════════════════════════════════════════════════════════
+
+  openChatSettings(): void {
+    if (!this.selectedChat) return;
+
+    // Toggle — if already open, close it
+    if (this.showChatSettings && !this.chatSettingsClosing) {
+      this.closeChatSettings();
+      return;
+    }
+
+    this.showChatSettings = true;
+    this.chatSettingsClosing = false;
+
+    // Reset state for the new chat
+    this.csActiveTab = 'general';
+    this.csClearMessages();
+    this.csPassword = '';
+    this.csConfirmPassword = '';
+    this.csMemberImagesLoaded = new Set<number>();
+
+    // Populate from selectedChat immediately (so header shows instantly)
+    this.csChatName = this.selectedChat.name;
+    this.csHasPassword = this.selectedChat.hasPassword;
+    this.csImagePreview = this.selectedChat.chatImageUrl ?? null;
+    this.csImageLoading = !!this.csImagePreview; // show skeleton until img loads
+
+    // Load members
+    this.csLoading = true;
+    this.chatUserService.GetUsersInChat(this.selectedChat.id).subscribe({
+      next: members => {
+        this.csMembers = members;
+        this.csLoading = false;
+      },
+      error: () => {
+        this.csErrorMessage = 'Failed to load members.';
+        this.csLoading = false;
+      }
+    });
+  }
+
+  closeChatSettings(): void {
+    if (this.chatSettingsClosing) return;
+    this.chatSettingsClosing = true;
+    clearTimeout(this.csCloseTimer);
+    this.csCloseTimer = setTimeout(() => {
+      this.showChatSettings = false;
+      this.chatSettingsClosing = false;
+    }, CS_CLOSE_MS);
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════════
+  // CHAT SETTINGS — tabs
+  // ══════════════════════════════════════════════════════════════════════════════
+
+  csSetTab(tab: 'general' | 'members'): void {
+    this.csActiveTab = tab;
+    this.csClearMessages();
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════════
+  // CHAT SETTINGS — image upload
+  // ══════════════════════════════════════════════════════════════════════════════
+
+  csOnImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const file = input.files[0];
+
+    // Show skeleton immediately while reading file
+    this.csUploadPreviewLoading = true;
+    this.csUploadImageLoading = true;
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      this.csImagePreview = e.target?.result as string;
+      // csUploadPreviewLoading cleared by (load) event on the img element
+    };
+    reader.readAsDataURL(file);
+
+    this.chatService.uploadChatImage(this.selectedChat!.id, file).subscribe({
+      next: res => {
+        this.csImagePreview = res.ImageUrl;
+        this.csUploadImageLoading = false;
+        this.csUploadPreviewLoading = true; // wait for img load event again
+        // Update header avatar too
+        this.csImageLoading = true;
+        // Update selectedChat so the chat header also reflects new image
+        if (this.selectedChat) {
+          this.selectedChat = { ...this.selectedChat, chatImageUrl: res.ImageUrl };
+          const chats = this.userChats$.value.map(c =>
+            c.id === this.selectedChat!.id ? { ...c, chatImageUrl: res.ImageUrl } : c
+          );
+          this.userChats$.next(chats);
+          this.applyFilter();
+        }
+        this.csShowSuccess('Chat image updated!');
+      },
+      error: () => {
+        this.csShowError('Failed to upload image.');
+        this.csUploadImageLoading = false;
+        this.csUploadPreviewLoading = false;
+      }
+    });
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════════
+  // CHAT SETTINGS — save general settings
+  // ══════════════════════════════════════════════════════════════════════════════
+
+  csOnTogglePassword(): void {
+    this.csHasPassword = !this.csHasPassword;
+    if (!this.csHasPassword) { this.csPassword = ''; this.csConfirmPassword = ''; }
+  }
+
+  csOnSaveChanges(): void {
+    this.csClearMessages();
+    if (!this.csChatName.trim()) { this.csShowError('Chat name cannot be empty.'); return; }
+    if (this.csHasPassword && this.csPassword !== this.csConfirmPassword) {
+      this.csShowError('Passwords do not match.');
+      return;
+    }
+
+    this.csSaving = true;
+    this.chatService.UpdateChat({
+      id: this.selectedChat!.id,
+      name: this.csChatName.trim(),
+      hasPassword: this.csHasPassword,
+      password: this.csPassword
+    }).subscribe({
+      next: updated => {
+        // Keep selectedChat in sync
+        this.selectedChat = updated;
+        // Update chat list too
+        const chats = this.userChats$.value.map(c => c.id === updated.id ? updated : c);
+        this.userChats$.next(chats);
+        this.applyFilter();
+        this.csShowSuccess('Settings saved!');
+        this.csSaving = false;
+      },
+      error: () => {
+        this.csShowError('Failed to save settings.');
+        this.csSaving = false;
+      }
+    });
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════════
+  // CHAT SETTINGS — delete chat
+  // ══════════════════════════════════════════════════════════════════════════════
+
+  csOpenDeleteConfirm(): void {
+    this.csShowDeleteConfirm = true;
+    this.csDeleteConfirmClosing = false;
+  }
+
+  csCloseDeleteConfirm(): void {
+    if (this.csDeleteConfirmClosing) return;
+    this.csDeleteConfirmClosing = true;
+    clearTimeout(this.csDeleteCloseTimer);
+    this.csDeleteCloseTimer = setTimeout(() => {
+      this.csShowDeleteConfirm = false;
+      this.csDeleteConfirmClosing = false;
+    }, CLOSE_ANIM_MS);
+  }
+
+  csOnDeleteChat(): void {
+    if (!this.selectedChat) return;
+    this.csDeleting = true;
+    this.chatService.DeleteChat(this.selectedChat.id).subscribe({
+      next: () => {
+        // Remove from list
+        this.userChats$.next(this.userChats$.value.filter(c => c.id !== this.selectedChat!.id));
+        this.applyFilter();
+        this.selectedChat = null;
+        this.selectedChatMessages$.next([]);
+        this.csCloseDeleteConfirm();
+        // Delay close so animation plays
+        setTimeout(() => {
+          this.closeChatSettings();
+          this.csDeleting = false;
+        }, CLOSE_ANIM_MS + 10);
+      },
+      error: () => {
+        this.csShowError('Failed to delete chat.');
+        this.csDeleting = false;
+        this.csCloseDeleteConfirm();
+      }
+    });
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════════
+  // CHAT SETTINGS — kick member
+  // ══════════════════════════════════════════════════════════════════════════════
+
+  csOpenKickConfirm(user: UserInterface): void {
+    this.csKickTargetUser = user;
+    this.csKickConfirmClosing = false;
+  }
+
+  csCloseKickConfirm(): void {
+    if (this.csKickConfirmClosing) return;
+    this.csKickConfirmClosing = true;
+    clearTimeout(this.csKickCloseTimer);
+    this.csKickCloseTimer = setTimeout(() => {
+      this.csKickTargetUser = null;
+      this.csKickConfirmClosing = false;
+    }, CLOSE_ANIM_MS);
+  }
+
+  csConfirmKick(): void {
+    if (!this.csKickTargetUser) return;
+    const user = this.csKickTargetUser;
+
+    // Set kicking flag BEFORE closing the modal so the row greys out immediately
+    this.csKickingUserId = user.id;
+
+    // Close the confirm card with animation
+    this.csCloseKickConfirm();
+
+    // Wait for animation to finish, then fire the API
+    setTimeout(() => {
+      this.chatUserService.RemoveChatUser({ userId: user.id, chatId: this.selectedChat!.id }).subscribe({
+        next: () => {
+          this.csMembers = this.csMembers.filter(m => m.id !== user.id);
+          this.csKickingUserId = null;
+          this.csShowSuccess(`${user.name} was removed.`);
+        },
+        error: () => {
+          this.csKickingUserId = null;
+          this.csShowError('Failed to remove member.');
+        }
+      });
+    }, CLOSE_ANIM_MS + 20);
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════════
+  // CHAT SETTINGS — alert helpers
+  // ══════════════════════════════════════════════════════════════════════════════
+
+  csShowSuccess(msg: string): void {
+    this.csSuccessMessage = msg;
+    this.csErrorMessage = '';
+    clearTimeout(this.csSuccessTimer);
+    this.csSuccessTimer = setTimeout(() => { this.csSuccessMessage = ''; }, 3500);
+  }
+
+  csShowError(msg: string): void {
+    this.csErrorMessage = msg;
+    this.csSuccessMessage = '';
+  }
+
+  csClearMessages(): void {
+    this.csSuccessMessage = '';
+    this.csErrorMessage = '';
   }
 }

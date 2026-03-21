@@ -206,7 +206,7 @@ hr {
     opacity: 0.5;
 }
 
-/* ── Live chat rows — staggered entrance when list first loads ── */
+/* ── Live chat rows — staggered entrance ── */
 
 @keyframes chat-row-enter {
     from {
@@ -225,7 +225,6 @@ hr {
     animation: chat-row-enter 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-/* stagger first 12 items; anything beyond renders instantly */
 .chats-loaded .chat:nth-child(1) {
     animation-delay: 0.00s;
 }
@@ -364,9 +363,8 @@ hr {
     color: var(--danger);
 }
 
-/* ── Quit confirm — panel-level overlay + centered card ── */
+/* ── Quit confirm ── */
 
-/* Transparent click-outside trap that fills the panel */
 .quit-overlay {
     position: absolute;
     inset: 0;
@@ -402,7 +400,6 @@ hr {
     animation: quit-overlay-out 0.18s ease forwards;
 }
 
-/* The card itself — centred in the panel */
 @keyframes quit-card-in {
     0% {
         opacity: 0;
@@ -447,9 +444,7 @@ hr {
     z-index: 41;
     backdrop-filter: blur(28px);
     -webkit-backdrop-filter: blur(28px);
-    box-shadow:
-        0 16px 48px rgba(0, 0, 0, 0.6),
-        0 0 0 1px rgba(239, 68, 68, 0.08);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(239, 68, 68, 0.08);
     animation: quit-card-in 0.24s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
 }
 
@@ -622,7 +617,7 @@ hr {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background .2s, color .2s, transform .15s;
+    transition: background .2s, color .2s, transform .15s, border-color .2s;
 }
 
 .header-btn:hover {
@@ -634,6 +629,28 @@ hr {
 
 .header-btn:active {
     transform: scale(0.94);
+}
+
+/* Active state for settings button when panel is open */
+.header-btn-active {
+    background: var(--accent-soft) !important;
+    color: var(--accent) !important;
+    border-color: rgba(99, 102, 241, 0.35) !important;
+}
+
+/* Slow spin for the settings gear when panel is open */
+@keyframes spin-slow {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.fa-spin-slow {
+    animation: spin-slow 3s linear infinite;
 }
 
 /* ── Messages area ── */
@@ -656,7 +673,7 @@ hr {
     border-radius: 2px;
 }
 
-/* ── Chat body wrapper — persistent container for skeleton + live messages ── */
+/* ── Chat body wrapper ── */
 
 .chat-body-wrap {
     flex: 1;
@@ -665,8 +682,6 @@ hr {
     overflow: hidden;
     min-height: 0;
 }
-
-/* ── Chat switch animations on the persistent wrapper ── */
 
 @keyframes chat-body-out {
     from {
@@ -685,9 +700,8 @@ hr {
     pointer-events: none;
 }
 
-/* ── New message entrance animations ── */
+/* ── New message entrance ── */
 
-/* Received message: slides up gently from below */
 @keyframes msg-pop-received {
     0% {
         opacity: 0;
@@ -705,7 +719,6 @@ hr {
     }
 }
 
-/* Sent message: slides up with a slightly snappier spring */
 @keyframes msg-pop-sent {
     0% {
         opacity: 0;
@@ -731,7 +744,6 @@ hr {
     animation: msg-pop-sent 0.28s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
 }
 
-/* Message delete: shrink toward the right and fade out */
 @keyframes msg-delete-out {
     0% {
         opacity: 1;
@@ -977,7 +989,6 @@ hr {
     transform: translateX(-50%) scale(0.93);
 }
 
-/* FAB entrance */
 @keyframes fab-pop-in {
     0% {
         opacity: 0;
@@ -995,7 +1006,6 @@ hr {
     }
 }
 
-/* FAB exit */
 @keyframes fab-pop-out {
     0% {
         opacity: 1;
@@ -1254,7 +1264,6 @@ hr {
 
 /* ── Inline edit bubble ── */
 
-/* Edit bubble: slide in from below, slide out downward */
 @keyframes edit-bubble-in {
     from {
         opacity: 0;
@@ -1358,8 +1367,6 @@ hr {
    ADD PEOPLE PANEL
    ═══════════════════════════════════════════════ */
 
-/* ── Overlay ── enter / exit ── */
-
 @keyframes aup-fade-in {
     from {
         opacity: 0;
@@ -1393,8 +1400,6 @@ hr {
     animation: aup-fade-out 0.2s ease forwards !important;
     pointer-events: none;
 }
-
-/* ── Panel ── enter / exit ── */
 
 @keyframes aup-slide-up {
     from {
@@ -1641,13 +1646,12 @@ hr {
     border-radius: var(--r-lg);
     cursor: pointer;
     transition: background .15s;
+    animation: search-result-enter 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .aup-user-row:hover {
     background: rgba(255, 255, 255, 0.04);
 }
-
-/* ── Search result rows — stagger in when they appear ── */
 
 @keyframes search-result-enter {
     from {
@@ -1659,10 +1663,6 @@ hr {
         opacity: 1;
         transform: translateY(0) scale(1);
     }
-}
-
-.aup-user-row {
-    animation: search-result-enter 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .aup-user-row:nth-child(1) {
@@ -1822,7 +1822,7 @@ hr {
 }
 
 /* ═══════════════════════════════════════════════
-   CREATE CHAT MODAL — enter / exit
+   CREATE CHAT MODAL
    ═══════════════════════════════════════════════ */
 
 @keyframes ccm-drop-in {
@@ -2096,6 +2096,1150 @@ hr {
     margin-top: auto;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════════
+   CHAT SETTINGS — INLINE SIDE PANEL
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Shared utility: hide an image while it's loading (skeleton shows instead) */
+.cs-avatar-hidden {
+    opacity: 0;
+    position: absolute;
+    pointer-events: none;
+}
+
+/* ── Panel slide-in from right ── */
+
+@keyframes cs-panel-slide-in {
+    from {
+        opacity: 0;
+        transform: translateX(28px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes cs-panel-slide-out {
+    from {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(24px) scale(0.98);
+    }
+}
+
+.cs-panel-inline {
+    width: 360px;
+    flex-shrink: 0;
+    height: 100%;
+    border-radius: var(--r-xl);
+    background: rgba(22, 25, 37, 0.75);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--border-mid);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(99, 102, 241, 0.07);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: "Oxygen", sans-serif;
+    animation: cs-panel-slide-in 0.26s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    position: relative;
+}
+
+.cs-panel-inline-closing {
+    animation: cs-panel-slide-out 0.22s ease forwards !important;
+    pointer-events: none;
+}
+
+/* Optional dimming overlay behind settings panel on mobile */
+@keyframes cs-overlay-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes cs-overlay-out {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+.cs-overlay-inline {
+    display: none;
+    /* visible only on mobile via media query */
+}
+
+/* ── Settings Header ── */
+
+.cs-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.cs-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.cs-back-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--border-mid);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--sub);
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s, color .2s, transform .15s, border-color .2s;
+    flex-shrink: 0;
+}
+
+.cs-back-btn:hover {
+    background: var(--danger-soft);
+    color: var(--danger);
+    border-color: rgba(239, 68, 68, 0.3);
+    transform: scale(1.08);
+}
+
+.cs-back-btn:active {
+    transform: scale(0.94);
+}
+
+/* ── Header avatar with skeleton ── */
+
+.cs-chat-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+}
+
+/* Skeleton shown in header while image loads */
+.cs-avatar-skel {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.cs-chat-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    position: relative;
+    z-index: 2;
+}
+
+.cs-chat-initials {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    border: 1.5px solid rgba(99, 102, 241, 0.35);
+    color: var(--accent);
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cs-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.cs-chat-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+    letter-spacing: -0.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cs-member-count {
+    font-size: 12px;
+    color: var(--green);
+}
+
+/* ── Tabs ── */
+
+.cs-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 12px 14px 0;
+    flex-shrink: 0;
+}
+
+.cs-tab {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 16px;
+    border-radius: var(--r-md) var(--r-md) 0 0;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: color .15s, background .15s;
+}
+
+.cs-tab:hover {
+    color: var(--sub);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.cs-tab-active {
+    color: var(--accent) !important;
+    background: var(--accent-soft) !important;
+    border: 1px solid rgba(99, 102, 241, 0.18);
+    border-bottom: none;
+}
+
+.cs-tab-badge {
+    background: rgba(99, 102, 241, 0.2);
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 10px;
+    line-height: 16px;
+}
+
+.cs-hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0;
+    flex-shrink: 0;
+}
+
+/* ── Inner loader ── */
+
+.cs-inner-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 14px;
+    color: var(--sub);
+    font-size: 13px;
+}
+
+.cs-spinner {
+    width: 28px;
+    height: 28px;
+    border: 2.5px solid var(--border-mid);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: cs-spin 0.7s linear infinite;
+}
+
+@keyframes cs-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ── Alerts ── */
+
+.cs-alert {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 10px 14px 0;
+    padding: 10px 13px;
+    border-radius: var(--r-md);
+    font-size: 13px;
+    font-weight: 500;
+    animation: cs-alert-in 0.22s ease;
+    flex-shrink: 0;
+}
+
+@keyframes cs-alert-in {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.cs-alert-success {
+    background: rgba(52, 211, 153, 0.1);
+    border: 1px solid rgba(52, 211, 153, 0.22);
+    color: var(--green);
+}
+
+.cs-alert-error {
+    background: var(--danger-soft);
+    border: 1px solid rgba(239, 68, 68, 0.22);
+    color: var(--danger);
+}
+
+.cs-alert-close {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    opacity: 0.6;
+    font-size: 12px;
+    padding: 2px 4px;
+    transition: opacity .15s;
+}
+
+.cs-alert-close:hover {
+    opacity: 1;
+}
+
+/* ── Tab content ── */
+
+.cs-tab-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    animation: cs-tab-in 0.2s ease;
+}
+
+.cs-tab-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.cs-tab-content::-webkit-scrollbar-thumb {
+    background: var(--border-mid);
+    border-radius: 2px;
+}
+
+@keyframes cs-tab-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── Sections ── */
+
+.cs-section {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cs-section:last-of-type {
+    border-bottom: none;
+}
+
+.cs-section-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--muted);
+    margin: 0;
+}
+
+.cs-section-label i {
+    font-size: 11px;
+    color: var(--accent);
+    opacity: 0.8;
+}
+
+/* ── Image upload section ── */
+
+.cs-image-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.cs-avatar-wrap {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    border-radius: 50%;
+}
+
+/* Upload section skeleton: covers the whole avatar circle */
+.cs-avatar-upload-skel {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    z-index: 2;
+}
+
+.cs-avatar-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border-mid);
+    position: relative;
+    z-index: 1;
+}
+
+.cs-avatar-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px dashed var(--border-mid);
+    color: var(--muted);
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cs-image-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cs-image-hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0;
+}
+
+.cs-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    padding: 7px 14px;
+    border-radius: var(--r-md);
+    font-size: 12px;
+    font-weight: 700;
+    font-family: inherit;
+    transition: all .2s;
+    width: fit-content;
+}
+
+.cs-upload-btn:hover:not(.cs-btn-disabled) {
+    background: rgba(99, 102, 241, 0.22);
+    border-color: var(--accent);
+}
+
+.cs-btn-disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* ── Fields ── */
+
+.cs-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+}
+
+.cs-field-mt {
+    margin-top: 4px;
+}
+
+.cs-field-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--sub);
+}
+
+.cs-input {
+    height: 40px;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: var(--r-lg);
+    border: 1px solid var(--border-mid);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+    font-size: 13px;
+    font-family: inherit;
+    padding: 0 14px;
+    transition: border-color .2s, background .2s, box-shadow .2s;
+}
+
+.cs-input:focus {
+    outline: none;
+    border-color: rgba(99, 102, 241, 0.5);
+    background: rgba(99, 102, 241, 0.06);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.cs-input::placeholder {
+    color: var(--muted);
+}
+
+.cs-input-error {
+    border-color: rgba(239, 68, 68, 0.5) !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.cs-char-count {
+    align-self: flex-end;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: -2px;
+}
+
+.cs-field-err {
+    font-size: 11px;
+    color: var(--danger);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* ── Password toggle ── */
+
+.cs-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    cursor: pointer;
+    padding: 4px 0;
+    user-select: none;
+}
+
+.cs-toggle-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cs-toggle-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.cs-toggle-desc {
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.cs-toggle-track {
+    width: 36px;
+    height: 20px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-mid);
+    display: flex;
+    align-items: center;
+    padding: 0 3px;
+    flex-shrink: 0;
+    transition: background .2s, border-color .2s;
+}
+
+.cs-toggle-on {
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+}
+
+.cs-toggle-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    transition: transform .22s cubic-bezier(0.34, 1.5, 0.64, 1);
+}
+
+.cs-toggle-on .cs-toggle-thumb {
+    transform: translateX(16px);
+}
+
+/* Password fields reveal */
+.cs-pw-fields {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.35s ease, opacity 0.28s ease;
+}
+
+.cs-pw-visible {
+    max-height: 220px;
+    opacity: 1;
+}
+
+/* ── Save button ── */
+
+.cs-save-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 40px;
+    border-radius: var(--r-lg);
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: filter .2s, transform .1s, box-shadow .2s;
+}
+
+.cs-save-btn:hover:not(:disabled) {
+    filter: brightness(1.12);
+    transform: scale(1.01);
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
+}
+
+.cs-save-btn:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.cs-save-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ── Danger zone ── */
+
+.cs-danger-zone {
+    margin-top: 20px;
+    padding: 14px;
+    border-radius: var(--r-lg);
+    background: rgba(239, 68, 68, 0.06);
+    border: 1px solid rgba(239, 68, 68, 0.18);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.cs-danger-label {
+    color: var(--danger) !important;
+}
+
+.cs-danger-label i {
+    color: var(--danger) !important;
+}
+
+.cs-danger-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.cs-danger-info {
+    flex: 1;
+}
+
+.cs-danger-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 3px;
+}
+
+.cs-danger-desc {
+    font-size: 11px;
+    color: var(--sub);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.cs-delete-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: var(--r-md);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: var(--danger-soft);
+    color: var(--danger);
+    font-size: 12px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background .15s, color .15s, border-color .15s, transform .1s;
+}
+
+.cs-delete-btn:hover:not(:disabled) {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+}
+
+.cs-delete-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.cs-delete-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ═══════════════════════════════════════════════
+   SETTINGS — MEMBERS TAB
+   ═══════════════════════════════════════════════ */
+
+.cs-members-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+@keyframes cs-member-in {
+    from {
+        opacity: 0;
+        transform: translateX(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.cs-member-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 10px;
+    border-radius: var(--r-lg);
+    transition: background .15s, opacity .25s;
+    animation: cs-member-in 0.25s ease both;
+}
+
+.cs-member-row:nth-child(1) {
+    animation-delay: 0.00s;
+}
+
+.cs-member-row:nth-child(2) {
+    animation-delay: 0.04s;
+}
+
+.cs-member-row:nth-child(3) {
+    animation-delay: 0.08s;
+}
+
+.cs-member-row:nth-child(4) {
+    animation-delay: 0.12s;
+}
+
+.cs-member-row:nth-child(5) {
+    animation-delay: 0.16s;
+}
+
+.cs-member-row:nth-child(n+6) {
+    animation-delay: 0.18s;
+}
+
+.cs-member-row:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.cs-member-kicking {
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+/* Member avatar with skeleton support */
+.cs-member-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Member image skeleton (shimmer circle) */
+.cs-member-img-skel {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.cs-member-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    position: relative;
+    z-index: 2;
+}
+
+.cs-member-initials {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    border: 1.5px solid rgba(99, 102, 241, 0.3);
+    color: var(--accent);
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cs-member-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.cs-member-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cs-owner-badge {
+    font-size: 10px;
+    font-weight: 700;
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    padding: 1px 6px;
+    border-radius: 10px;
+    white-space: nowrap;
+}
+
+.cs-owner-badge i {
+    font-size: 9px;
+}
+
+.cs-you-badge {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    padding: 1px 6px;
+    border-radius: 10px;
+    white-space: nowrap;
+}
+
+.cs-member-email {
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cs-kick-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--border-mid);
+    background: transparent;
+    color: var(--muted);
+    font-size: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    opacity: 0;
+    transform: translateX(4px);
+    transition: background .15s, color .15s, border-color .15s, opacity .15s, transform .15s;
+}
+
+.cs-member-row:hover .cs-kick-btn {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.cs-kick-btn:hover:not(:disabled) {
+    background: var(--danger-soft);
+    color: var(--danger);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.cs-kick-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.cs-members-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 40px 0;
+    color: var(--muted);
+}
+
+.cs-members-empty i {
+    font-size: 28px;
+    opacity: 0.5;
+}
+
+.cs-members-empty p {
+    margin: 0;
+    font-size: 13px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SETTINGS — CONFIRM OVERLAYS (delete / kick)
+   Rendered at fixed position, same z-index as other global modals
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+@keyframes cs-backdrop-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes cs-backdrop-out {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+.cs-confirm-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 200;
+    animation: cs-backdrop-in 0.18s ease forwards;
+}
+
+.cs-confirm-backdrop-closing {
+    animation: cs-backdrop-out 0.2s ease forwards !important;
+    pointer-events: none;
+}
+
+@keyframes cs-card-in {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, calc(-50% + 12px)) scale(0.94);
+    }
+
+    70% {
+        opacity: 1;
+        transform: translate(-50%, calc(-50% - 2px)) scale(1.01);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes cs-card-out {
+    from {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translate(-50%, calc(-50% + 10px)) scale(0.95);
+    }
+}
+
+.cs-confirm-card {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 340px;
+    background: rgba(14, 16, 24, 0.98);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    border: 1px solid var(--border-mid);
+    border-radius: var(--r-xl);
+    padding: 28px 24px;
+    z-index: 201;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(99, 102, 241, 0.08);
+    animation: cs-card-in 0.26s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+}
+
+.cs-confirm-closing {
+    animation: cs-card-out 0.2s ease forwards !important;
+    pointer-events: none;
+}
+
+.cs-confirm-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.cs-confirm-icon-danger {
+    background: var(--danger-soft);
+    border: 1px solid rgba(239, 68, 68, 0.22);
+    color: var(--danger);
+}
+
+.cs-confirm-icon-kick {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.22);
+    color: #f59e0b;
+}
+
+.cs-confirm-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text);
+    margin: 0;
+}
+
+.cs-confirm-body {
+    font-size: 13px;
+    color: var(--sub);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.cs-confirm-body strong {
+    color: var(--text);
+    font-weight: 700;
+}
+
+.cs-confirm-actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-top: 4px;
+}
+
+.cs-confirm-cancel {
+    flex: 1;
+    height: 36px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--border-mid);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--sub);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+}
+
+.cs-confirm-cancel:hover {
+    background: rgba(255, 255, 255, 0.09);
+    color: var(--text);
+}
+
+.cs-confirm-danger {
+    flex: 1;
+    height: 36px;
+    border-radius: var(--r-md);
+    border: none;
+    background: var(--danger);
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: filter .15s, transform .1s;
+}
+
+.cs-confirm-danger:hover:not(:disabled) {
+    filter: brightness(1.1);
+}
+
+.cs-confirm-danger:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+.cs-confirm-danger:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
 /* ═══════════════════════════════════════════════
    RESPONSIVE — TABLET  (≤ 768px)
    ═══════════════════════════════════════════════ */
@@ -2130,7 +3274,6 @@ hr {
         transform: translateX(0);
     }
 
-    /* Closing: slide back out */
     .panel-ui.panel-closing {
         transform: translateX(-100%) !important;
         transition: transform 0.24s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -2172,6 +3315,35 @@ hr {
         width: 100%;
         border-radius: var(--r-xl) var(--r-xl) 0 0;
         max-height: 75vh;
+    }
+
+    /* Settings panel slides in from the right over the chat on mobile */
+    .cs-overlay-inline {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(4px);
+        z-index: 30;
+        animation: cs-overlay-in 0.18s ease forwards;
+    }
+
+    .cs-overlay-inline.cs-overlay-inline-closing {
+        animation: cs-overlay-out 0.22s ease forwards !important;
+        pointer-events: none;
+    }
+
+    .cs-panel-inline {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        max-width: 420px;
+        height: 100%;
+        border-radius: var(--r-xl) 0 0 var(--r-xl);
+        z-index: 31;
+        animation: cs-panel-slide-in 0.26s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
 
     .ccm-modal {
@@ -2221,6 +3393,26 @@ hr {
 
     .ccm-modal .aup-chips {
         padding: 0 14px 10px;
+    }
+
+    /* Danger row stacks on mobile */
+    .cs-danger-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cs-delete-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .cs-image-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cs-confirm-card {
+        width: 90%;
     }
 }
 
@@ -2285,6 +3477,11 @@ hr {
 
     .title p {
         font-size: 19px;
+    }
+
+    .cs-panel-inline {
+        max-width: 100%;
+        border-radius: 0;
     }
 }
 

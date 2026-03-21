@@ -35,7 +35,7 @@ export class ChatService {
     formData.append('ChatId', chatId.toString());
     formData.append('Image', file);
 
-    return this.http.post<{ ImageUrl: string }>('/api/Chat/UploadChatImage', formData);
+    return this.http.post<{ ImageUrl: string }>(this.api + '/UploadChatImage', formData);
   }
 
   ChatVerification(prompt: { id: number, password: string }) {

@@ -106,8 +106,9 @@
                 <button class="header-btn" (click)="openAddUserPanel()" title="Add user">
                     <i class="fa-solid fa-user-plus"></i>
                 </button>
-                <button class="header-btn" [routerLink]="['/chat-settings', selectedChat.id]" title="Chat settings">
-                    <i class="fa-solid fa-gear"></i>
+                <button class="header-btn" (click)="openChatSettings()" title="Chat settings"
+                    [class.header-btn-active]="showChatSettings || chatSettingsClosing">
+                    <i class="fa-solid fa-gear" [class.fa-spin-slow]="showChatSettings && !chatSettingsClosing"></i>
                 </button>
             </div>
         </div>
@@ -208,8 +209,6 @@
         </div>
 
         <!-- ── MESSAGES ── -->
-
-        <!-- Persistent wrapper — always in DOM so out/in animations always have a target -->
         <div class="chat-body-wrap" [class.chat-body-out]="chatSwitchingOut">
 
             <!-- Skeleton bubbles while messages load -->
@@ -333,6 +332,234 @@
 
     </div>
 
+    <!-- ═══════════════ CHAT SETTINGS PANEL ═══════════════ -->
+    <div class="cs-overlay-inline" *ngIf="showChatSettings || chatSettingsClosing"
+        [class.cs-overlay-inline-closing]="chatSettingsClosing" (click)="closeChatSettings()">
+    </div>
+
+    <div class="cs-panel-inline" *ngIf="showChatSettings || chatSettingsClosing"
+        [class.cs-panel-inline-closing]="chatSettingsClosing" (click)="$event.stopPropagation()">
+
+        <!-- ── Settings Header ── -->
+        <div class="cs-header">
+            <div class="cs-header-left">
+                <button class="cs-back-btn" (click)="closeChatSettings()" title="Close settings">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <div class="cs-chat-avatar">
+                    <!-- Skeleton shown while image loading -->
+                    <div class="cs-avatar-skel skel" *ngIf="csImageLoading && csImagePreview"></div>
+                    <img *ngIf="csImagePreview" [src]="csImagePreview" [alt]="selectedChat?.name"
+                        [class.cs-avatar-hidden]="csImageLoading" (load)="csImageLoading = false"
+                        (error)="csImageLoading = false">
+                    <div *ngIf="!csImagePreview" class="cs-chat-initials">
+                        {{ getSettingsInitial(selectedChat?.name || '?') }}
+                    </div>
+                </div>
+                <div class="cs-header-info">
+                    <p class="cs-chat-name">{{ selectedChat?.name }}</p>
+                    <span class="cs-member-count">{{ csMembers.length }} member{{ csMembers.length !== 1 ? 's' : ''
+                        }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Tabs ── -->
+        <div class="cs-tabs">
+            <button class="cs-tab" [class.cs-tab-active]="csActiveTab === 'general'" (click)="csSetTab('general')">
+                <i class="fa-solid fa-gear"></i> General
+            </button>
+            <button class="cs-tab" [class.cs-tab-active]="csActiveTab === 'members'" (click)="csSetTab('members')">
+                <i class="fa-solid fa-users"></i> Members
+                <span class="cs-tab-badge">{{ csMembers.length }}</span>
+            </button>
+        </div>
+
+        <hr class="cs-hr">
+
+        <!-- ── Loader ── -->
+        <div class="cs-inner-loader" *ngIf="csLoading">
+            <div class="cs-spinner"></div>
+            <p>Loading…</p>
+        </div>
+
+        <!-- ── Alerts ── -->
+        <ng-container *ngIf="!csLoading">
+            <div class="cs-alert cs-alert-success" *ngIf="csSuccessMessage">
+                <i class="fa-solid fa-circle-check"></i>
+                {{ csSuccessMessage }}
+                <button class="cs-alert-close" (click)="csClearMessages()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="cs-alert cs-alert-error" *ngIf="csErrorMessage">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                {{ csErrorMessage }}
+                <button class="cs-alert-close" (click)="csClearMessages()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- ══════════ GENERAL TAB ══════════ -->
+            <div class="cs-tab-content" *ngIf="csActiveTab === 'general'">
+
+                <!-- Chat image -->
+                <div class="cs-section">
+                    <p class="cs-section-label">
+                        <i class="fa-solid fa-image"></i> Chat Photo
+                    </p>
+                    <div class="cs-image-row">
+                        <div class="cs-avatar-wrap">
+                            <!-- Skeleton while uploading or while image is loading -->
+                            <div class="cs-avatar-upload-skel skel"
+                                *ngIf="csUploadImageLoading || (csImagePreview && csUploadPreviewLoading)">
+                            </div>
+                            <img *ngIf="csImagePreview && !csUploadImageLoading" [src]="csImagePreview"
+                                [alt]="selectedChat?.name" class="cs-avatar-img"
+                                [class.cs-avatar-hidden]="csUploadPreviewLoading"
+                                (load)="csUploadPreviewLoading = false" (error)="csUploadPreviewLoading = false">
+                            <div *ngIf="!csImagePreview && !csUploadImageLoading" class="cs-avatar-placeholder">
+                                <i class="fa-solid fa-image"></i>
+                            </div>
+                        </div>
+                        <div class="cs-image-actions">
+                            <p class="cs-image-hint">Upload a photo for this group chat</p>
+                            <label class="cs-upload-btn" [class.cs-btn-disabled]="csUploadImageLoading">
+                                <i class="fa-solid fa-upload"></i>
+                                {{ csUploadImageLoading ? 'Uploading…' : 'Upload Photo' }}
+                                <input type="file" accept="image/*" (change)="csOnImageSelected($event)"
+                                    [disabled]="csUploadImageLoading" hidden>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat name -->
+                <div class="cs-section">
+                    <p class="cs-section-label">
+                        <i class="fa-solid fa-pen-to-square"></i> Chat Name
+                    </p>
+                    <div class="cs-field">
+                        <input class="cs-input" type="text" [(ngModel)]="csChatName" placeholder="Enter chat name"
+                            maxlength="60">
+                        <span class="cs-char-count">{{ csChatName.length }}/60</span>
+                    </div>
+                </div>
+
+                <!-- Security -->
+                <div class="cs-section">
+                    <p class="cs-section-label">
+                        <i class="fa-solid fa-lock"></i> Security
+                    </p>
+
+                    <div class="cs-toggle-row" (click)="csOnTogglePassword()">
+                        <div class="cs-toggle-info">
+                            <span class="cs-toggle-title">Password protection</span>
+                            <span class="cs-toggle-desc">Require a password to join</span>
+                        </div>
+                        <div class="cs-toggle-track" [class.cs-toggle-on]="csHasPassword">
+                            <div class="cs-toggle-thumb"></div>
+                        </div>
+                    </div>
+
+                    <div class="cs-pw-fields" [class.cs-pw-visible]="csHasPassword">
+                        <div class="cs-field cs-field-mt">
+                            <label class="cs-field-label">New Password</label>
+                            <input class="cs-input" type="password" [(ngModel)]="csPassword"
+                                placeholder="Enter password" autocomplete="new-password">
+                        </div>
+                        <div class="cs-field cs-field-mt">
+                            <label class="cs-field-label">Confirm Password</label>
+                            <input class="cs-input" [class.cs-input-error]="!csPasswordsMatch" type="password"
+                                [(ngModel)]="csConfirmPassword" placeholder="Confirm password"
+                                autocomplete="new-password">
+                            <span class="cs-field-err" *ngIf="!csPasswordsMatch">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Passwords do not match
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save -->
+                <button class="cs-save-btn" (click)="csOnSaveChanges()" [disabled]="csSaving">
+                    <ng-container *ngIf="!csSaving">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                    </ng-container>
+                    <ng-container *ngIf="csSaving">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i> Saving…
+                    </ng-container>
+                </button>
+
+                <!-- Danger zone -->
+                <div class="cs-danger-zone">
+                    <p class="cs-section-label cs-danger-label">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Danger Zone
+                    </p>
+                    <div class="cs-danger-row">
+                        <div class="cs-danger-info">
+                            <p class="cs-danger-title">Delete this chat</p>
+                            <p class="cs-danger-desc">Permanently removes the chat and all messages. Cannot be undone.
+                            </p>
+                        </div>
+                        <button class="cs-delete-btn" (click)="csOpenDeleteConfirm()" [disabled]="csDeleting">
+                            <i class="fa-solid fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+
+            </div><!-- /general tab -->
+
+            <!-- ══════════ MEMBERS TAB ══════════ -->
+            <div class="cs-tab-content" *ngIf="csActiveTab === 'members'">
+
+                <div class="cs-members-list">
+                    <div class="cs-member-row" *ngFor="let member of csMembers"
+                        [class.cs-member-kicking]="csKickingUserId === member.id">
+
+                        <div class="cs-member-avatar">
+                            <!-- skeleton while member image loads -->
+                            <div class="cs-member-img-skel skel"
+                                *ngIf="member.profileImageUrl && !csMemberImagesLoaded.has(member.id)">
+                            </div>
+                            <img *ngIf="member.profileImageUrl" [src]="member.profileImageUrl" [alt]="member.name"
+                                class="cs-member-img" [class.cs-avatar-hidden]="!csMemberImagesLoaded.has(member.id)"
+                                (load)="csMemberImagesLoaded.add(member.id)"
+                                (error)="csMemberImagesLoaded.add(member.id)">
+                            <div *ngIf="!member.profileImageUrl" class="cs-member-initials">
+                                {{ getSettingsInitial(member.name) }}
+                            </div>
+                        </div>
+
+                        <div class="cs-member-info">
+                            <span class="cs-member-name">
+                                {{ member.name }}
+                                <span class="cs-owner-badge" *ngIf="member.id === selectedChat?.createdByUserId">
+                                    <i class="fa-solid fa-crown"></i> Owner
+                                </span>
+                                <span class="cs-you-badge" *ngIf="member.id === tokenData?.id">You</span>
+                            </span>
+                            <span class="cs-member-email">{{ member.email }}</span>
+                        </div>
+
+                        <!-- Kick button — only owner sees it, can't kick themselves or other owner -->
+                        <button class="cs-kick-btn"
+                            *ngIf="csIsOwner && member.id !== tokenData?.id && member.id !== selectedChat?.createdByUserId"
+                            (click)="csOpenKickConfirm(member)" [disabled]="csKickingUserId === member.id"
+                            title="Remove from chat">
+                            <i class="fa-solid fa-right-from-bracket" *ngIf="csKickingUserId !== member.id"></i>
+                            <i class="fa-solid fa-circle-notch fa-spin" *ngIf="csKickingUserId === member.id"></i>
+                        </button>
+
+                    </div>
+
+                    <div class="cs-members-empty" *ngIf="!csMembers.length">
+                        <i class="fa-solid fa-users-slash"></i>
+                        <p>No members found</p>
+                    </div>
+                </div>
+
+            </div><!-- /members tab -->
+
+        </ng-container>
+
+    </div><!-- /cs-panel-inline -->
+
 </section>
 
 <!-- ═══════════════ CREATE CHAT MODAL ═══════════════ -->
@@ -439,6 +666,59 @@
         </button>
     </div>
 
+</div>
+
+<!-- ════════════════════════════════════════════════
+     CHAT SETTINGS — DELETE CONFIRM OVERLAY
+     ════════════════════════════════════════════════ -->
+<div class="cs-confirm-backdrop" *ngIf="csShowDeleteConfirm || csDeleteConfirmClosing"
+    [class.cs-confirm-backdrop-closing]="csDeleteConfirmClosing" (click)="csCloseDeleteConfirm()"></div>
+
+<div class="cs-confirm-card" *ngIf="csShowDeleteConfirm || csDeleteConfirmClosing"
+    [class.cs-confirm-closing]="csDeleteConfirmClosing" (click)="$event.stopPropagation()">
+    <div class="cs-confirm-icon cs-confirm-icon-danger">
+        <i class="fa-solid fa-trash"></i>
+    </div>
+    <h3 class="cs-confirm-title">Delete Chat?</h3>
+    <p class="cs-confirm-body">
+        <strong>{{ selectedChat?.name }}</strong> and all its messages will be permanently deleted.
+        This cannot be undone.
+    </p>
+    <div class="cs-confirm-actions">
+        <button class="cs-confirm-cancel" (click)="csCloseDeleteConfirm()">Cancel</button>
+        <button class="cs-confirm-danger" (click)="csOnDeleteChat()" [disabled]="csDeleting">
+            <ng-container *ngIf="!csDeleting">
+                <i class="fa-solid fa-trash"></i> Delete
+            </ng-container>
+            <ng-container *ngIf="csDeleting">
+                <i class="fa-solid fa-circle-notch fa-spin"></i> Deleting…
+            </ng-container>
+        </button>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     CHAT SETTINGS — KICK CONFIRM OVERLAY
+     ════════════════════════════════════════════════ -->
+<div class="cs-confirm-backdrop" *ngIf="csKickTargetUser || csKickConfirmClosing"
+    [class.cs-confirm-backdrop-closing]="csKickConfirmClosing" (click)="csCloseKickConfirm()"></div>
+
+<div class="cs-confirm-card" *ngIf="csKickTargetUser || csKickConfirmClosing"
+    [class.cs-confirm-closing]="csKickConfirmClosing" (click)="$event.stopPropagation()">
+    <div class="cs-confirm-icon cs-confirm-icon-kick">
+        <i class="fa-solid fa-right-from-bracket"></i>
+    </div>
+    <h3 class="cs-confirm-title">Remove Member?</h3>
+    <p class="cs-confirm-body">
+        <strong>{{ csKickTargetUser?.name }}</strong> will be removed from this chat.
+        They won't be able to rejoin without being added back.
+    </p>
+    <div class="cs-confirm-actions">
+        <button class="cs-confirm-cancel" (click)="csCloseKickConfirm()">Cancel</button>
+        <button class="cs-confirm-danger" (click)="csConfirmKick()" [disabled]="csKickingUserId !== null">
+            <i class="fa-solid fa-right-from-bracket"></i> Remove
+        </button>
+    </div>
 </div>
 
 <!-- ── Fallback: no chat selected ── -->
