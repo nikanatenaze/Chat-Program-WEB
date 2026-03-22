@@ -106,9 +106,10 @@
                 <button class="header-btn" (click)="openAddUserPanel()" title="Add user">
                     <i class="fa-solid fa-user-plus"></i>
                 </button>
+                <!-- CHANGED: removed fa-spin-slow, gear no longer rotates -->
                 <button class="header-btn" (click)="openChatSettings()" title="Chat settings"
                     [class.header-btn-active]="showChatSettings || chatSettingsClosing">
-                    <i class="fa-solid fa-gear" [class.fa-spin-slow]="showChatSettings && !chatSettingsClosing"></i>
+                    <i class="fa-solid fa-gear"></i>
                 </button>
             </div>
         </div>
@@ -212,41 +213,96 @@
         <div class="chat-body-wrap" [class.chat-body-out]="chatSwitchingOut">
 
             <!-- Skeleton bubbles while messages load -->
-            <div class="chat-messages skel-messages-area" *ngIf="chatLoading">
-                <div class="skel-msg-row">
-                    <div class="skel skel-av-xs"></div>
-                    <div class="skel-bubble-wrap" style="width:28%;">
-                        <div class="skel skel-text-line" style="width:100%;"></div>
+            <div class="chat-messages skel-messages-area" *ngIf="chatLoading"
+                [class.skel-messages-exiting]="skelExiting">
+
+                <!-- Group 1: other, short single line -->
+                <div class="skel-group">
+                    <div class="skel-sender-name skel"></div>
+                    <div class="skel-msg-row">
+                        <div class="skel skel-av-xs"></div>
+                        <div class="skel-bubble-wrap skel-bubble-other" style="width:22%;">
+                            <div class="skel skel-text-line" style="width:100%;"></div>
+                            <div class="skel-ts skel"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="skel-msg-row skel-row-me">
-                    <div class="skel-bubble-wrap" style="width:55%;">
-                        <div class="skel skel-text-line" style="width:100%;"></div>
-                        <div class="skel skel-text-line" style="width:70%;margin-top:7px;"></div>
+
+                <!-- Group 2: other, continuation, medium 2 lines -->
+                <div class="skel-group skel-group-tight">
+                    <div class="skel-msg-row">
+                        <div class="skel-av-spacer"></div>
+                        <div class="skel-bubble-wrap skel-bubble-other" style="width:38%;">
+                            <div class="skel skel-text-line" style="width:100%;"></div>
+                            <div class="skel skel-text-line" style="width:68%; margin-top:6px;"></div>
+                            <div class="skel-ts skel"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="skel-msg-row">
-                    <div class="skel skel-av-xs"></div>
-                    <div class="skel-bubble-wrap" style="width:48%;">
-                        <div class="skel skel-text-line" style="width:100%;"></div>
-                        <div class="skel skel-text-line" style="width:65%;margin-top:7px;"></div>
+
+                <!-- Group 3: me, 2 lines -->
+                <div class="skel-group">
+                    <div class="skel-msg-row skel-row-me">
+                        <div class="skel-bubble-wrap skel-bubble-me" style="width:42%;">
+                            <div class="skel skel-text-line skel-line-me" style="width:100%;"></div>
+                            <div class="skel skel-text-line skel-line-me" style="width:55%; margin-top:6px;"></div>
+                            <div class="skel-ts skel skel-ts-me"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="skel-msg-row skel-row-me">
-                    <div class="skel-bubble-wrap" style="width:22%;">
-                        <div class="skel skel-text-line" style="width:100%;"></div>
+
+                <!-- Group 4: me, very short reply -->
+                <div class="skel-group skel-group-tight">
+                    <div class="skel-msg-row skel-row-me">
+                        <div class="skel-bubble-wrap skel-bubble-me" style="width:18%;">
+                            <div class="skel skel-text-line skel-line-me" style="width:100%;"></div>
+                            <div class="skel-ts skel skel-ts-me"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="skel-msg-row">
-                    <div class="skel skel-av-xs"></div>
-                    <div class="skel-bubble-wrap" style="width:32%;">
-                        <div class="skel skel-text-line" style="width:100%;"></div>
+
+                <!-- Group 5: other, 3 lines long message -->
+                <div class="skel-group">
+                    <div class="skel-sender-name skel" style="width:50px;"></div>
+                    <div class="skel-msg-row">
+                        <div class="skel skel-av-xs"></div>
+                        <div class="skel-bubble-wrap skel-bubble-other" style="width:48%;">
+                            <div class="skel skel-text-line" style="width:100%;"></div>
+                            <div class="skel skel-text-line" style="width:100%; margin-top:6px;"></div>
+                            <div class="skel skel-text-line" style="width:40%; margin-top:6px;"></div>
+                            <div class="skel-ts skel"></div>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Group 6: me, medium -->
+                <div class="skel-group">
+                    <div class="skel-msg-row skel-row-me">
+                        <div class="skel-bubble-wrap skel-bubble-me" style="width:32%;">
+                            <div class="skel skel-text-line skel-line-me" style="width:100%;"></div>
+                            <div class="skel skel-text-line skel-line-me" style="width:72%; margin-top:6px;"></div>
+                            <div class="skel-ts skel skel-ts-me"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Group 7: other, short -->
+                <div class="skel-group">
+                    <div class="skel-sender-name skel" style="width:44px;"></div>
+                    <div class="skel-msg-row">
+                        <div class="skel skel-av-xs"></div>
+                        <div class="skel-bubble-wrap skel-bubble-other" style="width:20%;">
+                            <div class="skel skel-text-line" style="width:100%;"></div>
+                            <div class="skel-ts skel"></div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <!-- Live messages -->
-            <div class="chat-messages" #messagesContainer *ngIf="!chatLoading" (scroll)="onMessagesScroll($event)">
+            <div class="chat-messages" #messagesContainer *ngIf="!chatLoading"
+                [class.messages-revealing]="messagesRevealing" (scroll)="onMessagesScroll($event)">
                 <ng-container *ngIf="selectedChatMessages$ | async as messages">
                     <div class="msg" [class.msg-new-received]="i.id === latestMessageId && !i.isWriter"
                         [class.msg-new-sent]="i.id === latestMessageId && i.isWriter"
@@ -347,12 +403,13 @@
                     <i class="fa-solid fa-xmark"></i>
                 </button>
                 <div class="cs-chat-avatar">
-                    <!-- Skeleton shown while image loading -->
-                    <div class="cs-avatar-skel skel" *ngIf="csImageLoading && csImagePreview"></div>
-                    <img *ngIf="csImagePreview" [src]="csImagePreview" [alt]="selectedChat?.name"
-                        [class.cs-avatar-hidden]="csImageLoading" (load)="csImageLoading = false"
-                        (error)="csImageLoading = false">
-                    <div *ngIf="!csImagePreview" class="cs-chat-initials">
+                    <!-- CHANGED: skeleton shown during upload OR while initial image loading -->
+                    <div class="cs-avatar-skel skel" *ngIf="(csImageLoading && csImagePreview) || csUploadImageLoading">
+                    </div>
+                    <img *ngIf="csImagePreview && !csUploadImageLoading" [src]="csImagePreview"
+                        [alt]="selectedChat?.name" [class.cs-avatar-hidden]="csImageLoading"
+                        (load)="csImageLoading = false" (error)="csImageLoading = false">
+                    <div *ngIf="!csImagePreview && !csUploadImageLoading" class="cs-chat-initials">
                         {{ getSettingsInitial(selectedChat?.name || '?') }}
                     </div>
                 </div>
@@ -406,10 +463,8 @@
                     </p>
                     <div class="cs-image-row">
                         <div class="cs-avatar-wrap">
-                            <!-- Skeleton while uploading or while image is loading -->
-                            <div class="cs-avatar-upload-skel skel"
-                                *ngIf="csUploadImageLoading || (csImagePreview && csUploadPreviewLoading)">
-                            </div>
+                            <!-- CHANGED: skeleton covers avatar during ANY upload state -->
+                            <div class="cs-avatar-upload-skel skel" *ngIf="csUploadImageLoading"></div>
                             <img *ngIf="csImagePreview && !csUploadImageLoading" [src]="csImagePreview"
                                 [alt]="selectedChat?.name" class="cs-avatar-img"
                                 [class.cs-avatar-hidden]="csUploadPreviewLoading"
@@ -537,9 +592,11 @@
                             <span class="cs-member-email">{{ member.email }}</span>
                         </div>
 
-                        <!-- Kick button — only owner sees it, can't kick themselves or other owner -->
+                        <!-- CHANGED: kick button visible to ALL users (not just owner).
+                             Hidden only for self and the chat owner.
+                             Non-owners will get an error from the server / TS logic. -->
                         <button class="cs-kick-btn"
-                            *ngIf="csIsOwner && member.id !== tokenData?.id && member.id !== selectedChat?.createdByUserId"
+                            *ngIf="member.id !== tokenData?.id && member.id !== selectedChat?.createdByUserId"
                             (click)="csOpenKickConfirm(member)" [disabled]="csKickingUserId === member.id"
                             title="Remove from chat">
                             <i class="fa-solid fa-right-from-bracket" *ngIf="csKickingUserId !== member.id"></i>

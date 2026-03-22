@@ -74,10 +74,11 @@ hr {
 
 .title p {
     font-size: 22px;
-    font-weight: 700;
+    font-weight: 800;
     color: var(--text);
     margin: 0;
-    letter-spacing: -0.3px;
+    letter-spacing: -0.5px;
+    font-family: "Oxygen", sans-serif;
 }
 
 .new {
@@ -88,17 +89,19 @@ hr {
     color: var(--accent);
     border: 1px solid rgba(99, 102, 241, 0.3);
     cursor: pointer;
-    transition: .2s;
+    transition: background .18s, color .18s, border-color .18s, transform .15s;
     user-select: none;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.2px;
+    font-family: "Oxygen", sans-serif;
 }
 
 .new:hover {
     background: var(--accent);
     color: white;
     border-color: var(--accent);
-    transform: scale(1.04);
+    /* CHANGED: reduced scale from 1.04 → 1.02 */
+    transform: scale(1.02);
 }
 
 /* ── Search bar ── */
@@ -125,7 +128,7 @@ hr {
     width: 100%;
     height: 100%;
     color: var(--text);
-    font-family: inherit;
+    font-family: "Oxygen", sans-serif;
 }
 
 .search-input-div input::placeholder {
@@ -324,6 +327,7 @@ hr {
     display: flex;
     align-items: center;
     justify-content: center;
+    font-family: "Oxygen", sans-serif;
 }
 
 .chat-title {
@@ -341,6 +345,8 @@ hr {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-family: "Oxygen", sans-serif;
+    font-weight: 500;
 }
 
 .chat-hover-icon {
@@ -446,6 +452,7 @@ hr {
     -webkit-backdrop-filter: blur(28px);
     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(239, 68, 68, 0.08);
     animation: quit-card-in 0.24s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+    font-family: "Oxygen", sans-serif;
 }
 
 .quit-confirm-card.quit-confirm-closing {
@@ -461,6 +468,7 @@ hr {
     font-weight: 700;
     color: var(--text);
     letter-spacing: 0.1px;
+    font-family: "Oxygen", sans-serif;
 }
 
 .quit-confirm-header i {
@@ -487,17 +495,17 @@ hr {
     border: none;
     font-size: 12px;
     font-weight: 600;
-    font-family: inherit;
+    font-family: "Oxygen", sans-serif;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 5px;
-    transition: background .15s, color .15s, border-color .15s, transform .1s;
+    transition: background .15s, color .15s, border-color .15s, transform .12s;
 }
 
 .quit-btn:active {
-    transform: scale(0.96);
+    transform: scale(0.97);
 }
 
 .quit-btn-cancel {
@@ -585,18 +593,22 @@ hr {
     display: flex;
     align-items: center;
     justify-content: center;
+    font-family: "Oxygen", sans-serif;
 }
 
 .chat-name {
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text);
     margin: 0;
+    font-family: "Oxygen", sans-serif;
+    letter-spacing: -0.2px;
 }
 
 .chat-status {
     font-size: 11px;
     color: var(--green);
+    font-family: "Oxygen", sans-serif;
 }
 
 .chat-header-actions {
@@ -617,18 +629,20 @@ hr {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background .2s, color .2s, transform .15s, border-color .2s;
+    /* CHANGED: reduced transition scale effects */
+    transition: background .18s, color .18s, transform .15s, border-color .18s;
 }
 
 .header-btn:hover {
     background: var(--accent-soft);
     color: var(--accent);
     border-color: rgba(99, 102, 241, 0.3);
-    transform: scale(1.08);
+    /* CHANGED: reduced from 1.08 → 1.04 */
+    transform: scale(1.04);
 }
 
 .header-btn:active {
-    transform: scale(0.94);
+    transform: scale(0.96);
 }
 
 /* Active state for settings button when panel is open */
@@ -638,20 +652,7 @@ hr {
     border-color: rgba(99, 102, 241, 0.35) !important;
 }
 
-/* Slow spin for the settings gear when panel is open */
-@keyframes spin-slow {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.fa-spin-slow {
-    animation: spin-slow 3s linear infinite;
-}
+/* REMOVED: fa-spin-slow and gear rotation styles — no longer used */
 
 /* ── Messages area ── */
 
@@ -661,6 +662,7 @@ hr {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    justify-content: flex-end;
     gap: 2px;
 }
 
@@ -698,6 +700,104 @@ hr {
 .chat-body-out {
     animation: chat-body-out 0.18s ease forwards;
     pointer-events: none;
+}
+
+/* ── Skeleton → messages transition ── */
+
+@keyframes skel-exit {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0px);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.97);
+        filter: blur(3px);
+    }
+}
+
+.skel-messages-exiting {
+    animation: skel-exit 0.26s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+    pointer-events: none;
+}
+
+@keyframes messages-reveal {
+    0% {
+        opacity: 0;
+        transform: translateY(14px) scale(0.985);
+        filter: blur(4px);
+    }
+
+    60% {
+        opacity: 1;
+        filter: blur(0px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0px);
+    }
+}
+
+.messages-revealing {
+    animation: messages-reveal 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Individual message rows stagger in during reveal */
+.messages-revealing .msg {
+    opacity: 0;
+    animation: msg-row-stagger 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.messages-revealing .msg:nth-last-child(1) {
+    animation-delay: 0.00s;
+}
+
+.messages-revealing .msg:nth-last-child(2) {
+    animation-delay: 0.03s;
+}
+
+.messages-revealing .msg:nth-last-child(3) {
+    animation-delay: 0.06s;
+}
+
+.messages-revealing .msg:nth-last-child(4) {
+    animation-delay: 0.09s;
+}
+
+.messages-revealing .msg:nth-last-child(5) {
+    animation-delay: 0.12s;
+}
+
+.messages-revealing .msg:nth-last-child(6) {
+    animation-delay: 0.14s;
+}
+
+.messages-revealing .msg:nth-last-child(7) {
+    animation-delay: 0.16s;
+}
+
+.messages-revealing .msg:nth-last-child(8) {
+    animation-delay: 0.18s;
+}
+
+.messages-revealing .msg:nth-last-child(n+9) {
+    animation-delay: 0.20s;
+}
+
+@keyframes msg-row-stagger {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ── New message entrance ── */
@@ -818,6 +918,7 @@ hr {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    font-family: "Oxygen", sans-serif;
 }
 
 .avatar-spacer {
@@ -847,10 +948,12 @@ hr {
     word-break: break-word;
     overflow-wrap: anywhere;
     white-space: pre-wrap;
+    font-family: "Oxygen", sans-serif;
 }
 
 .message p {
     margin: 0;
+    line-height: 1.5;
 }
 
 .message span {
@@ -858,6 +961,8 @@ hr {
     margin-top: 4px;
     opacity: 0.5;
     align-self: flex-end;
+    font-family: "Oxygen", sans-serif;
+    letter-spacing: 0.2px;
 }
 
 .message.other {
@@ -875,17 +980,18 @@ hr {
 }
 
 .message.me:hover {
-    filter: brightness(1.1);
+    filter: brightness(1.08);
 }
 
 .sender {
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
     margin-left: 38px;
     margin-bottom: 3px;
     color: var(--accent);
-    letter-spacing: 0.2px;
+    letter-spacing: 0.3px;
     opacity: 0.85;
+    font-family: "Oxygen", sans-serif;
 }
 
 .msg:has(.message.me) .sender {
@@ -913,7 +1019,7 @@ hr {
     padding: 0 16px;
     font-size: 14px;
     color: var(--text);
-    font-family: inherit;
+    font-family: "Oxygen", sans-serif;
     transition: border-color .2s, background .2s;
 }
 
@@ -935,7 +1041,8 @@ hr {
     background: var(--accent);
     color: white;
     cursor: pointer;
-    transition: transform .2s, filter .2s;
+    /* CHANGED: reduced transform scale */
+    transition: transform .18s, filter .18s;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -944,7 +1051,8 @@ hr {
 }
 
 .chat-input button:hover:not(:disabled) {
-    transform: scale(1.08);
+    /* CHANGED: reduced from 1.08 → 1.04 */
+    transform: scale(1.04);
     filter: brightness(1.1);
 }
 
@@ -968,6 +1076,7 @@ hr {
     backdrop-filter: blur(8px);
     color: var(--sub);
     font-size: 11px;
+    font-family: "Oxygen", sans-serif;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -986,7 +1095,7 @@ hr {
 }
 
 .scroll-to-bottom-btn:active {
-    transform: translateX(-50%) scale(0.93);
+    transform: translateX(-50%) scale(0.95);
 }
 
 @keyframes fab-pop-in {
@@ -1038,6 +1147,14 @@ hr {
 
 .not-selec-text {
     font-size: 22px;
+    font-family: "Oxygen", sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+}
+
+.chat-ui-chat-none p:last-child {
+    font-family: "Oxygen", sans-serif;
+    font-size: 14px;
 }
 
 .cr-ch {
@@ -1103,11 +1220,77 @@ hr {
 
 .skel-messages-area {
     flex: 1;
-    padding: 20px 16px;
+    padding: 16px 16px 20px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    justify-content: flex-end;
+    gap: 0;
     overflow: hidden;
+}
+
+/* A group is one sender's cluster of messages */
+.skel-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: 14px;
+    opacity: 0;
+    animation: skel-group-enter 0.32s ease forwards;
+}
+
+.skel-group:nth-child(1) {
+    animation-delay: 0.00s;
+}
+
+.skel-group:nth-child(2) {
+    animation-delay: 0.04s;
+}
+
+.skel-group:nth-child(3) {
+    animation-delay: 0.08s;
+}
+
+.skel-group:nth-child(4) {
+    animation-delay: 0.11s;
+}
+
+.skel-group:nth-child(5) {
+    animation-delay: 0.14s;
+}
+
+.skel-group:nth-child(6) {
+    animation-delay: 0.17s;
+}
+
+.skel-group:nth-child(7) {
+    animation-delay: 0.20s;
+}
+
+@keyframes skel-group-enter {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Tight continuation row — sits close to the previous bubble */
+.skel-group-tight {
+    margin-bottom: 3px;
+}
+
+/* Sender name bar */
+.skel-sender-name {
+    height: 10px;
+    width: 64px;
+    border-radius: 4px;
+    margin-left: 38px;
+    margin-bottom: 4px;
+    opacity: 0.45;
 }
 
 .skel-msg-row {
@@ -1120,6 +1303,12 @@ hr {
     flex-direction: row-reverse;
 }
 
+/* Spacer replaces avatar on continuation rows */
+.skel-av-spacer {
+    width: 30px;
+    flex-shrink: 0;
+}
+
 .skel-av-xs {
     width: 30px;
     height: 30px;
@@ -1130,74 +1319,129 @@ hr {
             rgba(255, 255, 255, 0.10) 40%,
             rgba(255, 255, 255, 0.04) 80%);
     background-size: 300% 100%;
-    animation: shimmer 2s ease-in-out infinite;
+    animation: shimmer 1.8s ease-in-out infinite;
 }
 
+/* Bubble shell */
 .skel-bubble-wrap {
-    padding: 11px 14px 9px;
+    padding: 10px 13px 8px;
     border-radius: 15px;
     display: flex;
     flex-direction: column;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border);
-    border-bottom-left-radius: 4px;
     box-sizing: border-box;
 }
 
-.skel-row-me .skel-bubble-wrap {
-    background: rgba(99, 102, 241, 0.08);
-    border-color: rgba(99, 102, 241, 0.15);
-    border-bottom-left-radius: 15px;
+.skel-bubble-other {
+    background: rgba(255, 255, 255, 0.055);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom-left-radius: 4px;
+}
+
+.skel-bubble-me {
+    background: rgba(99, 102, 241, 0.10);
+    border: 1px solid rgba(99, 102, 241, 0.16);
     border-bottom-right-radius: 4px;
 }
 
+/* Text lines */
 .skel-text-line {
-    height: 12px;
-    border-radius: 4px;
+    height: 13px;
+    border-radius: 5px;
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0.05) 0%,
+            rgba(255, 255, 255, 0.13) 40%,
+            rgba(255, 255, 255, 0.05) 80%);
+    background-size: 300% 100%;
+    animation: shimmer 1.8s ease-in-out infinite;
 }
 
-.skel-bubble-wrap::after {
-    content: '';
-    display: block;
-    width: 32px;
-    height: 7px;
-    border-radius: 4px;
+/* Accent-tinted lines for "me" bubbles */
+.skel-line-me {
+    background: linear-gradient(90deg,
+            rgba(99, 102, 241, 0.10) 0%,
+            rgba(99, 102, 241, 0.24) 40%,
+            rgba(99, 102, 241, 0.10) 80%) !important;
+    background-size: 300% 100% !important;
+    animation: shimmer 1.8s ease-in-out infinite !important;
+}
+
+/* Timestamp bar pinned bottom-right */
+.skel-ts {
+    height: 8px;
+    width: 34px;
+    border-radius: 3px;
     margin-top: 7px;
     align-self: flex-end;
+    opacity: 0.38;
     background: linear-gradient(90deg,
-            rgba(255, 255, 255, 0.03) 0%,
-            rgba(255, 255, 255, 0.07) 40%,
-            rgba(255, 255, 255, 0.03) 80%);
+            rgba(255, 255, 255, 0.04) 0%,
+            rgba(255, 255, 255, 0.10) 40%,
+            rgba(255, 255, 255, 0.04) 80%);
     background-size: 300% 100%;
-    animation: shimmer 2s ease-in-out infinite;
+    animation: shimmer 1.8s ease-in-out infinite;
 }
 
-.skel-msg-row:nth-child(1) .skel,
-.skel-msg-row:nth-child(1) .skel-av-xs,
-.skel-msg-row:nth-child(1) .skel-bubble-wrap::after {
+.skel-ts-me {
+    background: linear-gradient(90deg,
+            rgba(99, 102, 241, 0.08) 0%,
+            rgba(99, 102, 241, 0.20) 40%,
+            rgba(99, 102, 241, 0.08) 80%);
+    background-size: 300% 100%;
+    animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* Stagger shimmer phase per group so waves don't all pulse in sync */
+.skel-group:nth-child(1) .skel,
+.skel-group:nth-child(1) .skel-av-xs,
+.skel-group:nth-child(1) .skel-ts,
+.skel-group:nth-child(1) .skel-text-line,
+.skel-group:nth-child(1) .skel-ts-me {
     animation-delay: 0s;
 }
 
-.skel-msg-row:nth-child(2) .skel,
-.skel-msg-row:nth-child(2) .skel-bubble-wrap::after {
-    animation-delay: 0.25s;
+.skel-group:nth-child(2) .skel,
+.skel-group:nth-child(2) .skel-av-xs,
+.skel-group:nth-child(2) .skel-ts,
+.skel-group:nth-child(2) .skel-text-line,
+.skel-group:nth-child(2) .skel-ts-me {
+    animation-delay: 0.15s;
 }
 
-.skel-msg-row:nth-child(3) .skel,
-.skel-msg-row:nth-child(3) .skel-av-xs,
-.skel-msg-row:nth-child(3) .skel-bubble-wrap::after {
-    animation-delay: 0.5s;
+.skel-group:nth-child(3) .skel,
+.skel-group:nth-child(3) .skel-ts,
+.skel-group:nth-child(3) .skel-text-line,
+.skel-group:nth-child(3) .skel-ts-me {
+    animation-delay: 0.30s;
 }
 
-.skel-msg-row:nth-child(4) .skel,
-.skel-msg-row:nth-child(4) .skel-bubble-wrap::after {
+.skel-group:nth-child(4) .skel,
+.skel-group:nth-child(4) .skel-ts,
+.skel-group:nth-child(4) .skel-text-line,
+.skel-group:nth-child(4) .skel-ts-me {
+    animation-delay: 0.45s;
+}
+
+.skel-group:nth-child(5) .skel,
+.skel-group:nth-child(5) .skel-av-xs,
+.skel-group:nth-child(5) .skel-ts,
+.skel-group:nth-child(5) .skel-text-line,
+.skel-group:nth-child(5) .skel-ts-me {
+    animation-delay: 0.60s;
+}
+
+.skel-group:nth-child(6) .skel,
+.skel-group:nth-child(6) .skel-ts,
+.skel-group:nth-child(6) .skel-text-line,
+.skel-group:nth-child(6) .skel-ts-me {
     animation-delay: 0.75s;
 }
 
-.skel-msg-row:nth-child(5) .skel,
-.skel-msg-row:nth-child(5) .skel-av-xs,
-.skel-msg-row:nth-child(5) .skel-bubble-wrap::after {
-    animation-delay: 1s;
+.skel-group:nth-child(7) .skel,
+.skel-group:nth-child(7) .skel-av-xs,
+.skel-group:nth-child(7) .skel-ts,
+.skel-group:nth-child(7) .skel-text-line,
+.skel-group:nth-child(7) .skel-ts-me {
+    animation-delay: 0.90s;
 }
 
 /* ═══════════════════════════════════════════════
@@ -1246,14 +1490,16 @@ hr {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background .15s, color .15s, transform .1s;
+    /* CHANGED: reduced scale */
+    transition: background .15s, color .15s, transform .12s;
 }
 
 .msg-action-btn:hover {
     background: var(--accent-soft);
     color: var(--accent);
     border-color: rgba(99, 102, 241, 0.3);
-    transform: scale(1.1);
+    /* CHANGED: reduced from 1.1 → 1.05 */
+    transform: scale(1.05);
 }
 
 .msg-action-btn.danger:hover {
@@ -1311,7 +1557,7 @@ hr {
     background: rgba(99, 102, 241, 0.08);
     color: var(--text);
     font-size: 14px;
-    font-family: inherit;
+    font-family: "Oxygen", sans-serif;
     resize: none;
     line-height: 1.45;
     transition: border-color .15s;
@@ -1338,14 +1584,16 @@ hr {
     display: flex;
     align-items: center;
     gap: 4px;
-    transition: opacity .15s, transform .1s;
-    font-family: inherit;
+    /* CHANGED: reduced scale on hover */
+    transition: opacity .15s, transform .12s;
+    font-family: "Oxygen", sans-serif;
     font-weight: 600;
 }
 
 .edit-btn:hover {
     opacity: 0.85;
-    transform: scale(1.04);
+    /* CHANGED: reduced from 1.04 → 1.02 */
+    transform: scale(1.02);
 }
 
 .edit-btn:active {
@@ -1442,6 +1690,7 @@ hr {
     flex-direction: column;
     overflow: hidden;
     animation: aup-slide-up 0.22s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+    font-family: "Oxygen", sans-serif;
 }
 
 .add-user-panel-closing {
@@ -1466,6 +1715,7 @@ hr {
     align-items: center;
     gap: 8px;
     letter-spacing: 0.2px;
+    font-family: "Oxygen", sans-serif;
 }
 
 .aup-title i {
@@ -1516,6 +1766,7 @@ hr {
     font-size: 12px;
     color: var(--text);
     animation: aup-chip-pop 0.15s cubic-bezier(0.34, 1.5, 0.64, 1);
+    font-family: "Oxygen", sans-serif;
 }
 
 @keyframes aup-chip-pop {
@@ -1543,6 +1794,7 @@ hr {
     justify-content: center;
     flex-shrink: 0;
     overflow: hidden;
+    font-family: "Oxygen", sans-serif;
 }
 
 .aup-chip-remove {
@@ -1587,7 +1839,7 @@ hr {
     border: none;
     color: var(--text);
     font-size: 13px;
-    font-family: inherit;
+    font-family: "Oxygen", sans-serif;
     outline: none;
 }
 
@@ -1626,6 +1878,7 @@ hr {
     padding: 28px 0;
     color: var(--muted);
     font-size: 13px;
+    font-family: "Oxygen", sans-serif;
 }
 
 .aup-empty i {
@@ -1647,6 +1900,7 @@ hr {
     cursor: pointer;
     transition: background .15s;
     animation: search-result-enter 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+    font-family: "Oxygen", sans-serif;
 }
 
 .aup-user-row:hover {
@@ -1708,6 +1962,7 @@ hr {
     flex-shrink: 0;
     overflow: hidden;
     transition: border-color .15s;
+    font-family: "Oxygen", sans-serif;
 }
 
 .aup-user-selected .aup-user-avatar {
@@ -1735,6 +1990,7 @@ hr {
     overflow: hidden;
     text-overflow: ellipsis;
     margin-top: 1px;
+    font-family: "Oxygen", sans-serif;
 }
 
 .aup-check {
@@ -1772,7 +2028,7 @@ hr {
     background: transparent;
     color: var(--sub);
     font-size: 13px;
-    font-family: inherit;
+    font-family: "Oxygen", sans-serif;
     cursor: pointer;
     transition: background .15s, color .15s;
     font-weight: 500;
@@ -1792,18 +2048,20 @@ hr {
     color: white;
     font-size: 13px;
     font-weight: 700;
-    font-family: inherit;
+    font-family: "Oxygen", sans-serif;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    transition: filter .15s, transform .1s;
+    /* CHANGED: reduced scale */
+    transition: filter .15s, transform .12s;
 }
 
 .aup-btn-add:hover:not(:disabled) {
-    filter: brightness(1.12);
-    transform: scale(1.02);
+    filter: brightness(1.1);
+    /* CHANGED: reduced from 1.02 → 1.01 */
+    transform: scale(1.01);
 }
 
 .aup-btn-add:disabled {
@@ -1920,12 +2178,13 @@ hr {
 
 .ccm-title {
     font-size: 15px;
-    font-weight: 700;
+    font-weight: 800;
     color: var(--text);
     display: flex;
     align-items: center;
     gap: 9px;
     letter-spacing: 0.1px;
+    font-family: "Oxygen", sans-serif;
 }
 
 .ccm-title i {
@@ -1941,11 +2200,12 @@ hr {
 .ccm-label {
     display: block;
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--muted);
     text-transform: uppercase;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.7px;
     margin-bottom: 7px;
+    font-family: "Oxygen", sans-serif;
 }
 
 .ccm-input {
@@ -1956,7 +2216,7 @@ hr {
     background: rgba(255, 255, 255, 0.05);
     color: var(--text);
     font-size: 14px;
-    font-family: inherit;
+    font-family: "Oxygen", sans-serif;
     padding: 0 14px;
     transition: border-color .2s, background .2s;
     box-sizing: border-box;
@@ -2038,15 +2298,16 @@ hr {
 
 .ccm-section-label {
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--muted);
     text-transform: uppercase;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.7px;
     padding: 14px 20px 10px;
     display: flex;
     align-items: center;
     gap: 7px;
     flex-shrink: 0;
+    font-family: "Oxygen", sans-serif;
 }
 
 .ccm-section-label i {
@@ -2100,14 +2361,11 @@ hr {
    CHAT SETTINGS — INLINE SIDE PANEL
    ═══════════════════════════════════════════════════════════════════════════════ */
 
-/* Shared utility: hide an image while it's loading (skeleton shows instead) */
 .cs-avatar-hidden {
     opacity: 0;
     position: absolute;
     pointer-events: none;
 }
-
-/* ── Panel slide-in from right ── */
 
 @keyframes cs-panel-slide-in {
     from {
@@ -2156,7 +2414,6 @@ hr {
     pointer-events: none;
 }
 
-/* Optional dimming overlay behind settings panel on mobile */
 @keyframes cs-overlay-in {
     from {
         opacity: 0;
@@ -2179,7 +2436,6 @@ hr {
 
 .cs-overlay-inline {
     display: none;
-    /* visible only on mobile via media query */
 }
 
 /* ── Settings Header ── */
@@ -2213,7 +2469,8 @@ hr {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background .2s, color .2s, transform .15s, border-color .2s;
+    /* CHANGED: reduced transform */
+    transition: background .18s, color .18s, transform .15s, border-color .18s;
     flex-shrink: 0;
 }
 
@@ -2221,11 +2478,12 @@ hr {
     background: var(--danger-soft);
     color: var(--danger);
     border-color: rgba(239, 68, 68, 0.3);
-    transform: scale(1.08);
+    /* CHANGED: reduced from 1.08 → 1.04 */
+    transform: scale(1.04);
 }
 
 .cs-back-btn:active {
-    transform: scale(0.94);
+    transform: scale(0.96);
 }
 
 /* ── Header avatar with skeleton ── */
@@ -2239,7 +2497,6 @@ hr {
     position: relative;
 }
 
-/* Skeleton shown in header while image loads */
 .cs-avatar-skel {
     position: absolute;
     inset: 0;
@@ -2268,6 +2525,7 @@ hr {
     display: flex;
     align-items: center;
     justify-content: center;
+    font-family: "Oxygen", sans-serif;
 }
 
 .cs-header-info {
@@ -2286,11 +2544,13 @@ hr {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-family: "Oxygen", sans-serif;
 }
 
 .cs-member-count {
     font-size: 12px;
     color: var(--green);
+    font-family: "Oxygen", sans-serif;
 }
 
 /* ── Tabs ── */
@@ -2313,7 +2573,7 @@ hr {
     color: var(--muted);
     font-size: 13px;
     font-weight: 600;
-    font-family: inherit;
+    font-family: "Oxygen", sans-serif;
     cursor: pointer;
     transition: color .15s, background .15s;
 }
@@ -2338,6 +2598,7 @@ hr {
     padding: 1px 6px;
     border-radius: 10px;
     line-height: 16px;
+    font-family: "Oxygen", sans-serif;
 }
 
 .cs-hr {
@@ -2358,6 +2619,7 @@ hr {
     gap: 14px;
     color: var(--sub);
     font-size: 13px;
+    font-family: "Oxygen", sans-serif;
 }
 
 .cs-spinner {
@@ -2388,6 +2650,7 @@ hr {
     font-weight: 500;
     animation: cs-alert-in 0.22s ease;
     flex-shrink: 0;
+    font-family: "Oxygen", sans-serif;
 }
 
 @keyframes cs-alert-in {
@@ -2484,9 +2747,10 @@ hr {
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.7px;
+    letter-spacing: 0.8px;
     color: var(--muted);
     margin: 0;
+    font-family: "Oxygen", sans-serif;
 }
 
 .cs-section-label i {
@@ -2511,7 +2775,6 @@ hr {
     border-radius: 50%;
 }
 
-/* Upload section skeleton: covers the whole avatar circle */
 .cs-avatar-upload-skel {
     position: absolute;
     inset: 0;
@@ -2552,6 +2815,7 @@ hr {
     font-size: 12px;
     color: var(--muted);
     margin: 0;
+    font-family: "Oxygen", sans-serif;
 }
 
 .cs-upload-btn {
@@ -2566,8 +2830,8 @@ hr {
     border-radius: var(--r-md);
     font-size: 12px;
     font-weight: 700;
-    font-family: inherit;
-    transition: all .2s;
+    font-family: "Oxygen", sans-serif;
+    transition: all .18s;
     width: fit-content;
 }
 
@@ -2598,6 +2862,7 @@ hr {
     font-size: 12px;
     font-weight: 600;
     color: var(--sub);
+    font-family: "Oxygen", sans-serif;
 }
 
 .cs-input {
@@ -2609,7 +2874,7 @@ hr {
     background: rgba(255, 255, 255, 0.05);
     color: var(--text);
     font-size: 13px;
-    font-family: inherit;
+    font-family: "Oxygen", sans-serif;
     padding: 0 14px;
     transition: border-color .2s, background .2s, box-shadow .2s;
 }
@@ -2635,6 +2900,7 @@ hr {
     font-size: 11px;
     color: var(--muted);
     margin-top: -2px;
+    font-family: "Oxygen", sans-serif;
 }
 
 .cs-field-err {
@@ -2643,6 +2909,7 @@ hr {
     display: flex;
     align-items: center;
     gap: 5px;
+    font-family: "Oxygen", sans-serif;
 }
 
 /* ── Password toggle ── */
@@ -2667,11 +2934,13 @@ hr {
     font-size: 13px;
     font-weight: 600;
     color: var(--text);
+    font-family: "Oxygen", sans-serif;
 }
 
 .cs-toggle-desc {
     font-size: 11px;
     color: var(--muted);
+    font-family: "Oxygen", sans-serif;
 }
 
 .cs-toggle-track {
@@ -2705,7 +2974,6 @@ hr {
     transform: translateX(16px);
 }
 
-/* Password fields reveal */
 .cs-pw-fields {
     max-height: 0;
     overflow: hidden;
@@ -2733,15 +3001,16 @@ hr {
     color: white;
     font-size: 14px;
     font-weight: 700;
-    font-family: inherit;
+    font-family: "Oxygen", sans-serif;
     cursor: pointer;
     margin-top: 16px;
-    transition: filter .2s, transform .1s, box-shadow .2s;
+    /* CHANGED: reduced scale */
+    transition: filter .2s, transform .12s, box-shadow .2s;
 }
 
 .cs-save-btn:hover:not(:disabled) {
-    filter: brightness(1.12);
-    transform: scale(1.01);
+    filter: brightness(1.1);
+    /* CHANGED: reduced from 1.01 → removed scale, just brightness+shadow */
     box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
 }
 
@@ -2791,6 +3060,7 @@ hr {
     font-weight: 700;
     color: var(--text);
     margin: 0 0 3px;
+    font-family: "Oxygen", sans-serif;
 }
 
 .cs-danger-desc {
@@ -2798,6 +3068,7 @@ hr {
     color: var(--sub);
     margin: 0;
     line-height: 1.5;
+    font-family: "Oxygen", sans-serif;
 }
 
 .cs-delete-btn {
@@ -2811,11 +3082,12 @@ hr {
     color: var(--danger);
     font-size: 12px;
     font-weight: 700;
-    font-family: inherit;
+    font-family: "Oxygen", sans-serif;
     cursor: pointer;
     white-space: nowrap;
     flex-shrink: 0;
-    transition: background .15s, color .15s, border-color .15s, transform .1s;
+    /* CHANGED: removed scale transform */
+    transition: background .15s, color .15s, border-color .15s;
 }
 
 .cs-delete-btn:hover:not(:disabled) {
@@ -2825,7 +3097,7 @@ hr {
 }
 
 .cs-delete-btn:active:not(:disabled) {
-    transform: scale(0.95);
+    transform: scale(0.97);
 }
 
 .cs-delete-btn:disabled {
@@ -2898,7 +3170,6 @@ hr {
     pointer-events: none;
 }
 
-/* Member avatar with skeleton support */
 .cs-member-avatar {
     width: 40px;
     height: 40px;
@@ -2908,7 +3179,6 @@ hr {
     position: relative;
 }
 
-/* Member image skeleton (shimmer circle) */
 .cs-member-img-skel {
     position: absolute;
     inset: 0;
@@ -2937,6 +3207,7 @@ hr {
     display: flex;
     align-items: center;
     justify-content: center;
+    font-family: "Oxygen", sans-serif;
 }
 
 .cs-member-info {
@@ -2957,6 +3228,7 @@ hr {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-family: "Oxygen", sans-serif;
 }
 
 .cs-owner-badge {
@@ -2968,6 +3240,7 @@ hr {
     padding: 1px 6px;
     border-radius: 10px;
     white-space: nowrap;
+    font-family: "Oxygen", sans-serif;
 }
 
 .cs-owner-badge i {
@@ -2983,6 +3256,7 @@ hr {
     padding: 1px 6px;
     border-radius: 10px;
     white-space: nowrap;
+    font-family: "Oxygen", sans-serif;
 }
 
 .cs-member-email {
@@ -2991,6 +3265,7 @@ hr {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-family: "Oxygen", sans-serif;
 }
 
 .cs-kick-btn {
@@ -3034,6 +3309,7 @@ hr {
     gap: 10px;
     padding: 40px 0;
     color: var(--muted);
+    font-family: "Oxygen", sans-serif;
 }
 
 .cs-members-empty i {
@@ -3048,7 +3324,6 @@ hr {
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    SETTINGS — CONFIRM OVERLAYS (delete / kick)
-   Rendered at fixed position, same z-index as other global modals
    ═══════════════════════════════════════════════════════════════════════════════ */
 
 @keyframes cs-backdrop-in {
@@ -3135,6 +3410,7 @@ hr {
     text-align: center;
     box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(99, 102, 241, 0.08);
     animation: cs-card-in 0.26s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+    font-family: "Oxygen", sans-serif;
 }
 
 .cs-confirm-closing {
@@ -3169,6 +3445,8 @@ hr {
     font-weight: 800;
     color: var(--text);
     margin: 0;
+    font-family: "Oxygen", sans-serif;
+    letter-spacing: -0.3px;
 }
 
 .cs-confirm-body {
@@ -3199,7 +3477,7 @@ hr {
     color: var(--sub);
     font-size: 13px;
     font-weight: 600;
-    font-family: inherit;
+    font-family: "Oxygen", sans-serif;
     cursor: pointer;
     transition: background .15s, color .15s;
 }
@@ -3218,13 +3496,14 @@ hr {
     color: white;
     font-size: 13px;
     font-weight: 700;
-    font-family: inherit;
+    font-family: "Oxygen", sans-serif;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    transition: filter .15s, transform .1s;
+    /* CHANGED: no scale on hover */
+    transition: filter .15s;
 }
 
 .cs-confirm-danger:hover:not(:disabled) {
@@ -3317,7 +3596,6 @@ hr {
         max-height: 75vh;
     }
 
-    /* Settings panel slides in from the right over the chat on mobile */
     .cs-overlay-inline {
         display: block;
         position: fixed;
@@ -3395,7 +3673,6 @@ hr {
         padding: 0 14px 10px;
     }
 
-    /* Danger row stacks on mobile */
     .cs-danger-row {
         flex-direction: column;
         align-items: flex-start;
@@ -3511,7 +3788,7 @@ hr {
     cursor: pointer;
     align-items: center;
     justify-content: center;
-    transition: background .2s, color .2s;
+    transition: background .18s, color .18s;
     flex-shrink: 0;
 }
 
