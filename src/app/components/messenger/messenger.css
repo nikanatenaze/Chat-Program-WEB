@@ -1,9 +1,11 @@
+/* messenger css */
+
 hr {
     border: none;
     border-top: 1px solid var(--border);
 }
 
-/* ── Stars canvas background ── */
+/* Stars canvas — sits behind everything as a fixed backdrop */
 
 .app-bg {
     position: fixed;
@@ -22,6 +24,7 @@ hr {
     pointer-events: none;
 }
 
+/* Soft purple glow blob centered on the canvas */
 .glow-blob {
     position: absolute;
     top: 50%;
@@ -37,7 +40,7 @@ hr {
     z-index: 0;
 }
 
-/* ── Main layout ── */
+/* ── Main layout — full-height flex row ── */
 
 .content {
     padding: 20px;
@@ -100,7 +103,6 @@ hr {
     background: var(--accent);
     color: white;
     border-color: var(--accent);
-    /* CHANGED: reduced scale from 1.04 → 1.02 */
     transform: scale(1.02);
 }
 
@@ -160,7 +162,7 @@ hr {
     border-radius: 2px;
 }
 
-/* ── Chat list skeleton rows ── */
+/* ── Chat list skeleton rows — slide in from the left ── */
 
 @keyframes chat-skel-enter {
     from {
@@ -209,7 +211,7 @@ hr {
     opacity: 0.5;
 }
 
-/* ── Live chat rows — staggered entrance ── */
+/* ── Live chat rows — staggered entrance on first load ── */
 
 @keyframes chat-row-enter {
     from {
@@ -276,6 +278,7 @@ hr {
     animation-delay: 0.40s;
 }
 
+/* Beyond 12 items just show instantly — no point staggering a huge list */
 .chats-loaded .chat:nth-child(n+13) {
     opacity: 1;
     animation: none;
@@ -349,6 +352,7 @@ hr {
     font-weight: 500;
 }
 
+/* Leave icon — slides in on row hover */
 .chat-hover-icon {
     opacity: 0;
     transform: translateX(6px);
@@ -369,7 +373,7 @@ hr {
     color: var(--danger);
 }
 
-/* ── Quit confirm ── */
+/* ── Quit confirm card — pops up from the bottom of the panel ── */
 
 .quit-overlay {
     position: absolute;
@@ -531,7 +535,7 @@ hr {
     border-color: var(--danger);
 }
 
-/* ── RIGHT: chat area ── */
+/* ── RIGHT: the actual chat area ── */
 
 .chat-ui {
     font-family: "Oxygen", sans-serif;
@@ -629,7 +633,6 @@ hr {
     display: flex;
     align-items: center;
     justify-content: center;
-    /* CHANGED: reduced transition scale effects */
     transition: background .18s, color .18s, transform .15s, border-color .18s;
 }
 
@@ -637,7 +640,6 @@ hr {
     background: var(--accent-soft);
     color: var(--accent);
     border-color: rgba(99, 102, 241, 0.3);
-    /* CHANGED: reduced from 1.08 → 1.04 */
     transform: scale(1.04);
 }
 
@@ -645,14 +647,12 @@ hr {
     transform: scale(0.96);
 }
 
-/* Active state for settings button when panel is open */
+/* Lit-up state when the settings panel is currently open */
 .header-btn-active {
     background: var(--accent-soft) !important;
     color: var(--accent) !important;
     border-color: rgba(99, 102, 241, 0.35) !important;
 }
-
-/* REMOVED: fa-spin-slow and gear rotation styles — no longer used */
 
 /* ── Messages area ── */
 
@@ -675,8 +675,7 @@ hr {
     border-radius: 2px;
 }
 
-/* ── Chat body wrapper ── */
-
+/* Wrapper that clips the messages while the skeleton is fading out */
 .chat-body-wrap {
     flex: 1;
     display: flex;
@@ -702,7 +701,7 @@ hr {
     pointer-events: none;
 }
 
-/* ── Skeleton → messages transition ── */
+/* ── Skeleton → real messages crossfade ── */
 
 @keyframes skel-exit {
     0% {
@@ -746,7 +745,7 @@ hr {
     animation: messages-reveal 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-/* Individual message rows stagger in during reveal */
+/* Stagger each visible message row as they reveal — newest first */
 .messages-revealing .msg {
     opacity: 0;
     animation: msg-row-stagger 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
@@ -800,7 +799,7 @@ hr {
     }
 }
 
-/* ── New message entrance ── */
+/* ── Incoming / outgoing new message animations ── */
 
 @keyframes msg-pop-received {
     0% {
@@ -844,6 +843,7 @@ hr {
     animation: msg-pop-sent 0.28s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
 }
 
+/* Message delete — collapses height so the list closes the gap cleanly */
 @keyframes msg-delete-out {
     0% {
         opacity: 1;
@@ -872,7 +872,7 @@ hr {
     overflow: hidden;
 }
 
-/* ── Message row ── */
+/* ── Individual message layout ── */
 
 .msg {
     display: flex;
@@ -921,6 +921,7 @@ hr {
     font-family: "Oxygen", sans-serif;
 }
 
+/* Keeps the bubble column aligned when no avatar is shown */
 .avatar-spacer {
     width: 30px;
     height: 30px;
@@ -994,11 +995,12 @@ hr {
     font-family: "Oxygen", sans-serif;
 }
 
+/* Your own sender label is redundant — hide it */
 .msg:has(.message.me) .sender {
     display: none;
 }
 
-/* ── Input bar ── */
+/* ── Message input bar ── */
 
 .chat-input {
     display: flex;
@@ -1041,7 +1043,6 @@ hr {
     background: var(--accent);
     color: white;
     cursor: pointer;
-    /* CHANGED: reduced transform scale */
     transition: transform .18s, filter .18s;
     display: flex;
     align-items: center;
@@ -1051,7 +1052,6 @@ hr {
 }
 
 .chat-input button:hover:not(:disabled) {
-    /* CHANGED: reduced from 1.08 → 1.04 */
     transform: scale(1.04);
     filter: brightness(1.1);
 }
@@ -1061,7 +1061,7 @@ hr {
     cursor: not-allowed;
 }
 
-/* ── Scroll-to-bottom FAB ── */
+/* ── Scroll-to-bottom pill FAB ── */
 
 .scroll-to-bottom-btn {
     position: absolute;
@@ -1173,7 +1173,7 @@ hr {
 }
 
 /* ═══════════════════════════════════════════════
-   SKELETON SHIMMER (shared)
+   SKELETON SHIMMER (shared utility)
    ═══════════════════════════════════════════════ */
 
 @keyframes shimmer {
@@ -1197,7 +1197,7 @@ hr {
     flex-shrink: 0;
 }
 
-/* ── Header skeleton ── */
+/* ── Header skeleton pieces ── */
 
 .skel-av-sm {
     width: 40px;
@@ -1216,7 +1216,7 @@ hr {
     opacity: 0.5;
 }
 
-/* ── Message skeletons ── */
+/* ── Message area skeleton ── */
 
 .skel-messages-area {
     flex: 1;
@@ -1228,7 +1228,7 @@ hr {
     overflow: hidden;
 }
 
-/* A group is one sender's cluster of messages */
+/* One "group" = a cluster of bubbles from the same sender */
 .skel-group {
     display: flex;
     flex-direction: column;
@@ -1278,12 +1278,11 @@ hr {
     }
 }
 
-/* Tight continuation row — sits close to the previous bubble */
+/* Continuation row — sits tight below previous bubble, no name label */
 .skel-group-tight {
     margin-bottom: 3px;
 }
 
-/* Sender name bar */
 .skel-sender-name {
     height: 10px;
     width: 64px;
@@ -1303,7 +1302,6 @@ hr {
     flex-direction: row-reverse;
 }
 
-/* Spacer replaces avatar on continuation rows */
 .skel-av-spacer {
     width: 30px;
     flex-shrink: 0;
@@ -1322,7 +1320,6 @@ hr {
     animation: shimmer 1.8s ease-in-out infinite;
 }
 
-/* Bubble shell */
 .skel-bubble-wrap {
     padding: 10px 13px 8px;
     border-radius: 15px;
@@ -1343,7 +1340,6 @@ hr {
     border-bottom-right-radius: 4px;
 }
 
-/* Text lines */
 .skel-text-line {
     height: 13px;
     border-radius: 5px;
@@ -1355,7 +1351,7 @@ hr {
     animation: shimmer 1.8s ease-in-out infinite;
 }
 
-/* Accent-tinted lines for "me" bubbles */
+/* Tint the "my message" skeleton lines purple to match real bubbles */
 .skel-line-me {
     background: linear-gradient(90deg,
             rgba(99, 102, 241, 0.10) 0%,
@@ -1365,7 +1361,6 @@ hr {
     animation: shimmer 1.8s ease-in-out infinite !important;
 }
 
-/* Timestamp bar pinned bottom-right */
 .skel-ts {
     height: 8px;
     width: 34px;
@@ -1390,7 +1385,10 @@ hr {
     animation: shimmer 1.8s ease-in-out infinite;
 }
 
-/* Stagger shimmer phase per group so waves don't all pulse in sync */
+/*
+  Stagger the shimmer phase per group so waves ripple
+  through the skeleton rather than all pulsing at once
+*/
 .skel-group:nth-child(1) .skel,
 .skel-group:nth-child(1) .skel-av-xs,
 .skel-group:nth-child(1) .skel-ts,
@@ -1458,6 +1456,7 @@ hr {
     flex-direction: row-reverse;
 }
 
+/* Edit/delete buttons are hidden until you hover the bubble */
 .msg-actions {
     display: flex;
     flex-direction: column;
@@ -1490,7 +1489,6 @@ hr {
     display: flex;
     align-items: center;
     justify-content: center;
-    /* CHANGED: reduced scale */
     transition: background .15s, color .15s, transform .12s;
 }
 
@@ -1498,7 +1496,6 @@ hr {
     background: var(--accent-soft);
     color: var(--accent);
     border-color: rgba(99, 102, 241, 0.3);
-    /* CHANGED: reduced from 1.1 → 1.05 */
     transform: scale(1.05);
 }
 
@@ -1508,7 +1505,7 @@ hr {
     border-color: rgba(239, 68, 68, 0.3);
 }
 
-/* ── Inline edit bubble ── */
+/* ── Inline edit textarea bubble ── */
 
 @keyframes edit-bubble-in {
     from {
@@ -1584,7 +1581,6 @@ hr {
     display: flex;
     align-items: center;
     gap: 4px;
-    /* CHANGED: reduced scale on hover */
     transition: opacity .15s, transform .12s;
     font-family: "Oxygen", sans-serif;
     font-weight: 600;
@@ -1592,7 +1588,6 @@ hr {
 
 .edit-btn:hover {
     opacity: 0.85;
-    /* CHANGED: reduced from 1.04 → 1.02 */
     transform: scale(1.02);
 }
 
@@ -2054,13 +2049,11 @@ hr {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    /* CHANGED: reduced scale */
     transition: filter .15s, transform .12s;
 }
 
 .aup-btn-add:hover:not(:disabled) {
     filter: brightness(1.1);
-    /* CHANGED: reduced from 1.02 → 1.01 */
     transform: scale(1.01);
 }
 
@@ -2367,27 +2360,81 @@ hr {
     pointer-events: none;
 }
 
+/*
+  The panel open animation.
+
+  It comes in from the right with a 3-stage spring:
+    1. Slides in from slightly off-screen right while fading in
+    2. Overshoot — nudges 2px past its resting spot (gives it weight)
+    3. Settles at its final position
+
+  The header, tabs and content stagger in separately so
+  the panel feels like it's assembling itself rather than
+  just teleporting onto the screen.
+*/
 @keyframes cs-panel-slide-in {
-    from {
+    0% {
         opacity: 0;
-        transform: translateX(28px) scale(0.98);
+        transform: translateX(40px) scale(0.97);
+        clip-path: inset(0 0 0 8% round var(--r-xl));
     }
 
-    to {
+    55% {
+        opacity: 1;
+        transform: translateX(-2px) scale(1.003);
+        clip-path: inset(0 0 0 0% round var(--r-xl));
+    }
+
+    75% {
+        transform: translateX(1px) scale(1);
+        clip-path: inset(0 0 0 0% round var(--r-xl));
+    }
+
+    100% {
         opacity: 1;
         transform: translateX(0) scale(1);
+        clip-path: inset(0 0 0 0% round var(--r-xl));
     }
 }
 
+/* Slide back out to the right while shrinking slightly */
 @keyframes cs-panel-slide-out {
-    from {
+    0% {
         opacity: 1;
         transform: translateX(0) scale(1);
+        clip-path: inset(0 0 0 0% round var(--r-xl));
     }
 
-    to {
+    100% {
         opacity: 0;
-        transform: translateX(24px) scale(0.98);
+        transform: translateX(32px) scale(0.97);
+        clip-path: inset(0 0 0 6% round var(--r-xl));
+    }
+}
+
+/* Header fades + drops in a beat after the panel itself */
+@keyframes cs-header-in {
+    0% {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Each section of content rises up with a short delay */
+@keyframes cs-content-rise {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
@@ -2405,13 +2452,56 @@ hr {
     flex-direction: column;
     overflow: hidden;
     font-family: "Oxygen", sans-serif;
-    animation: cs-panel-slide-in 0.26s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation: cs-panel-slide-in 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     position: relative;
 }
 
+/* When the panel is closing, play the reverse slide */
 .cs-panel-inline-closing {
-    animation: cs-panel-slide-out 0.22s ease forwards !important;
+    animation: cs-panel-slide-out 0.24s cubic-bezier(0.4, 0, 0.6, 1) forwards !important;
     pointer-events: none;
+}
+
+/*
+  Stagger the interior regions so content "builds in"
+  header → tabs → body, each a few ms after the panel itself
+*/
+.cs-panel-inline .cs-header {
+    animation: cs-header-in 0.28s ease 0.08s both;
+}
+
+.cs-panel-inline .cs-tabs {
+    animation: cs-content-rise 0.26s ease 0.13s both;
+}
+
+.cs-panel-inline .cs-hr {
+    animation: cs-content-rise 0.22s ease 0.16s both;
+}
+
+.cs-panel-inline .cs-tab-content,
+.cs-panel-inline .cs-inner-loader,
+.cs-panel-inline .cs-alert {
+    animation: cs-content-rise 0.28s ease 0.18s both;
+}
+
+/* The glow ring that pulses once when the panel opens */
+@keyframes cs-panel-glow-once {
+    0% {
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(99, 102, 241, 0.07), 0 0 0 0 rgba(99, 102, 241, 0.3);
+    }
+
+    40% {
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(99, 102, 241, 0.2), 0 0 32px 4px rgba(99, 102, 241, 0.18);
+    }
+
+    100% {
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(99, 102, 241, 0.07), 0 0 0 0 rgba(99, 102, 241, 0);
+    }
+}
+
+/* Overlay is hidden on desktop — only used on mobile */
+.cs-overlay-inline {
+    display: none;
 }
 
 @keyframes cs-overlay-in {
@@ -2432,10 +2522,6 @@ hr {
     to {
         opacity: 0;
     }
-}
-
-.cs-overlay-inline {
-    display: none;
 }
 
 /* ── Settings Header ── */
@@ -2469,7 +2555,6 @@ hr {
     display: flex;
     align-items: center;
     justify-content: center;
-    /* CHANGED: reduced transform */
     transition: background .18s, color .18s, transform .15s, border-color .18s;
     flex-shrink: 0;
 }
@@ -2478,7 +2563,6 @@ hr {
     background: var(--danger-soft);
     color: var(--danger);
     border-color: rgba(239, 68, 68, 0.3);
-    /* CHANGED: reduced from 1.08 → 1.04 */
     transform: scale(1.04);
 }
 
@@ -2486,8 +2570,7 @@ hr {
     transform: scale(0.96);
 }
 
-/* ── Header avatar with skeleton ── */
-
+/* Header avatar — positioned so the skeleton overlay sits on top */
 .cs-chat-avatar {
     width: 44px;
     height: 44px;
@@ -2608,7 +2691,7 @@ hr {
     flex-shrink: 0;
 }
 
-/* ── Inner loader ── */
+/* ── Loading spinner inside the panel ── */
 
 .cs-inner-loader {
     display: flex;
@@ -2637,7 +2720,7 @@ hr {
     }
 }
 
-/* ── Alerts ── */
+/* ── Success / error alert banners ── */
 
 .cs-alert {
     display: flex;
@@ -2693,7 +2776,7 @@ hr {
     opacity: 1;
 }
 
-/* ── Tab content ── */
+/* ── Tab content scroll area ── */
 
 .cs-tab-content {
     flex: 1;
@@ -2726,7 +2809,7 @@ hr {
     }
 }
 
-/* ── Sections ── */
+/* ── Form sections ── */
 
 .cs-section {
     padding: 14px 0;
@@ -2759,7 +2842,7 @@ hr {
     opacity: 0.8;
 }
 
-/* ── Image upload section ── */
+/* ── Chat image upload section ── */
 
 .cs-image-row {
     display: flex;
@@ -2845,7 +2928,7 @@ hr {
     cursor: not-allowed;
 }
 
-/* ── Fields ── */
+/* ── Input fields ── */
 
 .cs-field {
     display: flex;
@@ -2912,7 +2995,7 @@ hr {
     font-family: "Oxygen", sans-serif;
 }
 
-/* ── Password toggle ── */
+/* ── Password toggle row ── */
 
 .cs-toggle-row {
     display: flex;
@@ -2974,6 +3057,7 @@ hr {
     transform: translateX(16px);
 }
 
+/* Password fields slide open when the toggle is turned on */
 .cs-pw-fields {
     max-height: 0;
     overflow: hidden;
@@ -3004,13 +3088,11 @@ hr {
     font-family: "Oxygen", sans-serif;
     cursor: pointer;
     margin-top: 16px;
-    /* CHANGED: reduced scale */
     transition: filter .2s, transform .12s, box-shadow .2s;
 }
 
 .cs-save-btn:hover:not(:disabled) {
     filter: brightness(1.1);
-    /* CHANGED: reduced from 1.01 → removed scale, just brightness+shadow */
     box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
 }
 
@@ -3086,7 +3168,6 @@ hr {
     cursor: pointer;
     white-space: nowrap;
     flex-shrink: 0;
-    /* CHANGED: removed scale transform */
     transition: background .15s, color .15s, border-color .15s;
 }
 
@@ -3165,6 +3246,7 @@ hr {
     background: rgba(255, 255, 255, 0.04);
 }
 
+/* While a kick is in-flight, dim the row so it looks "gone" */
 .cs-member-kicking {
     opacity: 0.35;
     pointer-events: none;
@@ -3268,6 +3350,7 @@ hr {
     font-family: "Oxygen", sans-serif;
 }
 
+/* Kick button slides in on row hover, same as the leave-chat icon */
 .cs-kick-btn {
     width: 30px;
     height: 30px;
@@ -3323,7 +3406,7 @@ hr {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
-   SETTINGS — CONFIRM OVERLAYS (delete / kick)
+   SETTINGS — CONFIRM DIALOGS (delete chat / kick member)
    ═══════════════════════════════════════════════════════════════════════════════ */
 
 @keyframes cs-backdrop-in {
@@ -3502,7 +3585,6 @@ hr {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    /* CHANGED: no scale on hover */
     transition: filter .15s;
 }
 
@@ -3596,6 +3678,7 @@ hr {
         max-height: 75vh;
     }
 
+    /* On mobile the settings panel covers the screen as a drawer */
     .cs-overlay-inline {
         display: block;
         position: fixed;
@@ -3621,7 +3704,6 @@ hr {
         height: 100%;
         border-radius: var(--r-xl) 0 0 var(--r-xl);
         z-index: 31;
-        animation: cs-panel-slide-in 0.26s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
 
     .ccm-modal {
@@ -3763,7 +3845,8 @@ hr {
 }
 
 /* ═══════════════════════════════════════════════
-   PANEL OVERLAY & TOGGLE BUTTON (desktop hidden)
+   PANEL OVERLAY & HAMBURGER BUTTON
+   (hidden on desktop, shown on mobile via media query above)
    ═══════════════════════════════════════════════ */
 
 .panel-toggle-floating {

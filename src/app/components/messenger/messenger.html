@@ -106,7 +106,6 @@
                 <button class="header-btn" (click)="openAddUserPanel()" title="Add user">
                     <i class="fa-solid fa-user-plus"></i>
                 </button>
-                <!-- CHANGED: removed fa-spin-slow, gear no longer rotates -->
                 <button class="header-btn" (click)="openChatSettings()" title="Chat settings"
                     [class.header-btn-active]="showChatSettings || chatSettingsClosing">
                     <i class="fa-solid fa-gear"></i>
@@ -389,12 +388,18 @@
     </div>
 
     <!-- ═══════════════ CHAT SETTINGS PANEL ═══════════════ -->
-    <div class="cs-overlay-inline" *ngIf="showChatSettings || chatSettingsClosing"
-        [class.cs-overlay-inline-closing]="chatSettingsClosing" (click)="closeChatSettings()">
+
+    <!-- FIX: use chatSettingsVisible as the *ngIf guard instead of
+         showChatSettings || chatSettingsClosing.
+         chatSettingsVisible is toggled off for one tick on re-open so Angular
+         destroys and recreates the DOM node, guaranteeing the slide-in
+         animation replays cleanly every single time. -->
+    <div class="cs-overlay-inline" *ngIf="chatSettingsVisible" [class.cs-overlay-inline-closing]="chatSettingsClosing"
+        (click)="closeChatSettings()">
     </div>
 
-    <div class="cs-panel-inline" *ngIf="showChatSettings || chatSettingsClosing"
-        [class.cs-panel-inline-closing]="chatSettingsClosing" (click)="$event.stopPropagation()">
+    <div class="cs-panel-inline" *ngIf="chatSettingsVisible" [class.cs-panel-inline-closing]="chatSettingsClosing"
+        (click)="$event.stopPropagation()">
 
         <!-- ── Settings Header ── -->
         <div class="cs-header">
@@ -403,7 +408,6 @@
                     <i class="fa-solid fa-xmark"></i>
                 </button>
                 <div class="cs-chat-avatar">
-                    <!-- CHANGED: skeleton shown during upload OR while initial image loading -->
                     <div class="cs-avatar-skel skel" *ngIf="(csImageLoading && csImagePreview) || csUploadImageLoading">
                     </div>
                     <img *ngIf="csImagePreview && !csUploadImageLoading" [src]="csImagePreview"
@@ -463,7 +467,6 @@
                     </p>
                     <div class="cs-image-row">
                         <div class="cs-avatar-wrap">
-                            <!-- CHANGED: skeleton covers avatar during ANY upload state -->
                             <div class="cs-avatar-upload-skel skel" *ngIf="csUploadImageLoading"></div>
                             <img *ngIf="csImagePreview && !csUploadImageLoading" [src]="csImagePreview"
                                 [alt]="selectedChat?.name" class="cs-avatar-img"
@@ -568,7 +571,6 @@
                         [class.cs-member-kicking]="csKickingUserId === member.id">
 
                         <div class="cs-member-avatar">
-                            <!-- skeleton while member image loads -->
                             <div class="cs-member-img-skel skel"
                                 *ngIf="member.profileImageUrl && !csMemberImagesLoaded.has(member.id)">
                             </div>
@@ -592,9 +594,6 @@
                             <span class="cs-member-email">{{ member.email }}</span>
                         </div>
 
-                        <!-- CHANGED: kick button visible to ALL users (not just owner).
-                             Hidden only for self and the chat owner.
-                             Non-owners will get an error from the server / TS logic. -->
                         <button class="cs-kick-btn"
                             *ngIf="member.id !== tokenData?.id && member.id !== selectedChat?.createdByUserId"
                             (click)="csOpenKickConfirm(member)" [disabled]="csKickingUserId === member.id"

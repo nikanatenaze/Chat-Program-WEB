@@ -1,5 +1,4 @@
-/* ─── FONTS ────────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Oxygen:wght@300;400;700&family=Roboto:wght@400;500&display=swap');
+/* error.css */
 
 /* ─── HOST ──────────────────────────────────────────────────── */
 .not-found-container {
@@ -9,7 +8,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #02020a;
+    background: var(--bg-page);
     overflow: hidden;
 }
 
@@ -46,9 +45,9 @@
     max-width: 480px;
     width: 90%;
     padding: 52px 44px 48px;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--glass-bg);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 24px;
+    border-radius: var(--r-2xl);
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -64,37 +63,9 @@
     left: 10%;
     width: 80%;
     height: 2px;
-    background: linear-gradient(90deg,
-            rgba(131, 58, 180, 1) 0%,
-            rgba(253, 29, 29, 1) 50%,
-            rgba(252, 176, 69, 1) 100%);
-    border-radius: 999px;
+    background: var(--gradient-brand);
+    border-radius: var(--r-pill);
     animation: glowPulse 3s ease-in-out infinite;
-}
-
-@keyframes glowPulse {
-
-    0%,
-    100% {
-        opacity: 0.7;
-    }
-
-    50% {
-        opacity: 1;
-        box-shadow: 0 0 18px rgba(253, 29, 29, 0.4);
-    }
-}
-
-@keyframes cardIn {
-    from {
-        opacity: 0;
-        transform: translateY(24px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 /* ─── ORBIT DECORATION ──────────────────────────────────────── */
@@ -122,37 +93,28 @@
     box-shadow: 0 0 8px rgba(252, 176, 69, 0.5);
 }
 
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
 /* ─── ERROR BADGE ───────────────────────────────────────────── */
 .error-badge {
     padding: 5px 14px;
-    border-radius: 999px;
+    border-radius: var(--r-pill);
     font-size: 13px;
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-secondary);
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    background: rgba(131, 58, 180, 0.18);
-    color: rgba(200, 150, 255, 0.9);
-    border: 1px solid rgba(131, 58, 180, 0.3);
+    background: var(--purple-badge-bg);
+    color: var(--purple-text);
+    border: 1px solid var(--purple-badge-br);
     animation: cardIn 0.6s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* ─── 404 NUMBER ────────────────────────────────────────────── */
 .error-code {
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 108px;
     font-weight: 700;
     line-height: 1;
     margin: 18px 0 6px;
-    background: linear-gradient(90deg,
-            rgba(131, 58, 180, 1) 0%,
-            rgba(253, 29, 29, 1) 50%,
-            rgba(252, 176, 69, 1) 100%);
+    background: var(--gradient-brand);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -174,18 +136,18 @@
 
 /* ─── HEADING & DESC ────────────────────────────────────────── */
 .card h1 {
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 22px;
     font-weight: 700;
-    color: rgb(236, 236, 236);
+    color: var(--text-hero);
     margin-bottom: 12px;
     animation: cardIn 0.6s 0.22s both;
 }
 
 .card .desc {
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 15px;
-    color: rgba(180, 180, 195, 0.75);
+    color: var(--text-faint);
     line-height: 1.7;
     max-width: 340px;
     margin-bottom: 28px;
@@ -194,16 +156,16 @@
 
 /* ─── CHAT BUBBLE ───────────────────────────────────────────── */
 .chat-bubble {
-    background: rgba(131, 58, 180, 0.18);
-    border: 1px solid rgba(131, 58, 180, 0.3);
+    background: var(--purple-badge-bg);
+    border: 1px solid var(--purple-badge-br);
     padding: 11px 18px;
     border-radius: 16px 16px 16px 4px;
     display: inline-flex;
     align-items: center;
     gap: 8px;
     font-size: 13px;
-    color: rgba(200, 150, 255, 0.9);
-    font-family: "Roboto", sans-serif;
+    color: var(--purple-text);
+    font-family: var(--font-secondary);
     margin-bottom: 32px;
     animation: cardIn 0.6s 0.34s both;
 }
@@ -248,8 +210,8 @@
 .btn {
     display: inline-block;
     padding: 14px 26px;
-    border-radius: 10px;
-    font-family: "Oxygen", sans-serif;
+    border-radius: var(--r-md);
+    font-family: var(--font-primary);
     font-size: 15px;
     font-weight: 400;
     text-decoration: none;
@@ -258,10 +220,7 @@
 }
 
 .btn-primary {
-    background: linear-gradient(90deg,
-            rgba(131, 58, 180, 1) 0%,
-            rgba(253, 29, 29, 1) 50%,
-            rgba(252, 176, 69, 1) 100%);
+    background: var(--gradient-brand);
     color: #fff;
     border: none;
     box-shadow: 0 4px 20px rgba(253, 29, 29, 0.28);

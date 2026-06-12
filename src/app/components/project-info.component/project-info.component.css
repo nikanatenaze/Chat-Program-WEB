@@ -1,12 +1,11 @@
-/* ─── FONTS ───────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Oxygen:wght@300;400;700&family=Roboto:wght@400;500&display=swap');
+/* project-info.css */
 
 /* ─── HERO ────────────────────────────────────────────────── */
 .pi-hero {
     position: relative;
     width: 100%;
     min-height: 100vh;
-    background: #02020a;
+    background: var(--bg-page);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -20,10 +19,7 @@
     transform: translateX(-50%);
     width: 700px;
     height: 400px;
-    background: radial-gradient(ellipse at center,
-            rgba(131, 58, 180, 0.18) 0%,
-            rgba(253, 29, 29, 0.06) 50%,
-            transparent 70%);
+    background: var(--glow-blob-hero);
     pointer-events: none;
 }
 
@@ -38,41 +34,31 @@
     z-index: 2;
 }
 
-/* ─── BADGE (matches home) ────────────────────────────────── */
+/* ─── BADGE ───────────────────────────────────────────────── */
 .badge {
     padding: 6px 14px;
-    border-radius: 999px;
+    border-radius: var(--r-pill);
     font-size: 14px;
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-secondary);
     background: rgba(255, 255, 255, 0.08);
     color: #ddd;
     margin-bottom: 20px;
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--border-subtle);
     display: inline-block;
 }
 
 /* ─── HERO TITLE ──────────────────────────────────────────── */
 .pi-hero-title {
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 62px;
     font-weight: 700;
     margin: 0 0 16px;
     line-height: 1.1;
 }
 
-.text-gradient {
-    background: linear-gradient(90deg,
-            rgba(131, 58, 180, 1) 0%,
-            rgba(253, 29, 29, 1) 50%,
-            rgba(252, 176, 69, 1) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
 .pi-hero-sub {
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 24px;
     font-weight: 300;
     color: rgba(220, 220, 230, 0.7);
@@ -81,15 +67,15 @@
 }
 
 .pi-hero-desc {
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 16px;
-    color: rgba(200, 200, 215, 0.75);
+    color: var(--text-dim);
     max-width: 600px;
     line-height: 1.75;
     margin: 0 0 44px;
 }
 
-/* ─── BUTTONS (identical to home) ────────────────────────── */
+/* ─── BUTTONS ─────────────────────────────────────────────── */
 .pi-hero-actions {
     display: flex;
     flex-wrap: wrap;
@@ -102,12 +88,12 @@
     display: inline-block;
     text-align: center;
     text-decoration: none !important;
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 15px;
     padding: 15px 24px;
     color: white;
     cursor: pointer;
-    border-radius: 10px;
+    border-radius: var(--r-md);
     border: 2px solid rgba(255, 255, 255, 0.15);
     transition: transform 0.25s ease 0.05s, box-shadow 0.25s ease 0.05s, border-color 0.25s ease 0.05s;
     background-color: rgba(0, 0, 0, 0.45);
@@ -124,15 +110,12 @@
 .ctm-btn {
     border: none !important;
     padding: 17px 28px !important;
-    background: linear-gradient(90deg,
-            rgba(131, 58, 180, 1) 0%,
-            rgba(253, 29, 29, 1) 50%,
-            rgba(252, 176, 69, 1) 100%);
-    box-shadow: 0 4px 20px rgba(253, 29, 29, 0.3);
+    background: var(--gradient-brand);
+    box-shadow: 0 4px 20px var(--red-glow);
 }
 
 .ctm-btn:hover {
-    box-shadow: 0 8px 32px rgba(253, 29, 29, 0.5) !important;
+    box-shadow: 0 8px 32px var(--red-glow-hover) !important;
     transform: translateY(-3px) !important;
 }
 
@@ -153,30 +136,16 @@
     animation: scrollPulse 2s ease-in-out infinite;
 }
 
-@keyframes scrollPulse {
-
-    0%,
-    100% {
-        opacity: 0.4;
-        transform: scaleY(1);
-    }
-
-    50% {
-        opacity: 1;
-        transform: scaleY(1.15);
-    }
-}
-
 /* ─── SECTIONS ────────────────────────────────────────────── */
 .pi-section {
-    background-color: #040406;
+    background-color: var(--bg-section-alt);
     padding: 90px 24px 100px;
     position: relative;
     overflow: hidden;
 }
 
 .pi-section--dark {
-    background-color: #02020a;
+    background-color: var(--bg-page);
 }
 
 .pi-section--dark::before {
@@ -214,39 +183,36 @@
 
 .section-badge {
     padding: 5px 14px;
-    border-radius: 999px;
+    border-radius: var(--r-pill);
     font-size: 13px;
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-secondary);
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    background: rgba(131, 58, 180, 0.18);
-    color: rgba(200, 150, 255, 0.9);
-    border: 1px solid rgba(131, 58, 180, 0.3);
+    background: var(--purple-badge-bg);
+    color: var(--purple-text);
+    border: 1px solid var(--purple-badge-br);
     cursor: default;
 }
 
 .section-title {
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 44px;
     font-weight: 700;
-    color: rgb(236, 236, 236);
+    color: var(--text-hero);
     margin: 0;
     line-height: 1.15;
     text-align: center;
 }
 
 .section-title .accent {
-    background: linear-gradient(90deg,
-            rgba(131, 58, 180, 1) 0%,
-            rgba(253, 29, 29, 1) 60%,
-            rgba(252, 176, 69, 1) 100%);
+    background: var(--gradient-brand);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 
 .section-sub {
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 17px;
     color: rgba(200, 200, 210, 0.7);
     max-width: 520px;
@@ -265,8 +231,8 @@
 
 .feature-card {
     background: rgba(255, 255, 255, 0.035);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 16px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--r-xl);
     padding: 36px 32px;
     display: flex;
     flex-direction: column;
@@ -277,19 +243,19 @@
 
 .feature-card:hover {
     transform: translateY(-4px);
-    border-color: rgba(255, 255, 255, 0.14);
+    border-color: var(--border-strong);
     background: rgba(255, 255, 255, 0.055);
     transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease;
 }
 
 .feature-card--accent {
-    background: rgba(131, 58, 180, 0.1);
-    border-color: rgba(131, 58, 180, 0.25);
+    background: var(--purple-soft);
+    border-color: var(--purple-border);
 }
 
 .feature-card--accent:hover {
     background: rgba(131, 58, 180, 0.15);
-    border-color: rgba(131, 58, 180, 0.4);
+    border-color: rgba(131, 58, 180, 0.40);
 }
 
 .feature-icon {
@@ -299,8 +265,8 @@
     align-items: center;
     justify-content: center;
     background: rgba(255, 255, 255, 0.06);
-    border-radius: 10px;
-    color: rgba(200, 150, 255, 0.9);
+    border-radius: var(--r-md);
+    color: var(--purple-text);
 }
 
 .feature-icon svg {
@@ -309,7 +275,7 @@
 }
 
 .feature-card h3 {
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 18px;
     font-weight: 700;
     color: rgb(230, 230, 235);
@@ -317,20 +283,20 @@
 }
 
 .feature-card p {
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 15px;
-    color: rgba(180, 180, 195, 0.75);
+    color: var(--text-faint);
     line-height: 1.65;
     margin: 0;
 }
 
 .feature-card code {
-    font-family: 'Courier New', monospace;
+    font-family: var(--font-mono);
     font-size: 13px;
     background: rgba(255, 255, 255, 0.08);
     padding: 2px 6px;
-    border-radius: 4px;
-    color: rgba(200, 150, 255, 0.9);
+    border-radius: var(--r-xs);
+    color: var(--purple-text);
 }
 
 /* ─── STATS ROW ───────────────────────────────────────────── */
@@ -340,8 +306,8 @@
     justify-content: center;
     width: 100%;
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 16px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--r-xl);
     padding: 36px 24px;
     flex-wrap: wrap;
 }
@@ -358,12 +324,10 @@
 }
 
 .stat-number {
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 36px;
     font-weight: 700;
-    background: linear-gradient(90deg,
-            rgba(200, 150, 255, 1) 0%,
-            rgba(253, 100, 80, 1) 100%);
+    background: var(--gradient-stat);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -371,7 +335,7 @@
 }
 
 .stat-label {
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-secondary);
     font-size: 13px;
     color: rgba(180, 180, 195, 0.6);
     letter-spacing: 0.04em;
@@ -395,8 +359,8 @@
 
 .stack-card {
     background: rgba(255, 255, 255, 0.035);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 14px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--r-lg);
     padding: 24px 20px;
     display: flex;
     align-items: center;
@@ -407,7 +371,7 @@
 
 .stack-card:hover {
     transform: translateY(-3px);
-    border-color: rgba(255, 255, 255, 0.14);
+    border-color: var(--border-strong);
     background: rgba(255, 255, 255, 0.055);
     transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
 }
@@ -415,13 +379,14 @@
 .stack-logo-wrap {
     width: 52px;
     height: 52px;
-    border-radius: 12px;
+    border-radius: var(--r-md);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 }
 
+/* Per-tech logo background tints */
 .angular-bg {
     background: rgba(221, 0, 49, 0.15);
 }
@@ -443,7 +408,7 @@
 }
 
 .karma-bg {
-    background: rgba(131, 58, 180, 0.15);
+    background: var(--purple-soft);
 }
 
 .csharp-bg {
@@ -455,7 +420,7 @@
 }
 
 .stack-name {
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 15px;
     font-weight: 700;
     color: rgb(230, 230, 235);
@@ -463,7 +428,7 @@
 }
 
 .stack-ver {
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-secondary);
     font-size: 13px;
     color: rgba(170, 170, 185, 0.65);
 }
@@ -481,26 +446,24 @@
     align-items: flex-start;
     gap: 20px;
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 14px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--r-lg);
     padding: 24px 28px;
     cursor: default;
     transition: border-color 0.25s ease 0.04s, background 0.25s ease 0.04s;
 }
 
 .step-row:hover {
-    border-color: rgba(131, 58, 180, 0.3);
+    border-color: var(--purple-border);
     background: rgba(131, 58, 180, 0.06);
     transition: border-color 0.25s ease, background 0.25s ease;
 }
 
 .step-num {
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 28px;
     font-weight: 700;
-    background: linear-gradient(90deg,
-            rgba(131, 58, 180, 1) 0%,
-            rgba(253, 29, 29, 1) 100%);
+    background: linear-gradient(90deg, var(--purple) 0%, var(--red) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -510,7 +473,7 @@
 }
 
 .step-title {
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 16px;
     font-weight: 700;
     color: rgb(225, 225, 235);
@@ -518,13 +481,13 @@
 }
 
 .step-code {
-    font-family: 'Courier New', monospace;
+    font-family: var(--font-mono);
     font-size: 14px;
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.08);
     padding: 10px 16px;
-    border-radius: 8px;
-    color: rgba(200, 150, 255, 0.95);
+    border-radius: var(--r-sm);
+    color: var(--purple-text);
     display: block;
     word-break: break-all;
     cursor: text;
@@ -543,8 +506,8 @@
     align-items: center;
     gap: 16px;
     background: rgba(255, 255, 255, 0.035);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 14px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--r-lg);
     padding: 22px 24px;
     text-decoration: none;
     cursor: pointer;
@@ -553,7 +516,7 @@
 
 .link-card:hover {
     transform: translateY(-3px);
-    border-color: rgba(131, 58, 180, 0.4);
+    border-color: rgba(131, 58, 180, 0.40);
     background: rgba(131, 58, 180, 0.08);
     transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
 }
@@ -561,25 +524,17 @@
 .link-icon {
     width: 44px;
     height: 44px;
-    border-radius: 10px;
+    border-radius: var(--r-md);
     background: rgba(255, 255, 255, 0.06);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(200, 150, 255, 0.9);
+    color: var(--purple-text);
     flex-shrink: 0;
 }
 
-.link-icon svg {
-    width: 22px;
-    height: 22px;
-}
-
-.angular-icon svg {
-    width: 22px;
-    height: 22px;
-}
-
+.link-icon svg,
+.angular-icon svg,
 .ts-icon svg {
     width: 22px;
     height: 22px;
@@ -593,14 +548,14 @@
 }
 
 .link-title {
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 15px;
     font-weight: 700;
     color: rgb(225, 225, 235);
 }
 
 .link-url {
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-secondary);
     font-size: 13px;
     color: rgba(170, 170, 185, 0.6);
 }
@@ -630,8 +585,8 @@
     align-items: flex-start;
     gap: 16px;
     background: rgba(255, 255, 255, 0.035);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 16px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--r-xl);
     padding: 32px 28px;
     text-decoration: none;
     cursor: pointer;
@@ -640,20 +595,20 @@
 
 .ai-card:hover {
     transform: translateY(-5px);
-    border-color: rgba(131, 58, 180, 0.4);
+    border-color: rgba(131, 58, 180, 0.40);
     background: rgba(131, 58, 180, 0.08);
     transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease;
 }
 
 .ai-card:first-child:hover {
-    border-color: rgba(217, 119, 87, 0.5);
+    border-color: rgba(217, 119, 87, 0.50);
     background: rgba(217, 119, 87, 0.08);
 }
 
 .ai-logo {
     width: 56px;
     height: 56px;
-    border-radius: 14px;
+    border-radius: var(--r-lg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -662,12 +617,12 @@
 
 .claude-logo {
     background: rgba(217, 119, 87, 0.15);
-    border: 1px solid rgba(217, 119, 87, 0.3);
+    border: 1px solid rgba(217, 119, 87, 0.30);
 }
 
 .chatgpt-logo {
     background: rgba(16, 163, 127, 0.15);
-    border: 1px solid rgba(16, 163, 127, 0.3);
+    border: 1px solid rgba(16, 163, 127, 0.30);
 }
 
 .ai-info {
@@ -678,29 +633,29 @@
 }
 
 .ai-name {
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 20px;
     font-weight: 700;
     color: rgb(230, 230, 235);
 }
 
 .ai-maker {
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-secondary);
     font-size: 13px;
     color: rgba(170, 170, 185, 0.65);
     letter-spacing: 0.03em;
 }
 
 .ai-desc {
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 14px;
-    color: rgba(180, 180, 195, 0.75);
+    color: var(--text-faint);
     line-height: 1.65;
     margin: 8px 0 0;
 }
 
 .ai-visit {
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-secondary);
     font-size: 14px;
     font-weight: 500;
     color: rgba(200, 150, 255, 0.8);
@@ -717,7 +672,7 @@
 }
 
 .ai-disclaimer {
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 14px;
     color: rgba(160, 160, 175, 0.55);
     text-align: center;
@@ -728,7 +683,7 @@
 }
 
 .ai-disclaimer em {
-    color: rgba(200, 150, 255, 0.8);
+    color: var(--purple-text);
     font-style: normal;
 }
 
@@ -745,7 +700,7 @@
 }
 
 .about-cta p {
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 22px;
     color: rgba(210, 210, 220, 0.8);
     margin: 0;
@@ -761,7 +716,7 @@
 }
 
 .pi-license {
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-secondary);
     font-size: 13px;
     color: rgba(150, 150, 165, 0.5);
     letter-spacing: 0.04em;

@@ -13,10 +13,10 @@ import { NotificationService } from '../../services/notification.service';
 import { BehaviorSubject, forkJoin } from 'rxjs';
 import { GlobalMethods } from '../../classes/global-methods';
 
-// Animation duration constants (must match CSS)
-const CLOSE_ANIM_MS = 210;  // panel / modal exit animation
-const SWITCH_OUT_MS = 190;  // messages fade-out on chat switch
-const CS_CLOSE_MS = 240;  // chat-settings panel slide-out
+// How long exit animations take — keep these in sync with the CSS keyframe durations.
+const CLOSE_ANIM_MS = 210;   // panel / modal slide-out
+const SWITCH_OUT_MS = 190;   // messages fade when switching chats
+const CS_CLOSE_MS = 240;   // settings panel slide-out
 
 @Component({
   selector: 'app-messenger',
@@ -26,26 +26,26 @@ const CS_CLOSE_MS = 240;  // chat-settings panel slide-out
 })
 export class Messenger implements OnInit, OnDestroy, AfterViewInit {
 
-  // ─── Auth / user basics ──────────────────────────────────────────────────────
+  // ── Auth ─────────────────────────────────────────────────────────────────────
   public token: string = sessionStorage.getItem('token') ?? '';
   public tokenData!: TokenModelInterface;
   public userData!: UserInterface;
 
-  // ─── Chat list streams ───────────────────────────────────────────────────────
+  // ── Chat list streams ────────────────────────────────────────────────────────
   public userChats$ = new BehaviorSubject<ChatInterface[]>([]);
   public filteredChats$ = new BehaviorSubject<ChatInterface[]>([]);
   public selectedChatMessages$ = new BehaviorSubject<MessageInterface[]>([]);
 
-  // ─── Search & compose ────────────────────────────────────────────────────────
+  // ── Search & compose ─────────────────────────────────────────────────────────
   public searchTerm = '';
   public newMessage = '';
 
-  // ─── Loading / in-flight flags ───────────────────────────────────────────────
+  // ── Loading / sending flags ───────────────────────────────────────────────────
   public chatLoading = false;
   public chatsLoading = true;
   public isSending = false;
 
-  // ─── Inline message editing ──────────────────────────────────────────────────
+  // ── Inline message editing ───────────────────────────────────────────────────
   public editingMessageId: number | null = null;
   public editContent = '';
   public editClosingId: number | null = null;
@@ -56,7 +56,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   private deleteAnimTimer: any;
   private quitCloseTimer: any;
 
-  // ─── Add-people panel ────────────────────────────────────────────────────────
+  // ── Add-people panel ──────────────────────────────────────────────────────────
   public showAddUserPanel = false;
   public addUserPanelClosing = false;
   public addUserSearch = '';
@@ -66,7 +66,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   public addUserAdding = false;
   private addUserDebounce: any;
 
-  // ─── Create chat modal ───────────────────────────────────────────────────────
+  // ── Create chat modal ─────────────────────────────────────────────────────────
   public showCreateChatModal = false;
   public createChatModalClosing = false;
   public createChatName = '';
@@ -79,103 +79,111 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   public createChatCreating = false;
   private createChatDebounce: any;
 
-  // ─── Scroll-to-bottom FAB ────────────────────────────────────────────────────
+  // ── Scroll-to-bottom FAB ─────────────────────────────────────────────────────
   public showScrollToBottom = false;
   public fabClosing = false;
   private fabCloseTimer: any;
   @ViewChild('messagesContainer') messagesContainerRef!: ElementRef<HTMLDivElement>;
 
-  // ─── Stars canvas ────────────────────────────────────────────────────────────
+  // ── Stars canvas ─────────────────────────────────────────────────────────────
   @ViewChild('starsCanvas') starsCanvasRef!: ElementRef<HTMLCanvasElement>;
   private starsAnimFrame: number = 0;
 
-  // ─── Mobile sidebar ──────────────────────────────────────────────────────────
+  // ── Mobile sidebar ────────────────────────────────────────────────────────────
   public panelOpen = false;
   public panelClosing = false;
 
-  // ─── Active chat ─────────────────────────────────────────────────────────────
+  // ── Active chat ───────────────────────────────────────────────────────────────
   public selectedChat: ChatInterface | null = null;
 
-  // ─── Chat-switch animation ───────────────────────────────────────────────────
+  // ── Chat-switch animation state ───────────────────────────────────────────────
   public chatTransition: 'idle' | 'out' = 'idle';
   private switchPending = false;
   public get chatSwitchingOut(): boolean { return this.chatTransition === 'out'; }
 
-  // ─── Skeleton → messages transition ─────────────────────────────────────────
+  // ── Skeleton → real messages crossfade ───────────────────────────────────────
   public skelExiting = false;
   public messagesRevealing = false;
 
-  // ─── New message animation ───────────────────────────────────────────────────
+  // ── New message pop animation ─────────────────────────────────────────────────
   public latestMessageId: number | null = null;
   private latestMsgTimer: any;
 
-  // ─── Avatar / name caches ────────────────────────────────────────────────────
+  // ── Avatar / display-name caches (keyed by userId) ───────────────────────────
   private usersImageMap = new Map<number, string | null>();
   private usersNameMap = new Map<number, string>();
 
-  // ─── Chat list skeleton widths ───────────────────────────────────────────────
+  // ── Skeleton placeholder widths (randomised at design time) ──────────────────
   public chatSkelWidths = ['72%', '55%', '88%', '64%', '76%', '50%'];
   public chatSkelSubWidths = ['48%', '60%', '38%', '52%', '44%', '58%'];
 
-  // ─── Receive sound ───────────────────────────────────────────────────────────
+  // ── Incoming message sound ────────────────────────────────────────────────────
   private receiveAudio = new Audio('message-recive-sound.mp3');
 
   // ══════════════════════════════════════════════════════════════════════════════
-  // CHAT SETTINGS — state
+  // CHAT SETTINGS STATE
   // ══════════════════════════════════════════════════════════════════════════════
 
-  // Panel open/close
+  // Open / close flags
   public showChatSettings = false;
   public chatSettingsClosing = false;
+  /**
+   * chatSettingsVisible is the *ngIf guard for the panel DOM node.
+   * Toggling it off for a single tick forces Angular to destroy and
+   * recreate the element, which means the CSS open animation always
+   * fires from scratch — even when you close and immediately re-open.
+   */
+  public chatSettingsVisible = false;
   private csCloseTimer: any;
+  private csReopenTimer: any;
 
-  // Data
+  // Members list loaded from the server
   public csMembers: UserInterface[] = [];
   public csLoading = false;
 
-  // Form state
+  // Form state for the General tab
   public csChatName = '';
   public csHasPassword = false;
   public csPassword = '';
   public csConfirmPassword = '';
   public csActiveTab: 'general' | 'members' = 'general';
 
-  // Image
+  // Avatar image state
   public csImagePreview: string | null = null;
-  public csImageLoading = false;          // header avatar skeleton
-  public csUploadImageLoading = false;    // section avatar uploading
-  public csUploadPreviewLoading = false;  // section avatar img onload skeleton
+  public csImageLoading = false;   // spinner in the header avatar
+  public csUploadImageLoading = false;   // spinner while uploading a new photo
+  public csUploadPreviewLoading = false;   // skeleton while the uploaded image loads
+  private csPreviousImageUrl: string | null = null;  // lets us restore on upload error
 
-  // CHANGED: track old image URL so we can restore it on upload failure
-  private csPreviousImageUrl: string | null = null;
-
-  // Saving / deleting
+  // Save / delete in-flight flags
   public csSaving = false;
   public csDeleting = false;
+
+  // Alert messages (cleared by a timer or manually)
   public csSuccessMessage = '';
   public csErrorMessage = '';
   private csSuccessTimer: any;
 
-  // Delete confirm
+  // Delete-chat confirmation dialog
   public csShowDeleteConfirm = false;
   public csDeleteConfirmClosing = false;
   private csDeleteCloseTimer: any;
 
-  // Kick confirm
+  // Kick-member confirmation dialog
   public csKickTargetUser: UserInterface | null = null;
   public csKickConfirmClosing = false;
   public csKickingUserId: number | null = null;
   private csKickCloseTimer: any;
 
-  // Member image loaded tracking (Set of loaded member IDs)
+  // Tracks which member avatars have finished loading (so we can hide the skeleton)
   public csMemberImagesLoaded = new Set<number>();
 
-  // Owner check
+  // True if the current user created this chat
   public get csIsOwner(): boolean {
     return this.tokenData?.id === this.selectedChat?.createdByUserId;
   }
 
-  // Passwords match check
+  // Inline validation: only show the mismatch error once the confirm field has content
   public get csPasswordsMatch(): boolean {
     return !this.csConfirmPassword || this.csPassword === this.csConfirmPassword;
   }
@@ -206,16 +214,21 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy(): void {
+    // Kill the canvas loop so we're not leaking rAF callbacks
     if (this.starsAnimFrame) cancelAnimationFrame(this.starsAnimFrame);
+
+    // Clear all pending timeouts
     clearTimeout(this.latestMsgTimer);
     clearTimeout(this.fabCloseTimer);
     clearTimeout(this.editCloseTimer);
     clearTimeout(this.deleteAnimTimer);
     clearTimeout(this.quitCloseTimer);
     clearTimeout(this.csCloseTimer);
+    clearTimeout(this.csReopenTimer);
     clearTimeout(this.csSuccessTimer);
     clearTimeout(this.csDeleteCloseTimer);
     clearTimeout(this.csKickCloseTimer);
+
     this.hub.stopConnection()
       .then(() => console.log('SignalR disconnected'))
       .catch(err => console.error('SignalR disconnect error:', err));
@@ -266,6 +279,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
         ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(255,255,255,${Math.max(0, s.opacity + twinkle)})`;
         ctx.fill();
+        // Slowly drift stars upward; wrap back to the bottom when they leave the top
         s.y -= s.speed;
         if (s.y + s.r < 0) { s.y = H + s.r; s.x = Math.random() * W; }
       }
@@ -321,13 +335,14 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // SignalR
+  // SignalR real-time handlers
   // ═══════════════════════════════════════════════════════════════════════════
 
   private async connectSignalR() {
     await this.hub.startConnection(this.token);
     await this.hub.joinChatUsers(this.userData.id);
 
+    // Someone added us to a new chat
     this.hub.onAddUser(data => {
       const updated = [...this.userChats$.value, data].sort((a, b) => a.id - b.id);
       this.userChats$.next(updated);
@@ -335,32 +350,50 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
       this.notification.success(`You were added to "${data.name}"!`);
     });
 
+    // We were kicked or left — remove from sidebar and clear the chat area if it was active
     this.hub.onRemoveUser(data => {
       this.userChats$.next(this.userChats$.value.filter(x => x.id !== data.id));
       this.applyFilter();
+
       if (this.selectedChat?.id === data.id) {
-        this.closeChatSettings();
+        // Let the settings panel finish its slide-out before wiping the chat area
+        if (this.showChatSettings && !this.chatSettingsClosing) {
+          this.closeChatSettings();
+        }
+        setTimeout(() => {
+          this.selectedChat = null;
+          this.selectedChatMessages$.next([]);
+          this.chatLoading = false;
+        }, CS_CLOSE_MS);
+
+        this.notification.error(`You were removed from "${data.name}".`);
       }
     });
 
+    // New message arrived
     this.hub.onCreateMessage(data => {
       const mapped = this.mapMessage(data);
       this.selectedChatMessages$.next([...this.selectedChatMessages$.value, mapped]);
+
+      // Only play the receive sound for messages from others
       if (!mapped.isWriter) {
         this.receiveAudio.currentTime = 0;
         this.receiveAudio.volume = 0.4;
         this.receiveAudio.play().catch(() => { });
       }
+
       this._flashLatestMessage(mapped.id);
       this.scrollToBottom(true);
     });
 
+    // A message was deleted by its author
     this.hub.onDeleteMessage(data => {
       this.selectedChatMessages$.next(
         this.selectedChatMessages$.value.filter(m => m.id !== data.id)
       );
     });
 
+    // A message was edited
     this.hub.onEditMessage(data => {
       const updated = this.selectedChatMessages$.value.map(m =>
         m.id === data.id ? { ...m, content: data.content } : m
@@ -370,10 +403,11 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // Chat selection — with switch animation
+  // Chat selection — plays a fade-out before switching
   // ═══════════════════════════════════════════════════════════════════════════
 
   public selectChat(id: number) {
+    // Ignore rapid taps while a switch is already in progress
     if (this.switchPending) return;
 
     this.closeAddUserPanel();
@@ -383,6 +417,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
       this.closeChatSettings();
     }
 
+    // Only play the exit animation when there's something visible to cross-fade
     const hasContent = (this.selectedChatMessages$.value.length > 0 || this.selectedChat) && !this.chatLoading;
 
     if (hasContent) {
@@ -407,10 +442,12 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
 
     this.chatService.GetChatById(id).subscribe(chat => {
       this.selectedChat = chat;
+      // Leave the old SignalR room before joining the new one
       this.hub.leaveChat(chat.id);
       this.hub.joinChat(chat.id);
 
       this.chatUserService.GetUsersInChat(chat.id).subscribe(users => {
+        // Pre-populate the avatar / name caches so messages render immediately
         users.forEach(u => {
           this.usersImageMap.set(u.id, u.profileImageUrl ?? null);
           this.usersNameMap.set(u.id, u.name);
@@ -418,9 +455,11 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
 
         this.chatService.GetChatMessages(chat.id).subscribe(messages => {
           this.selectedChatMessages$.next(messages.map(x => this.mapMessage(x)));
-          // Animate skeleton out, then reveal messages
+
+          // Step 1: fade the skeleton out
           this.skelExiting = true;
           setTimeout(() => {
+            // Step 2: swap in real messages and play the reveal animation
             this.chatLoading = false;
             this.skelExiting = false;
             this.messagesRevealing = true;
@@ -455,6 +494,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     const current = messages[index];
     if (current.isWriter) return false;
     const next = messages[index + 1];
+    // Only show the avatar on the last bubble in a consecutive run from this user
     return !next || next.userId !== current.userId;
   }
 
@@ -466,11 +506,14 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     const fromMap = this.usersNameMap.get(message.userId);
     if (fromMap) return fromMap;
     if (message.userName) return message.userName;
+
+    // User not in cache yet — fetch lazily and trigger a re-render
     this.userService.getUserById(message.userId).subscribe(u => {
       this.usersNameMap.set(u.id, u.name);
       this.usersImageMap.set(u.id, u.profileImageUrl ?? null);
       this.selectedChatMessages$.next([...this.selectedChatMessages$.value]);
     });
+
     return '…';
   }
 
@@ -525,12 +568,13 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // Inline editing
+  // Inline message editing
   // ═══════════════════════════════════════════════════════════════════════════
 
   public startEdit(message: MessageInterface) {
     this.editingMessageId = message.id;
     this.editContent = message.content;
+    // Focus and place cursor at the end of the textarea
     setTimeout(() => {
       const el = document.getElementById(`edit-input-${message.id}`) as HTMLTextAreaElement;
       if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
@@ -553,6 +597,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     if (!content) return;
     this.messageService.EditMessage({ id: messageId, content, userId: this.tokenData.id }).subscribe({
       next: updated => {
+        // Play the close animation before swapping the content in
         this.editClosingId = messageId;
         clearTimeout(this.editCloseTimer);
         this.editCloseTimer = setTimeout(() => {
@@ -572,6 +617,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   public deleteMessage(messageId: number) {
     this.deletingMessageId = messageId;
     clearTimeout(this.deleteAnimTimer);
+    // Let the collapse animation finish before actually removing it from the server
     this.deleteAnimTimer = setTimeout(() => {
       this.messageService.DeleteMessage(messageId).subscribe({
         next: () => { this.deletingMessageId = null; },
@@ -625,6 +671,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
           }
           forkJoin(tokens.map((t: any) => this.userService.getUserById(t.id))).subscribe({
             next: (users: any) => {
+              // Don't show ourselves in the results
               this.createChatUserResults = users.filter((u: any) => u.id !== this.userData.id);
               this.createChatUserSearching = false;
             },
@@ -642,6 +689,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     } else {
       this.createChatSelected.set(user.id, user);
     }
+    // Recreate the Map so Angular's change detection picks up the mutation
     this.createChatSelected = new Map(this.createChatSelected);
   }
 
@@ -788,6 +836,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     users.forEach(user => {
       this.chatUserService.AddChatUser({ userId: user.id, chatId }).subscribe({
         next: () => {
+          // Keep the local avatar/name caches and settings member list in sync
           this.usersNameMap.set(user.id, user.name);
           this.usersImageMap.set(user.id, user.profileImageUrl ?? null);
           if (this.showChatSettings) {
@@ -847,6 +896,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     }, 220);
   }
 
+  // Alias kept for any template calls using the old name
   quitFromChatSwal(id: number) { this.openQuitConfirm(id); }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -868,12 +918,13 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // New-message animation helper
+  // New-message animation
   // ═══════════════════════════════════════════════════════════════════════════
 
   private _flashLatestMessage(id: number) {
     clearTimeout(this.latestMsgTimer);
     this.latestMessageId = id;
+    // Remove the class after the animation finishes so it can re-trigger next time
     this.latestMsgTimer = setTimeout(() => { this.latestMessageId = null; }, 400);
   }
 
@@ -887,6 +938,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     const shouldShow = distanceFromBottom > 150;
 
     if (!shouldShow && this.showScrollToBottom && !this.fabClosing) {
+      // Play the pop-out animation before hiding the button
       this.fabClosing = true;
       clearTimeout(this.fabCloseTimer);
       this.fabCloseTimer = setTimeout(() => {
@@ -912,6 +964,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
         this.fabClosing = false;
       } else {
         container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+        // Hide the FAB as we scroll to the bottom
         if (this.showScrollToBottom && !this.fabClosing) {
           this.fabClosing = true;
           clearTimeout(this.fabCloseTimer);
@@ -931,28 +984,61 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
   openChatSettings(): void {
     if (!this.selectedChat) return;
 
+    // Clicking the gear again while the panel is open → close it
     if (this.showChatSettings && !this.chatSettingsClosing) {
       this.closeChatSettings();
       return;
     }
 
-    this.showChatSettings = true;
-    this.chatSettingsClosing = false;
+    /*
+      Edge case: the user hit close and then immediately re-opened before
+      the slide-out finished. We cancel the pending close, destroy the DOM
+      node for one tick (so the open animation replays cleanly), then re-open.
+    */
+    if (this.chatSettingsClosing) {
+      clearTimeout(this.csCloseTimer);
+      clearTimeout(this.csReopenTimer);
+      this.showChatSettings = false;
+      this.chatSettingsClosing = false;
+      this.chatSettingsVisible = false;
 
+      this.csReopenTimer = setTimeout(() => this._initChatSettings(), 16);
+      return;
+    }
+
+    this._initChatSettings();
+  }
+
+  /**
+   * Sets up form state and makes the panel visible.
+   * Kept separate so the re-open path can call it too.
+   *
+   * We use chatSettingsVisible (not showChatSettings) as the *ngIf guard
+   * because toggling it off destroys the DOM node, which lets the CSS
+   * @keyframes fire from the very first frame on every open — no re-trigger hacks needed.
+   */
+  private _initChatSettings(): void {
     this.csActiveTab = 'general';
     this.csClearMessages();
     this.csPassword = '';
     this.csConfirmPassword = '';
     this.csMemberImagesLoaded = new Set<number>();
 
-    this.csChatName = this.selectedChat.name;
-    this.csHasPassword = this.selectedChat.hasPassword;
-    this.csImagePreview = this.selectedChat.chatImageUrl ?? null;
-    this.csPreviousImageUrl = this.csImagePreview;  // CHANGED: cache current image
+    // Pre-fill the form with the current chat's values
+    this.csChatName = this.selectedChat!.name;
+    this.csHasPassword = this.selectedChat!.hasPassword;
+    this.csImagePreview = this.selectedChat!.chatImageUrl ?? null;
+    this.csPreviousImageUrl = this.csImagePreview;
     this.csImageLoading = !!this.csImagePreview;
 
+    // Flip the flags — Angular recreates the DOM here, so the slide-in fires cleanly
+    this.showChatSettings = true;
+    this.chatSettingsClosing = false;
+    this.chatSettingsVisible = true;
+
+    // Fetch the member list asynchronously
     this.csLoading = true;
-    this.chatUserService.GetUsersInChat(this.selectedChat.id).subscribe({
+    this.chatUserService.GetUsersInChat(this.selectedChat!.id).subscribe({
       next: members => {
         this.csMembers = members;
         this.csLoading = false;
@@ -971,6 +1057,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     this.csCloseTimer = setTimeout(() => {
       this.showChatSettings = false;
       this.chatSettingsClosing = false;
+      this.chatSettingsVisible = false;
     }, CS_CLOSE_MS);
   }
 
@@ -985,7 +1072,6 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
 
   // ══════════════════════════════════════════════════════════════════════════════
   // CHAT SETTINGS — image upload
-  // CHANGED: skeleton shown everywhere during upload; old image restored on failure
   // ══════════════════════════════════════════════════════════════════════════════
 
   csOnImageSelected(event: Event): void {
@@ -993,27 +1079,24 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     if (!input.files?.length) return;
     const file = input.files[0];
 
-    // Save current image URL so we can restore it if upload fails
     const previousImage = this.csImagePreview;
 
-    // CHANGED: show skeleton in ALL avatar spots immediately (section + header)
+    // Show loading states while the upload is in flight
     this.csUploadImageLoading = true;
     this.csUploadPreviewLoading = true;
     this.csImageLoading = true;
-    // Clear preview so skeletons show everywhere (section avatar, header avatar)
     this.csImagePreview = null;
 
     this.chatService.uploadChatImage(this.selectedChat!.id, file).subscribe({
       next: res => {
         const newUrl = res.ImageUrl;
 
-        // CHANGED: set preview to new URL — skeleton will clear via img (load) event
         this.csImagePreview = newUrl;
         this.csUploadImageLoading = false;
-        this.csUploadPreviewLoading = true;  // cleared by img (load) event in section
-        this.csImageLoading = true;          // cleared by img (load) event in header
+        this.csUploadPreviewLoading = true;  // skeleton stays until the img onload fires
+        this.csImageLoading = true;
 
-        // Update selectedChat and chat list with new image URL
+        // Keep the sidebar avatar and header in sync
         if (this.selectedChat) {
           this.selectedChat = { ...this.selectedChat, chatImageUrl: newUrl };
           const chats = this.userChats$.value.map(c =>
@@ -1023,16 +1106,15 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
           this.applyFilter();
         }
 
-        // Update the cached "previous" to the new URL for future failures
         this.csPreviousImageUrl = newUrl;
         this.csShowSuccess('Chat image updated!');
       },
       error: () => {
-        // CHANGED: restore the old image everywhere on failure
+        // Restore the previous image on failure
         this.csImagePreview = previousImage;
         this.csUploadImageLoading = false;
-        this.csUploadPreviewLoading = !!previousImage; // cleared by img (load) if exists
-        this.csImageLoading = !!previousImage;         // cleared by img (load) if exists
+        this.csUploadPreviewLoading = !!previousImage;
+        this.csImageLoading = !!previousImage;
         this.csShowError('Failed to upload image. Please try again.');
       }
     });
@@ -1063,6 +1145,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
       password: this.csPassword
     }).subscribe({
       next: updated => {
+        // Push the updated chat into the sidebar list too
         this.selectedChat = updated;
         const chats = this.userChats$.value.map(c => c.id === updated.id ? updated : c);
         this.userChats$.next(chats);
@@ -1101,6 +1184,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     this.csDeleting = true;
     this.chatService.DeleteChat(this.selectedChat.id).subscribe({
       next: () => {
+        // Remove the chat from the sidebar and clear the active chat view
         this.userChats$.next(this.userChats$.value.filter(c => c.id !== this.selectedChat!.id));
         this.applyFilter();
         this.selectedChat = null;
@@ -1121,7 +1205,6 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
 
   // ══════════════════════════════════════════════════════════════════════════════
   // CHAT SETTINGS — kick member
-  // CHANGED: visible to ALL users; non-owners get an error alert from the server
   // ══════════════════════════════════════════════════════════════════════════════
 
   csOpenKickConfirm(user: UserInterface): void {
@@ -1143,19 +1226,10 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     if (!this.csKickTargetUser) return;
     const user = this.csKickTargetUser;
 
-    // CHANGED: if not owner, close confirm and show permission error immediately
-    if (!this.csIsOwner) {
-      this.csCloseKickConfirm();
-      setTimeout(() => {
-        this.csShowError('Only the chat owner can remove members.');
-      }, CLOSE_ANIM_MS + 10);
-      return;
-    }
-
-    // Owner path — proceed with actual kick
     this.csKickingUserId = user.id;
     this.csCloseKickConfirm();
 
+    // Wait for the confirmation dialog to finish closing before hitting the server
     setTimeout(() => {
       this.chatUserService.RemoveChatUser({ userId: user.id, chatId: this.selectedChat!.id }).subscribe({
         next: () => {
@@ -1165,7 +1239,6 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
         },
         error: () => {
           this.csKickingUserId = null;
-          // CHANGED: descriptive error — could be permissions or server issue
           this.csShowError('You do not have permission to remove members.');
         }
       });
@@ -1180,6 +1253,7 @@ export class Messenger implements OnInit, OnDestroy, AfterViewInit {
     this.csSuccessMessage = msg;
     this.csErrorMessage = '';
     clearTimeout(this.csSuccessTimer);
+    // Auto-dismiss after 3.5 s
     this.csSuccessTimer = setTimeout(() => { this.csSuccessMessage = ''; }, 3500);
   }
 

@@ -1,101 +1,186 @@
-/* Fonts (Google fonts) */
-@import url('https://fonts.googleapis.com/css2?family=Elms+Sans:ital,wght@0,100..900;1,100..900&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&family=Momo+Signature&family=Momo+Trust+Display&family=Oxygen:wght@300;400;700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+/* styles.css — Angular global stylesheet
+   All shared design tokens are defined here as CSS custom properties.
+   Every page/component CSS file references these variables instead of
+   hard-coding values, so a single edit here propagates everywhere.
+*/
 
-/* Font awsome cdn */
+@import url('https://fonts.googleapis.com/css2?family=Oxygen:wght@300;400;700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Syne:wght@600;700&family=DM+Sans:wght@300;400;500&display=swap');
+
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css');
 
-/* root */
-
 :root {
-  /* Glass styles */
-  --glass-bg: linear-gradient(135deg,
-      rgba(255, 255, 255, 0.18),
-      rgba(255, 255, 255, 0.04));
+  --sub: #8b93a8;
+  --muted: #5c6478;
+  /* ── Typography ───────────────────────────────────────────── */
+  --font-primary: "Oxygen", sans-serif;
+  --font-secondary: "Roboto", sans-serif;
+  --font-display: "Syne", sans-serif;
+  --font-ui: "DM Sans", sans-serif;
+  --font-mono: 'Courier New', monospace;
 
+  /* ── Page / surface backgrounds ───────────────────────────── */
+  --bg-page: #02020a;
+  /* used by every full-page container */
+  --bg-surface: #12151f;
+  /* cards, panels, shells */
+  --bg-panel: #0e1018;
+  /* sidebars, sub-panels */
+  --bg-card: #181c28;
+  /* settings rows, list items */
+  --bg-section-alt: #040406;
+  /* alternate section stripe (project info) */
+
+  /* ── Borders ──────────────────────────────────────────────── */
+  --border: rgba(255, 255, 255, 0.065);
+  --border-mid: rgba(255, 255, 255, 0.11);
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.14);
+
+  /* ── Text ─────────────────────────────────────────────────── */
+  --text: #e8ecf4;
+  --text-hero: rgb(236, 236, 236);
+  /* slightly different white used in hero */
+  --text-muted: #5c6478;
+  --text-sub: #8b93a8;
+  --text-dim: rgba(200, 200, 215, 0.75);
+  --text-faint: rgba(180, 180, 195, 0.75);
+  --text-placeholder: rgba(255, 255, 255, 0.28);
+
+  /* ── Brand gradient (purple → red → amber) ────────────────── */
+  --gradient-brand: linear-gradient(90deg,
+      rgba(131, 58, 180, 1) 0%,
+      rgba(253, 29, 29, 1) 50%,
+      rgba(252, 176, 69, 1) 100%);
+  /* 135-degree variant used for buttons / card fills */
+  --gradient-brand-135: linear-gradient(135deg,
+      rgba(131, 58, 180, 1) 0%,
+      rgba(200, 40, 40, 1) 60%,
+      rgba(230, 130, 40, 1) 100%);
+  /* stat / badge gradient */
+  --gradient-stat: linear-gradient(90deg,
+      rgba(200, 150, 255, 1) 0%,
+      rgba(253, 100, 80, 1) 100%);
+
+  /* ── Accent (indigo — messenger / account pages) ──────────── */
+  --accent: #6366f1;
+  --accent-hover: #4f52e0;
+  --accent-glow: rgba(99, 102, 241, 0.22);
+  --accent-soft: rgba(99, 102, 241, 0.10);
+
+  /* ── Brand purple (hero / project-info pages) ─────────────── */
+  --purple: rgba(131, 58, 180, 1);
+  --purple-soft: rgba(131, 58, 180, 0.10);
+  --purple-border: rgba(131, 58, 180, 0.25);
+  --purple-text: rgba(200, 150, 255, 0.9);
+  --purple-badge-bg: rgba(131, 58, 180, 0.18);
+  --purple-badge-br: rgba(131, 58, 180, 0.30);
+
+  /* ── Brand red ────────────────────────────────────────────── */
+  --red: rgba(253, 29, 29, 1);
+  --red-glow: rgba(253, 29, 29, 0.30);
+  --red-glow-hover: rgba(253, 29, 29, 0.50);
+  --red-shadow: rgba(180, 40, 40, 0.35);
+
+  /* ── Brand amber ──────────────────────────────────────────── */
+  --amber: rgba(252, 176, 69, 1);
+  --amber-soft: rgba(252, 176, 69, 0.80);
+
+  /* ── Semantic colours ─────────────────────────────────────── */
+  --green: #22c55e;
+  --danger: #ef4444;
+  --danger-soft: rgba(239, 68, 68, 0.10);
+  --danger-border: rgba(239, 68, 68, 0.22);
+  --warning: #f59e0b;
+
+  /* ── Glass / backdrop surfaces ────────────────────────────── */
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-bg-nav: rgba(20, 18, 24, 0.48);
+  --glass-bg-panel: rgba(22, 25, 37, 0.70);
+  --glass-bg-dark: rgba(14, 16, 24, 0.97);
+  --glass-blur: blur(18px);
+  --glass-blur-lg: blur(28px);
+  --glass-blur-xl: blur(32px);
+
+  /* Card inset border used on register / login cards */
+  --card-inset: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+
+  /* ── Shadows ──────────────────────────────────────────────── */
+  --shadow-card: 0 24px 60px rgba(0, 0, 0, 0.50),
+    0 4px 16px rgba(0, 0, 0, 0.30);
+  --shadow-panel: 0 24px 64px rgba(0, 0, 0, 0.60),
+    0 0 0 1px rgba(99, 102, 241, 0.06);
+  --shadow-shell: 0 0 0 1px rgba(99, 102, 241, 0.07),
+    0 40px 90px rgba(0, 0, 0, 0.65),
+    0 10px 28px rgba(0, 0, 0, 0.40);
+  --shadow-btn-red: 0 4px 20px rgba(180, 40, 40, 0.35);
+
+  /* ── Glow blobs ───────────────────────────────────────────── */
+  --glow-blob-hero: radial-gradient(ellipse at center,
+      rgba(131, 58, 180, 0.18) 0%,
+      rgba(253, 29, 29, 0.06) 50%,
+      transparent 70%);
+  --glow-blob-page: radial-gradient(ellipse at center,
+      rgba(131, 58, 180, 0.13) 0%,
+      transparent 70%);
+  --glow-blob-accent: radial-gradient(ellipse at center,
+      rgba(99, 102, 241, 0.09) 0%,
+      transparent 70%);
+
+  /* ── Border radii ─────────────────────────────────────────── */
+  --r-xs: 0.25rem;
+  /*  4px */
+  --r-sm: 0.40rem;
+  /*  6px */
+  --r-md: 0.625rem;
+  /* 10px */
+  --r-lg: 0.875rem;
+  /* 14px */
+  --r-xl: 1.25rem;
+  /* 20px */
+  --r-2xl: 1.50rem;
+  /* 24px */
+  --r-pill: 999px;
+
+  /* ── Z-index scale ────────────────────────────────────────── */
+  --z-base: 0;
+  --z-above: 2;
+  --z-nav: 200;
+  --z-overlay: 1000;
+
+  /* ── Legacy / compatibility aliases (kept so older rules
+        that still reference them don't break) ─────────────── */
   --glass-shadow:
     0 10px 40px rgba(0, 0, 0, 0.25),
-    inset 0 1px rgba(255, 255, 255, 0.3);
-
-  --glass-blur: blur(25px);
-  /* Gradients */
-  --border-gradient: linear-gradient(90deg, rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 50%, rgba(252, 176, 69, 1) 100%);
-  /* Backgrounds */
+    inset 0 1px rgba(255, 255, 255, 0.30);
+  --border-gradient: var(--gradient-brand);
   --dark-background-color: #212121;
   --background-color: #f0f2f5;
   --ui-background-color: #141414;
-  /* page background */
   --chat-background: #ffffff;
-  /* chat container background */
   --header-background: #2f3e46;
-  /* dark modern header */
-
-  /* Chat bubbles */
   --user-bubble-color: #4a90e2;
-  /* your messages - modern blue */
   --other-bubble-color: #e1e8ed;
-  /* other messages - light gray */
   --system-bubble-color: #ffd166;
-  /* system notifications - soft yellow */
-
-  /* Text */
   --text-color: #1c1c1e;
-  /* main text - dark gray */
   --secondary-text: #6b6b70;
-  /* secondary text - soft gray */
   --placeholder-color: #a0a0a5;
-  /* input placeholders */
-
-  /* Accent / interactive elements */
   --accent-color: #9b5de5;
-  /* buttons, highlights - vibrant purple */
   --link-color: #4a90e2;
-  /* links - blue */
   --hover-color: #f0c987;
-  /* hover effects - subtle warm */
-
-  /* Borders / shadows */
   --border-color: #dcdfe6;
-  /* soft border color */
   --shadow-color: 0 4px 12px rgba(0, 0, 0, 0.15);
-  ;
-  /* subtle shadows */
-
-  /* Navigation */
   --nav-background: #2f3e46;
-  /* sidebar/header background */
   --nav-hover: #354f5c;
-  /* hover effect */
   --nav-active: #4a90e2;
-  /* active menu item */
   --nav-text-color: #ffffff;
-  /* text in navigation - white for contrast */
-  /* panel styles */
-
-  --bg:           #0c0e14;
-  --surface:      #12151f;
-  --panel:        #0e1018;
-  --card:         #181c28;
-  --border:       rgba(255,255,255,0.065);
-  --border-mid:   rgba(255,255,255,0.11);
-  --text:         #e8ecf4;
-  --muted:        #5c6478;
-  --sub:          #8b93a8;
-  --accent:       #6366f1;
-  --accent-glow:  rgba(99,102,241,0.22);
-  --accent-soft:  rgba(99,102,241,0.1);
-  --accent-hover: #4f52e0;
-  --green:        #22c55e;
-  --danger:       #ef4444;
-  --danger-soft:  rgba(239,68,68,0.1);
-  --r-xl:  1.25rem;
-  --r-lg:  0.875rem;
-  --r-md:  0.625rem;
-  --r-sm:  0.4rem;
-
+  /* messenger/account short-names kept for compatibility */
+  --bg: var(--bg-page);
+  --surface: var(--bg-surface);
+  --panel: var(--bg-panel);
+  --card: var(--bg-card);
 }
 
-/* Baisic document configurations */
-
+/* GLOBAL RESETS */
 * {
   margin: 0;
   padding: 0;
@@ -106,51 +191,136 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Baisic styles */
+/* SHARED UTILITY CLASSES */
 
-.border-gradient {
-  transition: 0.3s all ease;
-  border-image: var(--border-gradient) 1 !important;
-  border-radius: inherit;
-}
-
-.default-page-background {
-  background-color: var(--dark-background-color);
-  --color: #252525;
-  background-image:
-    linear-gradient(0deg, transparent 24%, var(--color) 25%, var(--color) 26%, transparent 27%, transparent 74%, var(--color) 75%, var(--color) 76%, transparent 77%, transparent),
-    linear-gradient(90deg, transparent 24%, var(--color) 25%, var(--color) 26%, transparent 27%, transparent 74%, var(--color) 75%, var(--color) 76%, transparent 77%, transparent);
-  background-size: 55px 55px;
-  font-family: "Roboto", sans-serif;
-}
-
+/* Gradient text */
 .text-gradient {
-  background: var(--border-gradient);
+  background: var(--gradient-brand);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   display: inline-block;
 }
 
-/* content-loader styles */
+/* Grid-pattern dark page background (used by default-page-background pages) */
+.default-page-background {
+  background-color: var(--dark-background-color);
+  --color: #252525;
+  background-image:
+    linear-gradient(0deg,
+      transparent 24%, var(--color) 25%, var(--color) 26%,
+      transparent 27%, transparent 74%,
+      var(--color) 75%, var(--color) 76%, transparent 77%, transparent),
+    linear-gradient(90deg,
+      transparent 24%, var(--color) 25%, var(--color) 26%,
+      transparent 27%, transparent 74%,
+      var(--color) 75%, var(--color) 76%, transparent 77%, transparent);
+  background-size: 55px 55px;
+  font-family: var(--font-secondary);
+}
 
+/* Shared border-gradient utility */
+.border-gradient {
+  transition: 0.3s all ease;
+  border-image: var(--gradient-brand) 1 !important;
+  border-radius: inherit;
+}
+
+/* ── Spinner ─────────────────────────────────────────────────── */
 .content-loader {
+  width: 36px;
+  height: 36px;
   border: 4px solid rgba(165, 161, 161, 0.4);
   border-left-color: transparent;
   border-radius: 50%;
-  border: 4px solid rgba(165, 161, 161, 0.4);
-  border-left-color: transparent;
-  width: 36px;
-  height: 36px;
   animation: spin89345 1s linear infinite;
 }
 
 @keyframes spin89345 {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Shared shimmer skeleton ─────────────────────────────────── */
+@keyframes shimmer {
   0% {
-    transform: rotate(0deg);
+    background-position: 200% 0;
   }
 
   100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ── Shared scroll-pulse (used by hero scroll indicators) ────── */
+@keyframes scrollPulse {
+
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scaleY(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scaleY(1.15);
+  }
+}
+
+/* ── Shared card-in entrance ─────────────────────────────────── */
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Shared glow-pulse (top-border accent on cards) ──────────── */
+@keyframes glowPulse {
+
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 18px rgba(253, 29, 29, 0.4);
+  }
+}
+
+/* ── Shared spinning orbit ───────────────────────────────────── */
+@keyframes spin {
+  to {
     transform: rotate(360deg);
+  }
+}
+
+/* ── Shared input error shake ────────────────────────────────── */
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-3px);
+  }
+
+  50% {
+    transform: translateX(3px);
+  }
+
+  75% {
+    transform: translateX(-3px);
+  }
+
+  100% {
+    transform: translateX(0);
   }
 }

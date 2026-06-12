@@ -1,4 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Oxygen:wght@300;400;700&family=Roboto:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+/* login.css
+   Mirror of register.css — same card shell, fewer input wrappers.
+   Both reference the same global tokens from styles.css.
+*/
 
 /* ─── PAGE ───────────────────────────────────────────────────── */
 .page {
@@ -8,11 +11,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #02020a;
+    background: var(--bg-page);
     overflow: hidden;
 }
 
-/* ─── STARS CANVAS ──────────────────────────────────────────── */
 .stars-canvas {
     position: absolute;
     inset: 0;
@@ -22,7 +24,6 @@
     pointer-events: none;
 }
 
-/* ─── GLOW BLOB ─────────────────────────────────────────────── */
 .glow-blob {
     position: absolute;
     top: 50%;
@@ -31,9 +32,7 @@
     width: 640px;
     height: 420px;
     border-radius: 50%;
-    background: radial-gradient(ellipse at center,
-            rgba(131, 58, 180, 0.13) 0%,
-            transparent 70%);
+    background: var(--glow-blob-page);
     pointer-events: none;
     z-index: 0;
 }
@@ -42,28 +41,20 @@
 .register-card {
     position: relative;
     z-index: 2;
-    font-family: "Roboto", sans-serif;
-
+    font-family: var(--font-secondary);
     width: 340px;
     padding: 36px 20px 28px;
-    border-radius: 20px;
+    border-radius: var(--r-xl);
     border: none;
-
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-
-    box-shadow:
-        0 24px 60px rgba(0, 0, 0, 0.5),
-        0 4px 16px rgba(0, 0, 0, 0.3),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.07);
-
+    box-shadow: var(--shadow-card), var(--card-inset);
     animation: cardIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -74,11 +65,8 @@
     left: 10%;
     width: 80%;
     height: 2px;
-    background: linear-gradient(90deg,
-            rgba(131, 58, 180, 1) 0%,
-            rgba(253, 29, 29, 1) 50%,
-            rgba(252, 176, 69, 1) 100%);
-    border-radius: 999px;
+    background: var(--gradient-brand);
+    border-radius: var(--r-pill);
     animation: glowPulse 3s ease-in-out infinite;
 }
 
@@ -93,32 +81,7 @@
             transparent,
             rgba(131, 58, 180, 0.4) 50%,
             transparent);
-    border-radius: 999px;
-}
-
-@keyframes glowPulse {
-
-    0%,
-    100% {
-        opacity: 0.6;
-    }
-
-    50% {
-        opacity: 1;
-        box-shadow: 0 0 18px rgba(253, 29, 29, 0.4);
-    }
-}
-
-@keyframes cardIn {
-    from {
-        opacity: 0;
-        transform: translateY(28px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    border-radius: var(--r-pill);
 }
 
 /* ─── ORBIT ──────────────────────────────────────────────────── */
@@ -142,19 +105,13 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: rgba(252, 176, 69, 0.8);
+    background: var(--amber-soft);
     box-shadow: 0 0 8px rgba(252, 176, 69, 0.5);
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
 }
 
 /* ─── TITLES ─────────────────────────────────────────────────── */
 .title {
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 28px;
     font-weight: 700;
     margin: 0;
@@ -167,7 +124,7 @@
     font-weight: 300;
     font-style: italic;
     color: rgba(200, 200, 220, 0.6);
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-secondary);
     animation: cardIn 0.6s 0.14s both;
 }
 
@@ -216,7 +173,7 @@
 }
 
 .input {
-    border-radius: 10px;
+    border-radius: var(--r-md);
     border: 1px solid rgba(255, 255, 255, 0.1);
     height: 48px;
     width: 100%;
@@ -224,13 +181,13 @@
     padding-right: 14px;
     background: rgba(255, 255, 255, 0.05);
     color: white;
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-secondary);
     font-size: 14px;
     transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
 }
 
 .input::placeholder {
-    color: rgba(255, 255, 255, 0.28);
+    color: var(--text-placeholder);
 }
 
 .input:focus {
@@ -241,7 +198,7 @@
 }
 
 .input-inner:focus-within .input-icon {
-    color: rgba(200, 150, 255, 0.7);
+    color: var(--purple-text);
 }
 
 .error-field .input {
@@ -260,29 +217,7 @@
     font-size: 11px;
     margin-top: 5px;
     padding-left: 4px;
-    font-family: "Roboto", sans-serif;
-}
-
-@keyframes shake {
-    0% {
-        transform: translateX(0);
-    }
-
-    25% {
-        transform: translateX(-3px);
-    }
-
-    50% {
-        transform: translateX(3px);
-    }
-
-    75% {
-        transform: translateX(-3px);
-    }
-
-    100% {
-        transform: translateX(0);
-    }
+    font-family: var(--font-secondary);
 }
 
 /* ─── BUTTON ─────────────────────────────────────────────────── */
@@ -290,16 +225,13 @@
     width: 84%;
     height: 48px;
     margin-top: 28px;
-    border-radius: 10px;
-    background: linear-gradient(135deg,
-            rgba(131, 58, 180, 1) 0%,
-            rgba(200, 40, 40, 1) 60%,
-            rgba(230, 130, 40, 1) 100%);
+    border-radius: var(--r-md);
+    background: var(--gradient-brand-135);
     background-size: 200% 200%;
     color: white;
     cursor: pointer;
     border: none;
-    font-family: "Oxygen", sans-serif;
+    font-family: var(--font-primary);
     font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.04em;
@@ -307,7 +239,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    box-shadow: 0 4px 20px rgba(180, 40, 40, 0.35);
+    box-shadow: var(--shadow-btn-red);
     transition: background-position 0.4s ease, box-shadow 0.2s, transform 0.15s;
     animation: cardIn 0.6s 0.30s both;
 }
@@ -349,7 +281,7 @@
     margin-top: 14px;
     color: rgba(180, 150, 255, 0.7);
     font-size: 13px;
-    font-family: "Roboto", sans-serif;
+    font-family: var(--font-secondary);
     text-decoration: none;
     transition: color 0.2s;
     animation: cardIn 0.6s 0.36s both;
@@ -382,7 +314,7 @@
     .register-card {
         width: 100%;
         padding: 24px 12px 20px;
-        border-radius: 16px;
+        border-radius: var(--r-xl);
     }
 
     .title {
