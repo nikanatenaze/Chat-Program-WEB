@@ -1,40 +1,33 @@
-# ProjectInit
+# Chat Program WEB
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.6.
+This is the front-end web application companion for the Chat Program. It provides a clean, responsive web interface for users to register, log in, join chat rooms, and exchange real-time messages.
 
-## Development server
+## 🚀 Features
 
-To start a local development server, run:
+- **User Authentication UI:** Interactive forms for user login and signup.
+- **Real-Time Interface:** Designed to display messages instantly as they are sent and received.
+- **Chat Rooms:** Clean layouts for navigating different chat rooms or channels.
+- **Responsive Design:** Fully optimized for both desktop and mobile web browsers.
 
+## 🛠️ Tech Stack
+
+- **Frontend:** HTML5, CSS3, JavaScript (or your specific framework like React/Vue if applicable)
+- **Styling:** Custom CSS for a modern, sleek chat layout
+- **Backend Integration:** Connects seamlessly with the [Chat-Program-API](https://github.com/nikanatenaze/Chat-Program-API)
+
+## 📋 Prerequisites
+
+To view or develop this project locally, you just need a modern web browser. If you want to run a local development server, it is recommended to have:
+
+- [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) (VS Code Extension) OR
+- [Node.js](https://nodejs.org/) (if using npm packages or a local build tool)
+
+## ⚙️ Setup and Installation
+
+1. **Clone the repository:**
 ```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+git clone [https://github.com/nikanatenaze/Chat-Program-WEB.git](https://github.com/nikanatenaze/Chat-Program-WEB.git)
+cd Chat-Program-WEB
 
 ## Running unit tests
 
